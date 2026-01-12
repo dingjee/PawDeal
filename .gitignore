@@ -1,3 +1,9 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Test artifacts (keep folder structure with .gitkeep)
+tests/logs/*
+!tests/logs/.gitkeep
+tests/snapshots/*
+!tests/snapshots/.gitkeep

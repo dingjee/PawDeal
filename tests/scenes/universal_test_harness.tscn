@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dh8q5cy6ylqnx"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_harness.gd" id="1_harness"]
+
+[node name="UniversalTestHarness" type="Node"]
+script = ExtResource("1_harness")
+
+[node name="TestContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
