@@ -1,20 +1,38 @@
 # Agent Guidelines & Workflow (Godot Project)
 
-## 0. Requirement Clarification (需求澄清) - 最高优先级
-**每次接收指令后，执行任何修改前，Agent 必须执行以下逻辑：**
+## 0. Requirement Clarification (需求澄清) - 启动门槛
+**每次接收指令后，Agent 必须首先执行以下逻辑，不得跳过：**
 
 1. **上下文对齐**: 阅读相关代码和 `.tscn` 文件，理解现有逻辑。
 2. **意图确认**: 明确用户期望的最终效果。
-3. **主动询问**: 遇到以下情况必须停止操作并提问，**禁止基于假设自行决定**：
-    - 存在多种实现路径或方案。
+3. **主动询问**: 遇到以下情况必须停止操作并提问：
+    - 需求描述模糊或存在歧义。
     - 需求可能破坏现有系统逻辑。
     - **[重要]** 若因技术限制必须使用非静态类型（Variant），必须先向用户解释原因，获得明确同意后再执行。
-4. **准则**: 只有在完全理解需求及实现逻辑，并获得用户确认后，方可制定计划并编码。
 
 ---
 
-## 1. Development Process (Multimodal TDD)
-遵循测试驱动开发闭环，严禁跳过：
+## 1. Architecture & Technical Design Strategy (架构先行)
+**在理解需求后，严禁直接编写功能代码。Agent 必须先设计技术方案：**
+
+1. **Proposed Architecture (方案设计)**:
+    - 规划涉及工程文件路径变化 (`.tscn`、`.gd`、`.tres`)。
+    - 规划涉及的节点结构变化 (`.tscn`)。
+    - 规划脚本职责划分 (`.gd`) 及数据流向。
+    - 确保设计符合 **Section 7** 的解耦原则。
+
+2. **Option Selection (多方案决策)**:
+    - 若存在多种实现路径（例如：使用 `Signal` vs `CallGroup`，或 `Resource` vs `JSON`），Agent 必须：
+        - 列出 **Option A** 与 **Option B**。
+        - 简述各自的优缺点（Pros/Cons）。
+        - **等待用户选择**或确认首选方案。
+
+3. **Consensus (共识)**: 只有在架构方案获得用户明确批准后，方可进入下一步 TDD 开发编码阶段。
+
+---
+
+## 2. Development Process (Multimodal TDD)
+方案确定后，遵循测试驱动开发闭环：
 
 1. **Test First**: 优先在 `tests/scenes/` 编写或更新测试场景。
 2. **Execution**: 使用 Godot 命令行运行测试场景。
@@ -24,7 +42,7 @@
 
 ---
 
-## 2. Environment & Maintenance
+## 3. Environment & Maintenance
 - **Godot Path**:
     - **Windows**: `D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe`
     - **macOS**: `/Applications/Godot.app/Contents/MacOS/Godot`
@@ -32,21 +50,21 @@
 
 ---
 
-## 3. Code & Project Standards
+## 4. Code & Project Standards
 - **Indentation**: **必须使用 Tab**。
 - **Typing**: **强制静态类型声明** (如 `var health: int = 100`)。
 - **Snapshot Policy**: 截图仅在 `tests/snapshots/` 原位读写，严禁复制到项目其他位置以防污染。
 
 ---
 
-## 4. UI Automation & Testing Protocols
+## 5. UI Automation & Testing Protocols
 - **Wrapper Strategy**: 严禁修改生产环境场景（`res://scenes/`）。必须使用 `tests/scenes/` 下的通用测试场景（Harness）通过代码动态加载（Instantiate）待测子场景。
 - **Action Simulation**: 模拟交互必须使用 `Input.parse_input_event()`，禁止直接调用信号回调函数。
 - **Logging**: 日志命名规范：`tests/logs/test_run_%Y-%m-%d_%H-%M-%S.txt`。
 
 ---
 
-## 5. Test Harness Usage (通用测试靶场)
+## 6. Test Harness Usage (通用测试靶场)
 Agent 应使用或维护 `tests/scenes/universal_test_harness.tscn` 下的通用测试场景，该场景已具备以下能力：
 - **动态挂载**: 能够加载任意被测子场景（Sub-scene）。
 - **自动化支持**: 提供 `get_ui_state()`、`simulate_click(pos)` 等接口。
@@ -54,13 +72,12 @@ Agent 应使用或维护 `tests/scenes/universal_test_harness.tscn` 下的通用
 
 ---
 
-## 6. Architecture & Modularity (Decoupling)
-为了确保代码的可维护性和**测试的可行性**，开发必须遵循以下解耦原则：
+## 7. Architecture & Modularity (Decoupling Guidelines)
+**设计架构（Section 1）时必须严格遵守的解耦标准：**
 
 - **"Call Down, Signal Up" (向下调用，向上信号)**:
     - **父节点**有权调用子节点的函数或修改其属性。
     - **子节点严禁**直接引用或调用父节点/兄弟节点。必须通过 `signal` 通知外部变化。
-    - 目的：确保任何子场景（Sub-scene）都能在测试靶场中独立运行，而不因缺少特定的父节点报错。
 - **Explicit Dependencies (显式依赖)**:
     - 优先使用 `@export` 变量注入依赖，禁止在 `_ready()` 中使用 `get_node("../Parent")` 或硬编码路径查找外部节点。
     - **禁止**过度使用 Singletons (Autoloads) 存储临时状态。
