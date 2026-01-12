@@ -47,12 +47,20 @@
     - **Windows**: `D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe`
     - **macOS**: `/Applications/Godot.app/Contents/MacOS/Godot`
 - **Log Maintenance**: 由于日志文件名包含时间戳，Agent 应定期清理 `tests/logs/` 及 `tests/snapshots/` 目录，仅保留最近的 **10条** 测试记录及 **10张** 测试截图，避免占用过多空间。
+- **Test Execution Wrapper**:
+    - 严禁直接调用 Godot 可执行文件，**必须**使用项目封装脚本。
+    - 命令格式：`.\tests\run_test.bat <path_to_scene.tscn>`
+    - 作用：避免触发原始可执行文件的安全标志检查。
 
 ---
 
 ## 4. Code & Project Standards
 - **Indentation**: **必须使用 Tab**。
 - **Typing**: **强制静态类型声明** (如 `var health: int = 100`)。
+- **Documentation (中文注释)**: 
+    - **所有代码必须包含详尽的中文注释**，以降低用户审查和维护门槛。
+    - **DocStrings**: 关键函数头必须说明参数、返回值及功能（如 `## 计算伤害值`）。
+    - **Inline Comments**: 复杂算法或逻辑跳转处，必须用中文行内注释解释“为什么这样做”。
 - **Snapshot Policy**: 截图仅在 `tests/snapshots/` 原位读写，严禁复制到项目其他位置以防污染。
 
 ---
@@ -85,3 +93,15 @@ Agent 应使用或维护 `tests/scenes/universal_test_harness.tscn` 下的通用
     - 业务逻辑（Script）不应与特定的 UI 结构强绑定。
     - 纯数据（如配置、物品属性）应分离为 `Resource` (`.tres`)，实现数据与逻辑分离。
 - **[重要]** 若因实际实施中，必须引入有违或变通上述的模块化解耦原则，必须先向用户澄清并解释原因，获得明确同意后再执行。
+
+---
+
+## 8. Test Isolation (测试隔离)
+**测试代码必须与生产代码完全隔离，确保可随时移除测试目录而不影响生产环境：**
+
+- **单向依赖**: 测试代码 (`tests/`) 可以引用生产代码 (`scenes/`, `scripts/`, `resources/`)，但 **生产代码严禁** `preload`、`load` 或以任何方式引用 `tests/` 目录下的文件。
+- **目录结构**:
+    - 生产代码: `scenes/`, `scripts/`, `resources/`
+    - 测试代码: `tests/scenes/`, `tests/scripts/`
+- **验收标准**: 直接删除 `tests/` 目录后，运行任意生产场景必须无报错、无 Warning、无残留引用。
+- **目的**: 便于发布时剥离测试代码，保持生产包体积最小化。
