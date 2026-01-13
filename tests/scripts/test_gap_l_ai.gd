@@ -1,13 +1,13 @@
 ## test_gap_l_ai.gd
-## GAP-L 效用模型的测试脚本（重构版）
-## 验证模型在不同情况下的决策行为，特别是 P（相对优势）和 L（效率惩罚）的正确性
+## GAP-L 效用模型的测试脚本（重构版 - L 维度时间成本）
+## 验证模型在不同情况下的决策行为，特别是 L 维度的连续公式
 ##
 ## 测试场景：
-## 1. 简单高效的贸易采购 (High G, Low Effort) - 预期接受
-## 2. 费力不讨好的方案 (Low G, High Effort) - 预期拒绝 (L 维度)
-## 3. 对手获利更多 (V_opp > V_self) - 预期拒绝 (P 维度)
-## 4. 伤敌一千自损八百 (V_self < 0, 但 V_self > V_opp) - 高 P 性格可能接受
-## 5. 高收益高成本 (High G, High Effort) - 效率可接受，预期接受
+## 1. 基础场景：简单高效的贸易采购 - 验证 G、P 维度正常工作
+## 2. 基础场景：对手获利更多 - 验证 P 维度拒绝逻辑
+## 3. 高贪婪型 AI：第 1 轮通过，第 10 轮拒绝（涨价心理）
+## 4. 低贪婪型 AI：第 1 轮拒绝，第 10 轮通过（疲劳妥协）
+## 5. 中性 AI：时间不影响决策（L_cost = 0）
 extends Node
 
 ## 预加载生产代码中的脚本
@@ -21,18 +21,15 @@ var tests_failed: int = 0
 
 func _ready() -> void:
 	print("\n" + "=".repeat(70))
-	print("GAP-L 效用模型测试 - 重构版（验证 P 和 L 维度）")
+	print("GAP-L 效用模型测试 - L 维度时间成本重构版")
 	print("=".repeat(70))
 	
-	# 创建 AI 实例（使用默认性格参数）
-	var ai: RefCounted = GapLAI.new()
-	
 	# 运行所有测试场景
-	_run_scenario_1(ai)
-	_run_scenario_2(ai)
-	_run_scenario_3(ai)
-	_run_scenario_4(ai)
-	_run_scenario_5(ai)
+	_run_scenario_1_basic_trade()
+	_run_scenario_2_opponent_wins()
+	_run_scenario_3_high_greed_inflation()
+	_run_scenario_4_low_greed_discount()
+	_run_scenario_5_neutral_greed()
 	
 	print("\n" + "=".repeat(70))
 	print("测试完成: %d 通过, %d 失败" % [tests_passed, tests_failed])
@@ -42,137 +39,200 @@ func _ready() -> void:
 	get_tree().quit()
 
 
-## ===== 测试场景 1：简单高效的贸易采购 =====
-## 预期：AI 应当接受。
-## - G 值高 (+50)，对手收益低 (+10)
-## - P = 50 - 10 = +40（相对优势大）
-## - L = effort / gain = 2.0 / 50 = 0.04（效率极高）
-func _run_scenario_1(ai: RefCounted) -> void:
+## ===== 场景 1：基础贸易采购 =====
+## 验证 G、P 维度的基本功能（不涉及时间压力）
+## 预期：接受
+func _run_scenario_1_basic_trade() -> void:
 	print("\n" + "-".repeat(60))
-	print("场景 1：简单高效的贸易采购")
-	print("测试目标：验证高 G、高 P（相对优势）、低 L（效率高）的接受")
+	print("场景 1：基础贸易采购（G、P 维度验证）")
+	print("测试目标：在第 1 轮（无时间压力）下，高 G、高 P 的提案被接受")
 	print("-".repeat(60))
 	
+	# 创建中性 AI（weight_greed = 1.0 = neutral_greed）
+	var ai: RefCounted = GapLAI.new()
+	
 	# 创建卡牌：采购 500 万吨大豆
-	# 参数：name, self_gain, opponent_gain, effort_cost
+	# 参数：name, self_gain, opponent_gain
 	var card_a: Resource = GapLCardData.create(
 		"采购 500 万吨大豆",
 		50.0, # 我方收益 +50
-		10.0, # 对手收益 +10（美方农民赚钱）
-		1.0 # 执行成本 1.0（简单）
+		10.0 # 对手收益 +10
 	)
 	
 	var cards: Array = [card_a]
-	var result: Dictionary = ai.calculate_utility(cards)
+	var context: Dictionary = {"round": 1}
+	var result: Dictionary = ai.calculate_utility(cards, context)
 	
 	_print_result("场景 1", result, true)
 
 
-## ===== 测试场景 2：费力不讨好 =====
-## 预期：AI 应当拒绝。
-## - G 值低 (+5)，但执行成本极高 (+50)
-## - L = effort / gain = 51.0 / 5 = 10.2（效率极差）
-## 这体现了 L 维度的核心逻辑：极大精力换取微小利益，不如放弃
-func _run_scenario_2(ai: RefCounted) -> void:
+## ===== 场景 2：对手获利更多（让步过大）=====
+## 验证 P 维度的拒绝逻辑
+## 预期：拒绝
+func _run_scenario_2_opponent_wins() -> void:
 	print("\n" + "-".repeat(60))
-	print("场景 2：费力不讨好")
-	print("测试目标：验证 L 维度对「高成本低收益」方案的惩罚")
+	print("场景 2：对手获利更多（P 维度验证）")
+	print("测试目标：对手收益远超我方时，P 维度导致拒绝")
 	print("-".repeat(60))
 	
-	# 卡牌：建立复杂的合规审查机制，只换来微薄利润
+	var ai: RefCounted = GapLAI.new()
+	
+	# 创建卡牌：开放市场准入，对手获益远超我方
 	var card_a: Resource = GapLCardData.create(
-		"建立多层级合规审查机制",
-		5.0, # 我方收益 +5（微薄）
-		2.0, # 对手收益 +2
-		50.0 # 执行成本 50.0（极度繁琐：修法 + 培训 + 审查）
+		"开放金融市场准入",
+		30.0, # 我方收益 +30
+		80.0 # 对手收益 +80（对手赚更多）
 	)
 	
 	var cards: Array = [card_a]
-	var result: Dictionary = ai.calculate_utility(cards)
+	var context: Dictionary = {"round": 1}
+	var result: Dictionary = ai.calculate_utility(cards, context)
 	
 	_print_result("场景 2", result, false)
 
 
-## ===== 测试场景 3：对手获利更多（让步过大）=====
-## 预期：AI 应当拒绝。
-## - G 值正 (+30)，但对手收益更高 (+80)
-## - P = 30 - 80 = -50（相对优势严重为负）
-## 这体现了 P 维度的核心逻辑：对手赢太多，即使我方赚钱也不行
-func _run_scenario_3(ai: RefCounted) -> void:
+## ===== 场景 3：高贪婪型 AI - 涨价心理 =====
+## 验证 L 维度的涨价效应：高贪婪型 AI 在后期拒绝原本可接受的提案
+##
+## 精确设计（第 1 轮刚好过线，第 10 轮刚好被拒）：
+## - weight_greed = 2.0, neutral_greed = 1.0 → greed_direction = +1.0
+## - weight_laziness = 2.0, fatigue_scale = 10.0
+## - 第 1 轮: time_pressure = (1/10)^2 * 10 = 0.1, L_cost = 1.0 * 0.1 * 2.0 = 0.2
+## - 第 10 轮: time_pressure = (10/10)^2 * 10 = 10, L_cost = 1.0 * 10 * 2.0 = 20
+##
+## 设计一个 Total ≈ 25 的提案（第 1 轮 24.8 > 10 接受，第 10 轮 5 < 10 拒绝）
+## G_score + A_score + P_score = 25 时，减去 L_cost=20 后 = 5
+func _run_scenario_3_high_greed_inflation() -> void:
 	print("\n" + "-".repeat(60))
-	print("场景 3：对手获利更多（让步过大）")
-	print("测试目标：验证 P 维度对「相对劣势」的惩罚")
+	print("场景 3：高贪婪型 AI - 涨价心理（L 维度核心测试）")
+	print("测试目标：第 1 轮接受的提案，第 10 轮被拒绝（因为 L_cost 涨价）")
 	print("-".repeat(60))
 	
-	# 卡牌：开放市场准入，对手获益远超我方
+	# 创建高贪婪 AI，调整参数使 L_cost 影响更显著
+	var ai: RefCounted = GapLAI.new()
+	ai.weight_greed = 2.0 # 高于 neutral_greed = 1.0 → 涨价型
+	ai.weight_anchor = 0.0 # 关闭 A 维度，简化计算
+	ai.weight_power = 0.0 # 关闭 P 维度，简化计算
+	ai.weight_laziness = 2.0 # L 敏感度
+	ai.base_batna = 10.0 # 基础门槛
+	
+	# 设计提案：G = 8.0 → G_score = 8 * 2 = 16
+	# 第 1 轮: L_cost = 0.2 → Total = 16 - 0.2 = 15.8 > 10 ✓
+	# 第 10 轮: L_cost = 20 → Total = 16 - 20 = -4 < 10 ✗
 	var card_a: Resource = GapLCardData.create(
-		"开放金融市场准入",
-		30.0, # 我方收益 +30
-		80.0, # 对手收益 +80（对手赚更多）
-		5.0 # 执行成本 5.0（中等）
+		"边界测试提案",
+		8.0, # 我方收益（精确设计）
+		0.0 # 对手收益
 	)
 	
 	var cards: Array = [card_a]
-	var result: Dictionary = ai.calculate_utility(cards)
 	
-	_print_result("场景 3", result, false)
+	# 测试 3a：第 1 轮
+	print("\n【高贪婪型 - 第 1 轮】")
+	var context_r1: Dictionary = {"round": 1}
+	var result_r1: Dictionary = ai.calculate_utility(cards, context_r1)
+	_print_result("场景 3a (第 1 轮)", result_r1, true)
+	
+	# 测试 3b：第 10 轮
+	print("\n【高贪婪型 - 第 10 轮】")
+	var context_r10: Dictionary = {"round": 10}
+	var result_r10: Dictionary = ai.calculate_utility(cards, context_r10)
+	_print_result("场景 3b (第 10 轮)", result_r10, false)
 
 
-## ===== 测试场景 4：伤敌一千自损八百（高 P 性格验证）=====
-## 预期：取决于 P 权重设置。
-## - G 值负 (-10)，但对手损失更大 (-30)
-## - P = -10 - (-30) = +20（相对优势为正：我亏 10，但让对手亏 30）
-## 这体现了 P 维度的核心逻辑：只要比对手强，愿意亏钱
-## 
-## 注意：默认 weight_power = 1.0，此场景验证基础行为
-## 如果想看到"伤敌一千自损八百"被接受，需要提高 weight_power
-func _run_scenario_4(ai: RefCounted) -> void:
+## ===== 场景 4：低贪婪型 AI - 疲劳妥协 =====
+## 验证 L 维度的打折效应：低贪婪型 AI 在后期接受原本会拒绝的提案
+##
+## 精确设计（第 1 轮刚好被拒，第 10 轮刚好过线）：
+## - weight_greed = 0.5, neutral_greed = 1.0 → greed_direction = -0.5
+## - weight_laziness = 2.0, fatigue_scale = 10.0
+## - 第 1 轮: L_cost = -0.5 * 0.1 * 2.0 = -0.1 (几乎无帮助)
+## - 第 10 轮: L_cost = -0.5 * 10 * 2.0 = -10 (Total += 10)
+##
+## 设计一个 Total ≈ 5 的提案（第 1 轮 5 < 10 拒绝，第 10 轮 15 > 10 接受）
+func _run_scenario_4_low_greed_discount() -> void:
 	print("\n" + "-".repeat(60))
-	print("场景 4：伤敌一千自损八百")
-	print("测试目标：验证 P 维度对「相对优势」的正向贡献")
+	print("场景 4：低贪婪型 AI - 疲劳妥协（L 维度核心测试）")
+	print("测试目标：第 1 轮拒绝的提案，第 10 轮被接受（因为 L_cost 打折）")
 	print("-".repeat(60))
 	
-	# 卡牌：制裁条款，双方都亏损，但对手亏得更多
+	# 创建低贪婪 AI，调整参数使 L_cost 影响更显著
+	var ai: RefCounted = GapLAI.new()
+	ai.weight_greed = 0.5 # 低于 neutral_greed = 1.0 → 打折型
+	ai.weight_anchor = 0.0 # 关闭 A 维度，简化计算
+	ai.weight_power = 0.0 # 关闭 P 维度，简化计算
+	ai.weight_laziness = 2.0 # L 敏感度
+	ai.base_batna = 10.0 # 基础门槛
+	
+	# 设计提案：G = 10.0 → G_score = 10 * 0.5 = 5
+	# 第 1 轮: L_cost = -0.1 → Total = 5 - (-0.1) = 5.1 < 10 ✗
+	# 第 10 轮: L_cost = -10 → Total = 5 - (-10) = 15 > 10 ✓
 	var card_a: Resource = GapLCardData.create(
-		"实施对等反制关税",
-		-10.0, # 我方损失 -10
-		-30.0, # 对手损失 -30（对手亏得更多）
-		3.0 # 执行成本 3.0（简单）
+		"边界测试提案",
+		10.0, # 我方收益（精确设计）
+		0.0 # 对手收益
 	)
 	
 	var cards: Array = [card_a]
-	var result: Dictionary = ai.calculate_utility(cards)
 	
-	# 默认权重下，G=-10 会导致 L 变成纯成本累加，可能导致拒绝
-	# 这里我们测试的是 P 维度的正向贡献是否正确计算
-	# 预期：虽然 P 为正，但 G 为负加上 L 惩罚，总分可能低于 BATNA
-	# 设置为 false（预期拒绝），但核心是验证 P 计算正确
-	_print_result("场景 4", result, false)
+	# 测试 4a：第 1 轮
+	print("\n【低贪婪型 - 第 1 轮】")
+	var context_r1: Dictionary = {"round": 1}
+	var result_r1: Dictionary = ai.calculate_utility(cards, context_r1)
+	_print_result("场景 4a (第 1 轮)", result_r1, false)
+	
+	# 测试 4b：第 10 轮
+	print("\n【低贪婪型 - 第 10 轮】")
+	var context_r10: Dictionary = {"round": 10}
+	var result_r10: Dictionary = ai.calculate_utility(cards, context_r10)
+	_print_result("场景 4b (第 10 轮)", result_r10, true)
 
 
-## ===== 测试场景 5：高收益高成本（效率可接受）=====
-## 预期：AI 应当接受。
-## - G 值高 (+100)，执行成本也高 (+30)
-## - L = effort / gain = 31.0 / 100 = 0.31（效率可接受）
-## 这验证了 L 维度不是简单的成本累加，而是效率比
-func _run_scenario_5(ai: RefCounted) -> void:
+## ===== 场景 5：中性 AI - 时间中立 =====
+## 验证当 weight_greed = neutral_greed 时，L_cost = 0，时间不影响决策
+func _run_scenario_5_neutral_greed() -> void:
 	print("\n" + "-".repeat(60))
-	print("场景 5：高收益高成本（效率可接受）")
-	print("测试目标：验证 L 维度的效率比计算（成本高但收益更高）")
+	print("场景 5：中性 AI - 时间中立（L 维度边界测试）")
+	print("测试目标：无论第几轮，L_cost = 0，决策结果一致")
 	print("-".repeat(60))
 	
-	# 卡牌：大型基础设施项目，成本高但收益更高
+	# 创建中性 AI（默认 weight_greed = 1.0 = neutral_greed）
+	var ai: RefCounted = GapLAI.new()
+	ai.weight_greed = 1.0 # 等于 neutral_greed → 时间中立
+	
+	# 创建一个刚好过线的提案
 	var card_a: Resource = GapLCardData.create(
-		"合作建设数据中心",
-		100.0, # 我方收益 +100
-		40.0, # 对手收益 +40
-		30.0 # 执行成本 30.0（复杂但值得）
+		"标准贸易协议",
+		25.0, # 我方收益 +25
+		15.0 # 对手收益 +15
 	)
 	
 	var cards: Array = [card_a]
-	var result: Dictionary = ai.calculate_utility(cards)
 	
-	_print_result("场景 5", result, true)
+	# 测试在不同回合的决策
+	print("\n【中性 AI - 多回合对比】")
+	for round_num: int in [1, 5, 10]:
+		var context: Dictionary = {"round": round_num}
+		var result: Dictionary = ai.calculate_utility(cards, context)
+		var breakdown: Dictionary = result["breakdown"]
+		print("  回合 %d: L_cost = %.4f, Total = %.2f, 决策 = %s" % [
+			round_num,
+			breakdown["L_cost"],
+			result["total_score"],
+			"接受" if result["accepted"] else "拒绝"
+		])
+	
+	# 验证第 10 轮的 L_cost 是否为 0
+	var context_r10: Dictionary = {"round": 10}
+	var result_r10: Dictionary = ai.calculate_utility(cards, context_r10)
+	var l_cost_is_zero: bool = absf(result_r10["breakdown"]["L_cost"]) < 0.0001
+	
+	if l_cost_is_zero:
+		print("\n  ✓ 验证通过：L_cost = 0（时间中立）")
+		tests_passed += 1
+	else:
+		print("\n  ✗ 验证失败：L_cost = %.4f（应为 0）" % result_r10["breakdown"]["L_cost"])
+		tests_failed += 1
 
 
 ## ===== 结果打印辅助函数 =====
@@ -180,30 +240,36 @@ func _run_scenario_5(ai: RefCounted) -> void:
 ## @param result: AI 计算返回的结果字典
 ## @param expected_accept: 预期的决策结果
 func _print_result(scenario_name: String, result: Dictionary, expected_accept: bool) -> void:
-	print("\n【卡牌分析】")
+	print("\n【维度分析】")
 	
 	var breakdown: Dictionary = result["breakdown"]
 	
 	# 打印原始值
 	print("  G (我方收益) 原始值: %.1f" % breakdown["G_raw"])
 	print("  对手收益总和: %.1f" % breakdown["opp_total"])
-	print("  P (相对优势) 原始值: %.1f  [计算: G_raw - opp_total]" % breakdown["P_raw"])
-	print("  执行成本总和: %.1f" % breakdown["effort_total"])
-	print("  L (效率惩罚) 原始值: %.2f  [计算: effort / max(G, 1)]" % breakdown["L_raw"])
+	print("  P (相对优势) 原始值: %.1f  [V_self - V_opp]" % breakdown["P_raw"])
 	print("  锚点差距 (gap): %.1f" % breakdown["gap_from_anchor"])
 	print("  A (锚定) 原始值: %.1f" % breakdown["A_raw"])
+	
+	# 打印 L 维度详情
+	print("\n【L 维度时间成本】")
+	print("  贪婪方向 (greed_direction): %.2f" % breakdown["greed_direction"])
+	print("  当前回合: %d" % breakdown["current_round"])
+	print("  时间压力 (time_pressure): %.4f" % breakdown["time_pressure"])
+	print("  L 原始值 (带符号): %.4f" % breakdown["L_raw"])
+	print("  L_cost (加权): %.4f" % breakdown["L_cost"])
 	
 	# 打印加权后分数
 	print("\n【加权计算】")
 	print("  G_score (G × W_g): %.1f" % breakdown["G_score"])
 	print("  A_score (A × W_a): %.1f" % breakdown["A_score"])
 	print("  P_score (P × W_p): %.1f" % breakdown["P_score"])
-	print("  L_cost  (L × W_l): %.2f" % breakdown["L_cost"])
+	print("  L_cost  (L × W_l): %.4f" % breakdown["L_cost"])
 	
 	# 打印公式
 	print("\n【效用公式】")
 	print("  Total = G_score + A_score + P_score - L_cost")
-	print("        = %.1f + %.1f + %.1f - %.2f" % [
+	print("        = %.1f + %.1f + %.1f - (%.4f)" % [
 		breakdown["G_score"],
 		breakdown["A_score"],
 		breakdown["P_score"],
