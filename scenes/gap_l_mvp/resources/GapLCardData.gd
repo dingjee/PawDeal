@@ -40,8 +40,8 @@ extends Resource
 ## @param self_gain: 我方收益（G 值）
 ## @param opponent_gain: 对手收益（用于 P 维度）
 ## @return: 配置好的 GapLCardData 实例
-static func create(name: String, self_gain: float, opponent_gain: float) -> GapLCardData:
-	var card: GapLCardData = GapLCardData.new()
+static func create(name: String, self_gain: float, opponent_gain: float) -> Resource:
+	var card := GapLCardData.new()
 	card.card_name = name
 	card.g_value = self_gain
 	card.opp_value = opponent_gain

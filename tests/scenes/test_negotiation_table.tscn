@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://bv5t6g7r8nc2w"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_negotiation_table.gd" id="1_test"]
+[ext_resource type="Script" path="res://scenes/negotiation/scripts/NegotiationManager.gd" id="2_manager"]
+
+[node name="TestNegotiationTable" type="Node"]
+script = ExtResource("1_test")
+
+[node name="Manager" type="Node" parent="."]
+script = ExtResource("2_manager")

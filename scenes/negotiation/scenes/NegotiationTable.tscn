@@ -1,0 +1,325 @@
+[gd_scene load_steps=3 format=3 uid="uid://cj8wq2hv6pmrt"]
+
+[ext_resource type="Script" path="res://scenes/negotiation/scripts/NegotiationManager.gd" id="1_manager"]
+[ext_resource type="Script" path="res://scenes/negotiation/scripts/NegotiationTableUI.gd" id="2_ui"]
+
+[node name="NegotiationTable" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_ui")
+
+[node name="Manager" type="Node" parent="."]
+script = ExtResource("1_manager")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.14, 0.18, 1)
+
+[node name="TopLayer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 120.0
+grow_horizontal = 2
+
+[node name="OpponentHUD" type="HBoxContainer" parent="TopLayer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 24
+
+[node name="AvatarFrame" type="Panel" parent="TopLayer/OpponentHUD"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+
+[node name="Avatar" type="TextureRect" parent="TopLayer/OpponentHUD/AvatarFrame"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PsychMeters" type="VBoxContainer" parent="TopLayer/OpponentHUD"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="GreedMeter" type="HBoxContainer" parent="TopLayer/OpponentHUD/PsychMeters"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLayer/OpponentHUD/PsychMeters/GreedMeter"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "贪婪度 G"
+
+[node name="Bar" type="ProgressBar" parent="TopLayer/OpponentHUD/PsychMeters/GreedMeter"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 50.0
+show_percentage = false
+
+[node name="AnchorMeter" type="HBoxContainer" parent="TopLayer/OpponentHUD/PsychMeters"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLayer/OpponentHUD/PsychMeters/AnchorMeter"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "锚定值 A"
+
+[node name="Bar" type="ProgressBar" parent="TopLayer/OpponentHUD/PsychMeters/AnchorMeter"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 30.0
+show_percentage = false
+
+[node name="PowerMeter" type="HBoxContainer" parent="TopLayer/OpponentHUD/PsychMeters"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLayer/OpponentHUD/PsychMeters/PowerMeter"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "权力欲 P"
+
+[node name="Bar" type="ProgressBar" parent="TopLayer/OpponentHUD/PsychMeters/PowerMeter"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 70.0
+show_percentage = false
+
+[node name="PatienceMeter" type="HBoxContainer" parent="TopLayer/OpponentHUD/PsychMeters"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="TopLayer/OpponentHUD/PsychMeters/PatienceMeter"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "耐心值 L"
+
+[node name="Bar" type="ProgressBar" parent="TopLayer/OpponentHUD/PsychMeters/PatienceMeter"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 10.0
+value = 10.0
+show_percentage = false
+
+[node name="FeedbackBubble" type="PanelContainer" parent="TopLayer/OpponentHUD"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="FeedbackLabel" type="Label" parent="TopLayer/OpponentHUD/FeedbackBubble"]
+layout_mode = 2
+text = "让我考虑一下..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="MiddleLayer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 130.0
+offset_bottom = -200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OfferContainer" type="PanelContainer" parent="MiddleLayer"]
+custom_minimum_size = Vector2(600, 300)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="MiddleLayer/OfferContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="MiddleLayer/OfferContainer/VBox"]
+layout_mode = 2
+text = "当前提案"
+horizontal_alignment = 1
+
+[node name="TopicLayout" type="HBoxContainer" parent="MiddleLayer/OfferContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="PlaceholderCard1" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "拖放
+议题卡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaceholderCard2" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "拖放
+议题卡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlaceholderCard3" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+custom_minimum_size = Vector2(100, 140)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "拖放
+议题卡"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TacticTag" type="Label" parent="MiddleLayer/OfferContainer/VBox"]
+layout_mode = 2
+text = "附加姿态: [直接提交]"
+horizontal_alignment = 1
+
+[node name="BottomLayer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -190.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 12
+
+[node name="TacticSelector" type="HBoxContainer" parent="BottomLayer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="TacticLabel" type="Label" parent="BottomLayer/TacticSelector"]
+layout_mode = 2
+text = "选择战术:"
+
+[node name="BtnSimple" type="Button" parent="BottomLayer/TacticSelector"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "直接"
+
+[node name="BtnSubstantiation" type="Button" parent="BottomLayer/TacticSelector"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "理性"
+
+[node name="BtnThreat" type="Button" parent="BottomLayer/TacticSelector"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "威胁"
+
+[node name="BtnRelationship" type="Button" parent="BottomLayer/TacticSelector"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "感情"
+
+[node name="BtnApologize" type="Button" parent="BottomLayer/TacticSelector"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "道歉"
+
+[node name="ActionButtons" type="HBoxContainer" parent="BottomLayer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 24
+
+[node name="SubmitBtn" type="Button" parent="BottomLayer/ActionButtons"]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "提交提案"
+
+[node name="ReactionButtons" type="HBoxContainer" parent="BottomLayer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 16
+
+[node name="BtnAccept" type="Button" parent="BottomLayer/ReactionButtons"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "接受成交"
+
+[node name="BtnRejectSoft" type="Button" parent="BottomLayer/ReactionButtons"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "委婉拒绝"
+
+[node name="BtnRejectHard" type="Button" parent="BottomLayer/ReactionButtons"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "愤怒拒绝"
+
+[node name="BtnWalkAway" type="Button" parent="BottomLayer/ReactionButtons"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "直接离开"
+
+[node name="HandArea" type="ScrollContainer" parent="BottomLayer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="HandLayout" type="HBoxContainer" parent="BottomLayer/HandArea"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StateLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 40.0
+grow_horizontal = 0
+text = "状态: 玩家回合"
+horizontal_alignment = 2
+
+[node name="RoundLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = 40.0
+offset_right = -10.0
+offset_bottom = 70.0
+grow_horizontal = 0
+text = "回合: 1 / 10"
+horizontal_alignment = 2

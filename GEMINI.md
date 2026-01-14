@@ -1,107 +1,56 @@
-# Agent Guidelines & Workflow (Godot Project)
+# Godot Agent Protocol
 
-## 0. Requirement Clarification (需求澄清) - 启动门槛
-**每次接收指令后，Agent 必须首先执行以下逻辑，不得跳过：**
+## 0. INIT: Requirement & Safety
+**EXECUTE FIRST:**
+1.  **Context**: Scan related `.tscn`/`.gd` to understand logic.
+2.  **Intent**: Confirm user goal.
+3.  **HALT & ASK IF**:
+    * Ambiguous reqs or risk to existing logic.
+    * **Tech Constraint**: Usage of non-static `Variant` is required (Must explain why & get consent).
 
-1. **上下文对齐**: 阅读相关代码和 `.tscn` 文件，理解现有逻辑。
-2. **意图确认**: 明确用户期望的最终效果。
-3. **主动询问**: 遇到以下情况必须停止操作并提问：
-    - 需求描述模糊或存在歧义。
-    - 需求可能破坏现有系统逻辑。
-    - **[重要]** 若因技术限制必须使用非静态类型（Variant），必须先向用户解释原因，获得明确同意后再执行。
+## 1. DESIGN (No Code Yet)
+1.  **Plan**: Map changes to files (`.tscn`, `.gd`, `.tres`) & node structure.
+2.  **Options**: If paths diverge (e.g., Signal vs Group), list **Option A/B** with Pros/Cons.
+3.  **Wait**: Proceed to TDD only after user **Consensus**.
 
----
+## 2. WORKFLOW: Multimodal TDD
+1.  **Test First**: Create/Update `tests/scenes/`.
+2.  **Exec**: Run via Wrapper (Sec 3).
+3.  **Audit**:
+    * **Logs**: `tests/logs/` (No Errors).
+    * **Visual**: Read `tests/snapshots/`. **MANDATORY**: Describe UI state in reply to prove visual check.
 
-## 1. Architecture & Technical Design Strategy (架构先行)
-**在理解需求后，严禁直接编写功能代码。Agent 必须先设计技术方案：**
+## 3. ENV & TOOLS
+* **Godot Bin**:
+    * Win: `D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe`
+    * Mac: `/Applications/Godot.app/Contents/MacOS/Godot`
+* **Wrapper**: `.\tests\run_test.{bat|sh} <scene_path> [--gui]`
+    * Default: `--headless` (Logic). Use `--gui` for UI Snapshots.
+* **Maintain**: Keep only last 10 logs/snapshots in `tests/`.
 
-1. **Proposed Architecture (方案设计)**:
-    - 规划涉及工程文件路径变化 (`.tscn`、`.gd`、`.tres`)。
-    - 规划涉及的节点结构变化 (`.tscn`)。
-    - 规划脚本职责划分 (`.gd`) 及数据流向。
-    - 确保设计符合 **Section 7** 的解耦原则。
+## 4. STANDARDS
+* **Style**: **Tabs** only. **Static Typing** mandatory (e.g., `var hp: int`).
+* **Docs**: **Chinese Comments** required for all logic.
+    * *DocStrings*: Function/Arg descriptions.
+    * *Inline*: Explain complex "Why".
+* **Snapshots**: Read/Write only in `tests/snapshots/`.
 
-2. **Option Selection (多方案决策)**:
-    - 若存在多种实现路径（例如：使用 `Signal` vs `CallGroup`，或 `Resource` vs `JSON`），Agent 必须：
-        - 列出 **Option A** 与 **Option B**。
-        - 简述各自的优缺点（Pros/Cons）。
-        - **等待用户选择**或确认首选方案。
+## 5. UI TESTING (Harness)
+**Do not mod production scenes.** Use `tests/scenes/universal_test_harness.tscn`.
+* **Core API**: `load_test_scene(path)`, `capture_snapshot(name)`, `simulate_click(vec)`, `assert_true(desc, cond)`.
+* **Method A (Config)**: Set `target_scene_path` in harness `.tscn` -> Run Wrapper.
+* **Method B (Inherit)**: Extend `TestHarness` -> Override `_run_test()`.
 
-3. **Consensus (共识)**: 只有在架构方案获得用户明确批准后，方可进入下一步 TDD 开发编码阶段。
+## 6. ARCHITECTURE (Decoupling)
+* **Pattern**: **Call Down, Signal Up**. Kids never `get_node("Parent")`.
+* **Deps**: Use `@export`. No Hardcoded paths. No Logic-UI binding (Scripts generic).
+* **Data**: Separate config/data into `Resource` (`.tres`).
 
----
+## 7. ISOLATION
+* **Rule**: `tests/` depends on `scenes/`. **`scenes/` MUST NOT reference `tests/`**.
+* **Check**: Deleting `tests/` must not break project.
 
-## 2. Development Process (Multimodal TDD)
-方案确定后，遵循测试驱动开发闭环：
-
-1. **Test First**: 优先在 `tests/scenes/` 编写或更新测试场景。
-2. **Execution**: 使用 Godot 命令行运行测试场景。
-3. **Dual Audit (双维审计)**: 
-    - **Console**: 检查 `tests/logs/` 下的日志，确保无 Error/Warning。
-    - **Visual**: 必须读取 `tests/snapshots/` 截图。**在读取截图后，Agent 必须简述看到的 UI 状态（如布局、元素位置等）向用户证明已完成视觉审计。**
-
----
-
-## 3. Environment & Maintenance
-- **Godot Path**:
-    - **Windows**: `D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe`
-    - **macOS**: `/Applications/Godot.app/Contents/MacOS/Godot`
-- **Log Maintenance**: 由于日志文件名包含时间戳，Agent 应定期清理 `tests/logs/` 及 `tests/snapshots/` 目录，仅保留最近的 **10条** 测试记录及 **10张** 测试截图，避免占用过多空间。
-- **Test Execution Wrapper**:
-    - 严禁直接调用 Godot 可执行文件，**必须**使用项目封装脚本。
-    - 命令格式：`.\tests\run_test.bat <path_to_scene.tscn>`
-    - 作用：避免触发原始可执行文件的安全标志检查。
-
----
-
-## 4. Code & Project Standards
-- **Indentation**: **必须使用 Tab**。
-- **Typing**: **强制静态类型声明** (如 `var health: int = 100`)。
-- **Documentation (中文注释)**: 
-    - **所有代码必须包含详尽的中文注释**，以降低用户审查和维护门槛。
-    - **DocStrings**: 关键函数头必须说明参数、返回值及功能（如 `## 计算伤害值`）。
-    - **Inline Comments**: 复杂算法或逻辑跳转处，必须用中文行内注释解释“为什么这样做”。
-- **Snapshot Policy**: 截图仅在 `tests/snapshots/` 原位读写，严禁复制到项目其他位置以防污染。
-
----
-
-## 5. UI Automation & Testing Protocols
-- **Wrapper Strategy**: 严禁修改生产环境场景（`res://scenes/`）。必须使用 `tests/scenes/` 下的通用测试场景（Harness）通过代码动态加载（Instantiate）待测子场景。
-- **Action Simulation**: 模拟交互必须使用 `Input.parse_input_event()`，禁止直接调用信号回调函数。
-- **Logging**: 日志命名规范：`tests/logs/test_run_%Y-%m-%d_%H-%M-%S.txt`。
-
----
-
-## 6. Test Harness Usage (通用测试靶场)
-Agent 应使用或维护 `tests/scenes/universal_test_harness.tscn` 下的通用测试场景，该场景已具备以下能力：
-- **动态挂载**: 能够加载任意被测子场景（Sub-scene）。
-- **自动化支持**: 提供 `get_ui_state()`、`simulate_click(pos)` 等接口。
-- **自动截屏**: 在关键步骤或测试结束时自动保存截图至指定目录。
-
----
-
-## 7. Architecture & Modularity (Decoupling Guidelines)
-**设计架构（Section 1）时必须严格遵守的解耦标准：**
-
-- **"Call Down, Signal Up" (向下调用，向上信号)**:
-    - **父节点**有权调用子节点的函数或修改其属性。
-    - **子节点严禁**直接引用或调用父节点/兄弟节点。必须通过 `signal` 通知外部变化。
-- **Explicit Dependencies (显式依赖)**:
-    - 优先使用 `@export` 变量注入依赖，禁止在 `_ready()` 中使用 `get_node("../Parent")` 或硬编码路径查找外部节点。
-    - **禁止**过度使用 Singletons (Autoloads) 存储临时状态。
-- **Component Isolation (组件独立)**:
-    - 业务逻辑（Script）不应与特定的 UI 结构强绑定。
-    - 纯数据（如配置、物品属性）应分离为 `Resource` (`.tres`)，实现数据与逻辑分离。
-- **[重要]** 若因实际实施中，必须引入有违或变通上述的模块化解耦原则，必须先向用户澄清并解释原因，获得明确同意后再执行。
-
----
-
-## 8. Test Isolation (测试隔离)
-**测试代码必须与生产代码完全隔离，确保可随时移除测试目录而不影响生产环境：**
-
-- **单向依赖**: 测试代码 (`tests/`) 可以引用生产代码 (`scenes/`, `scripts/`, `resources/`)，但 **生产代码严禁** `preload`、`load` 或以任何方式引用 `tests/` 目录下的文件。
-- **目录结构**:
-    - 生产代码: `scenes/`, `scripts/`, `resources/`
-    - 测试代码: `tests/scenes/`, `tests/scripts/`
-- **验收标准**: 直接删除 `tests/` 目录后，运行任意生产场景必须无报错、无 Warning、无残留引用。
-- **目的**: 便于发布时剥离测试代码，保持生产包体积最小化。
+## 8. MEMO PROTOCOL
+**Post-Decision (Sec 1):**
+1.  Create/Update `docs/[SYSTEM]_MEMO.md`.
+2.  Content: Selected Option, Upgrade Path (Phase 2+), Decision Log.

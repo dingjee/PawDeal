@@ -214,3 +214,334 @@ func _generate_reason(total: float, g: float, a: float, p: float, l: float,
 	
 	# 低于 BATNA
 	return "Below BATNA threshold"
+
+
+## ===== Tactic 融合计算接口 (Phase 1) =====
+## 以下方法实现 NegotiAct 行为与 GAP-L 数学模型的融合
+
+## 心理状态快照结构
+## 用于在应用 Tactic 修正前保存 AI 的原始状态
+## @return: 包含所有可修改心理参数的字典
+func _snapshot_psychology() -> Dictionary:
+	return {
+		"weight_greed": weight_greed,
+		"weight_anchor": weight_anchor,
+		"weight_power": weight_power,
+		"weight_laziness": weight_laziness,
+		"base_batna": base_batna,
+		"current_anchor": current_anchor,
+		"neutral_greed": neutral_greed,
+		"max_patience_rounds": max_patience_rounds,
+		"fatigue_scale": fatigue_scale,
+	}
+
+
+## 恢复心理状态
+## 从快照中恢复 AI 的心理参数（用于 Tactic 效果回滚）
+## @param snapshot: 之前保存的快照字典
+## @param preserve_permanent: 可选，是否保留永久效果（Phase 2 扩展）
+func _restore_psychology(snapshot: Dictionary, preserve_permanent: bool = false) -> void:
+	weight_greed = snapshot["weight_greed"]
+	weight_anchor = snapshot["weight_anchor"]
+	weight_power = snapshot["weight_power"]
+	weight_laziness = snapshot["weight_laziness"]
+	base_batna = snapshot["base_batna"]
+	current_anchor = snapshot["current_anchor"]
+	neutral_greed = snapshot["neutral_greed"]
+	max_patience_rounds = snapshot["max_patience_rounds"]
+	fatigue_scale = snapshot["fatigue_scale"]
+	# Phase 2: preserve_permanent 参数预留，当前未使用
+	if preserve_permanent:
+		pass # TODO: 处理永久效果的保留逻辑
+
+
+## 应用战术修正
+## 根据 Tactic 的 modifiers 列表临时修改 AI 的心理参数
+## @param tactic: NegotiationTactic 资源实例
+func _apply_tactic_modifiers(tactic: Resource) -> void:
+	# 安全检查：确保 tactic 有 modifiers 属性
+	if not tactic.has_method("get") and not "modifiers" in tactic:
+		push_warning("Tactic 缺少 modifiers 属性")
+		return
+	
+	var modifiers: Array = tactic.modifiers
+	
+	for modifier: Dictionary in modifiers:
+		var target: String = modifier.get("target", "")
+		var op: String = modifier.get("op", "")
+		var val: float = modifier.get("val", 0.0)
+		
+		# 检查目标属性是否存在
+		if target.is_empty():
+			push_warning("Modifier 缺少 target 字段")
+			continue
+		
+		# 根据操作类型应用修正
+		match op:
+			"multiply":
+				# 乘法修正：当前值 × val
+				var current_val: float = get(target)
+				set(target, current_val * val)
+			"add":
+				# 加法修正：当前值 + val
+				var current_val: float = get(target)
+				set(target, current_val + val)
+			"set":
+				# 直接设置：覆盖为 val
+				set(target, val)
+			_:
+				push_warning("未知的修正操作: %s" % op)
+
+
+## 分析战术有效性
+## 根据计算结果生成战术反馈信息（用于 UI 显示 "Hit" 或 "Miss"）
+## @param tactic: 使用的战术
+## @param result: calculate_utility 的返回结果
+## @return: 包含反馈信息的字典
+func _analyze_tactic_effectiveness(tactic: Resource, result: Dictionary) -> Dictionary:
+	var feedback: Dictionary = {
+		"tactic_id": tactic.id if "id" in tactic else "unknown",
+		"tactic_name": tactic.display_name if "display_name" in tactic else "未知战术",
+		"hit": false,
+		"message": ""
+	}
+	
+	# 根据战术类型和结果判断效果
+	var act_type: int = tactic.act_type if "act_type" in tactic else 0
+	
+	# SUBSTANTIATION (理性论证) - 如果成功接受，则 Hit
+	if act_type == 1: # ActType.SUBSTANTIATION
+		if result["accepted"]:
+			feedback["hit"] = true
+			feedback["message"] = "理性分析奏效，对方降低了心理预期"
+		else:
+			feedback["message"] = "对方似乎不为所动..."
+	
+	# THREAT (威胁) - 检查是否适得其反
+	elif act_type == 8: # ActType.THREAT
+		var breakdown: Dictionary = result["breakdown"]
+		if breakdown["P_score"] > 20.0:
+			feedback["hit"] = false
+			feedback["message"] = "威胁激怒了对方！他们的对抗情绪激增"
+		elif result["accepted"]:
+			feedback["hit"] = true
+			feedback["message"] = "威胁见效，对方屈服了"
+		else:
+			feedback["message"] = "对方顶住了压力，谈判陷入僵局"
+	
+	# RELATIONSHIP (拉关系) - 检查 P 维度是否被屏蔽
+	elif act_type == 6: # ActType.RELATIONSHIP
+		feedback["hit"] = true
+		feedback["message"] = "打感情牌让对方暂时放下了竞争心态"
+	
+	# 默认反馈
+	else:
+		if result["accepted"]:
+			feedback["hit"] = true
+			feedback["message"] = "战术配合提案成功打动了对方"
+		else:
+			feedback["message"] = "战术未能改变结果"
+	
+	return feedback
+
+
+## 融合计算主入口：评估带战术的提案
+## 这是 NegotiAct 与 GAP-L 融合的核心接口
+##
+## 工作流程：
+## 1. 快照当前心理状态
+## 2. 应用战术修正（临时修改 weights/anchor 等）
+## 3. 调用核心 calculate_utility 计算效用
+## 4. 分析战术有效性
+## 5. 回滚心理状态
+##
+## @param cards: GapLCardData 数组，代表提案中的所有条款
+## @param tactic: NegotiationTactic 资源，代表玩家选择的沟通姿态
+## @param context: 上下文字典，包含 "round" 等信息
+## @return: 包含决策结果、详细分解和战术反馈的字典
+func evaluate_proposal_with_tactic(
+	cards: Array,
+	tactic: Resource,
+	context: Dictionary = {}
+) -> Dictionary:
+	# 1. 状态快照 - 保存当前心理参数
+	var original_state: Dictionary = _snapshot_psychology()
+	
+	# 2. 应用战术修正 - 临时修改心理参数
+	_apply_tactic_modifiers(tactic)
+	
+	# 3. 执行核心计算 - 调用原有的效用计算函数
+	var result: Dictionary = calculate_utility(cards, context)
+	
+	# 4. 记录战术反馈 - 分析战术效果
+	result["tactic_feedback"] = _analyze_tactic_effectiveness(tactic, result)
+	
+	# 5. 状态回滚 - 恢复原始心理参数
+	# Phase 1: 所有效果都是临时的，完全回滚
+	# Phase 2: 可通过 tactic.permanent_effects 保留部分效果
+	var has_permanent: bool = tactic.has_permanent_effects() if tactic.has_method("has_permanent_effects") else false
+	_restore_psychology(original_state, has_permanent)
+	
+	return result
+
+
+## ===== AI 反提案生成 (Rule-Based Counter-Offer) =====
+##
+## Phase 1 实现：基于规则的简单反提案策略
+## 工作原理：
+## 1. 分析当前提案中各卡牌对效用的贡献
+## 2. 移除对 AI 不利的卡牌（G_raw < 0 或 P_raw << 0）
+## 3. 从 AI 牌组中添加对 AI 有利的卡牌
+##
+## Phase 2 升级路径：Utility-Optimized Search（智能搜索最优组合）
+
+## 生成 AI 反提案
+## @param player_cards: 玩家当前提出的卡牌数组
+## @param ai_deck: AI 可用的卡牌库
+## @param context: 上下文字典（包含 round 等）
+## @return: 包含反提案卡牌和说明的字典
+func generate_counter_offer(
+	player_cards: Array,
+	ai_deck: Array,
+	context: Dictionary = {}
+) -> Dictionary:
+	var result: Dictionary = {
+		"cards": [],
+		"removed_cards": [],
+		"added_cards": [],
+		"reason": "",
+		"success": false
+	}
+	
+	# 如果玩家提案为空，直接返回失败
+	if player_cards.is_empty():
+		result["reason"] = "玩家提案为空，无法生成反提案"
+		return result
+	
+	# ===== Step 1: 分析每张卡牌的贡献 =====
+	var card_analysis: Array = []
+	for card: Resource in player_cards:
+		var g_raw: float = card.g_value
+		var p_raw: float = card.g_value - card.opp_value
+		var g_score: float = g_raw * weight_greed
+		var p_score: float = p_raw * weight_power
+		
+		card_analysis.append({
+			"card": card,
+			"g_raw": g_raw,
+			"p_raw": p_raw,
+			"g_score": g_score,
+			"p_score": p_score,
+			"total_contribution": g_score + p_score,
+			"keep": true # 默认保留
+		})
+	
+	# ===== Step 2: 标记需要移除的卡牌 =====
+	# 规则：G_raw <= 0 的卡牌对 AI 不利（AI 会亏钱）
+	# 规则：P_raw < -10 的卡牌对 AI 竞争力有害（对手占太大优势）
+	var cards_to_keep: Array = []
+	for analysis: Dictionary in card_analysis:
+		var should_remove: bool = false
+		var remove_reason: String = ""
+		
+		if analysis["g_raw"] <= 0:
+			should_remove = true
+			remove_reason = "G_raw <= 0 (AI 会亏损)"
+		elif analysis["p_raw"] < -15.0 and weight_power > 1.0:
+			# 高 P 性格的 AI 不接受对手优势太大的条款
+			should_remove = true
+			remove_reason = "P_raw < -15 且 AI 竞争心强"
+		
+		if should_remove:
+			analysis["keep"] = false
+			result["removed_cards"].append({
+				"card": analysis["card"],
+				"reason": remove_reason
+			})
+		else:
+			cards_to_keep.append(analysis["card"])
+	
+	# ===== Step 3: 从 AI 牌组添加卡牌 =====
+	# 策略：添加对 AI 最有利的卡牌（高 G 低 Opp）
+	if not ai_deck.is_empty():
+		# 按 AI 效用排序（G/Opp 比率）
+		var sorted_ai_cards: Array = ai_deck.duplicate()
+		sorted_ai_cards.sort_custom(_compare_card_value_for_ai)
+		
+		# 最多添加 1 张卡牌（Phase 1 简单策略）
+		var cards_to_add: int = 1
+		for i: int in range(mini(cards_to_add, sorted_ai_cards.size())):
+			var ai_card: Resource = sorted_ai_cards[i]
+			# 确保不重复添加
+			var already_in: bool = false
+			for existing: Resource in cards_to_keep:
+				if existing.card_name == ai_card.card_name:
+					already_in = true
+					break
+			
+			if not already_in:
+				cards_to_keep.append(ai_card)
+				result["added_cards"].append({
+					"card": ai_card,
+					"reason": "高 G/Opp 比率，对 AI 有利"
+				})
+	
+	# ===== Step 4: 验证反提案是否可接受 =====
+	if cards_to_keep.is_empty():
+		result["reason"] = "移除所有卡牌后提案为空，谈判破裂"
+		return result
+	
+	var counter_result: Dictionary = calculate_utility(cards_to_keep, context)
+	
+	if counter_result["accepted"]:
+		result["cards"] = cards_to_keep
+		result["success"] = true
+		result["reason"] = "反提案效用 %.2f > BATNA %.2f，AI 可接受" % [
+			counter_result["total_score"], base_batna
+		]
+	else:
+		# 反提案仍不可接受，返回修改后的版本供玩家参考
+		result["cards"] = cards_to_keep
+		result["success"] = false
+		result["reason"] = "反提案效用 %.2f < BATNA %.2f，但 AI 愿意继续谈判" % [
+			counter_result["total_score"], base_batna
+		]
+	
+	result["counter_utility"] = counter_result
+	return result
+
+
+## 卡牌价值比较函数（用于排序）
+## 按 G/Opp 比率降序排列，优先选择对 AI 有利的卡牌
+func _compare_card_value_for_ai(card_a: Resource, card_b: Resource) -> bool:
+	# 计算效益比：G 值高、对手收益低的卡牌更好
+	var ratio_a: float = card_a.g_value / maxf(card_a.opp_value, 1.0)
+	var ratio_b: float = card_b.g_value / maxf(card_b.opp_value, 1.0)
+	return ratio_a > ratio_b
+
+
+## 选择 AI 的谈判战术
+## Phase 1: 基于性格的简单选择
+## @return: NegotiationTactic 资源（需外部创建）或 null
+func select_ai_tactic() -> Dictionary:
+	# 返回战术参数，由调用方创建实际的 Resource
+	var tactic_params: Dictionary = {
+		"id": "ai_tactic_simple",
+		"display_name": "AI 直接回应",
+		"act_type": 0, # SIMPLE
+		"modifiers": []
+	}
+	
+	# 根据 AI 性格选择战术倾向
+	if weight_power > 1.5:
+		# 高 P 性格：倾向展示实力
+		tactic_params["id"] = "ai_tactic_power"
+		tactic_params["display_name"] = "AI 展示实力"
+		tactic_params["act_type"] = 2 # STRESSING_POWER
+	elif weight_anchor > 1.5:
+		# 高 A 性格：倾向理性谈判
+		tactic_params["id"] = "ai_tactic_rational"
+		tactic_params["display_name"] = "AI 理性分析"
+		tactic_params["act_type"] = 1 # SUBSTANTIATION
+	
+	return tactic_params

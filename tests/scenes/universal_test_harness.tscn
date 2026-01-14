@@ -4,6 +4,8 @@
 
 [node name="UniversalTestHarness" type="Node"]
 script = ExtResource("1_harness")
+target_scene_path = "res://scenes/negotiation/scenes/NegotiationTable.tscn"
+snapshot_delay_frames = 10
 
 [node name="TestContainer" type="Control" parent="."]
 layout_mode = 3

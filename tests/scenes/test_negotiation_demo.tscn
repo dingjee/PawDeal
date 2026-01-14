@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dr6v8nxp2c5kq"]
+
+[ext_resource type="PackedScene" path="res://scenes/negotiation/scenes/NegotiationTable.tscn" id="1_table"]
+
+[node name="TestNegotiationDemo" type="Node2D"]
+
+[node name="NegotiationTable" parent="." instance=ExtResource("1_table")]

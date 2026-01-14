@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://b8x7y3q1w2e4r"]
+
+[ext_resource type="Script" path="res://scenes/negotiation/scripts/DraggableCard.gd" id="1_card"]
+
+[node name="DraggableCard" type="PanelContainer"]
+custom_minimum_size = Vector2(100, 140)
+offset_right = 100.0
+offset_bottom = 140.0
+script = ExtResource("1_card")

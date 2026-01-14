@@ -1,0 +1,676 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NegotiAct: Introducing a comprehensive coding scheme to capture temporal interaction patterns in negotiations
+Supplementary File
+Table of Contents
+
+Coding manual	4
+General rules	4
+Unitizing	4
+Coding	5
+Splitting up codes	6
+Categories - Overview	7
+Table S2 Categories and respective definitions	7
+Codes - Overview	8
+Table S3 Behavioral codes and respective definitions	8
+Codes - Definitions and Examples	11
+Table S4 Acts of providing and asking about negotiation-related information	11
+Table S5 Offers	16
+Table S6 Acts of persuasive communication	19
+Table S7 Socio-emotional statements	23
+Table S8 Unethical behaviors	27
+Table S9 Acts of process-related communication	30
+Table S10 Residual category	32
+Payoff-matrices	33
+Table S11 Summary chart - Negotiation task 1	33
+Table S12 Summary chart - Negotiation task 2	34
+Additional analyses - Correlation matrices and lag sequential analyses	35
+Table S13 Correlations between the frequency of codes, joint gains, individual gains	35
+Table S14 Correlations between the frequency of sellers' codes, joint gains, individual gains	37
+Table S15 Correlations between the frequency of buyers' codes, joint gains, individual gains	39
+Lag sequential analysis	41
+Table S16 Exploratory lag sequential analyses concerning socio-emotional statements and unethical behaviors	42
+References	44
+
+Coding manual
+
+General rules
+
+      In the following, we describe our general approach to coding videotaped negotiations with our coding scheme. This approach comprises the steps (a) unitizing, (b) coding, and, if appropriate, (c) splitting up codes. NegotiAct can be applied not only to the negotiation exchange itself, but also to the whole conversation that the negotiation is embedded in. As soon as negotiation parties first get in touch, for instance, by exchanging e-mails, or when entering the (virtual) room and until they leave again, the interaction can be coded.
+Unitizing
+
+      In a first step, everything that is said in a videotaped negotiation must be unitized in thought units (cf. Bales, 1950; Kauffeld & Lehmann-Willenbrock, 2012). One thought unit captures exactly one statement and, thus, represents the smallest meaningful segment of behavior that can stand alone (Bales, 1950). Usually, this is a single sentence that comprises or implies a subject and a predicate (Hatfield & Weider-Hatfield, 1978). However, it can also be one word (e.g., a "No" when rejecting an offer) or even a few sentences (e.g., when substantiating a position; see Table 1 for further examples). Only one statement should be captured with one thought unit, meaning that only one of the 47 codes can be assigned to one thought unit. Thus, a new thought unit must be parsed whenever one of the following situations is given: (i) The speaker changes. (ii) The speaker makes a new statement that contains a new thought within a speaking turn (e.g., first making an offer, then substantiating it). (iii) The speaker remains within the same code but expresses two different complete thoughts (e.g., voicing two different reasons for an offer in a row).
+
+Table S1
+
+Sample transcript with thought unit segmentation
+
+SpeakerTranscriptBuyer"[For us, it's more important to agree on the price than on the contract
+
+duration.] [What is more important to you?]"Seller"[The contract duration is also of less importance to us.]"Buyer"[Mm hmm.] [So how about we agree on 400.000€ and 2 years?]"Seller"[No,] [because...uh... eh....] [The problem is, we need to cover all the costs. We need to cover all the expenses.] [And we'd rather have a
+longer contract duration.]"Buyer"[So you'd be happier with a contract duration of 10 years.]"Seller"[Yes, I..]"Buyer"[Wait.] [Me too.] [Hahahahaha.]"Seller"[Hahahaha.] [So, you also prefer 10 over 2 years?] [Then, let's agree
+
+on 10 ten years.]"Buyer"[Yes, we can agree on that!] [Now, let's talk about the price.]Note. Words within square brackets indicate one thought unit. Coding
+In a second step, one of the 47 codes is assigned to every thought unit (act-for-act-
+
+coding). Additionally, the role of the person speaking is allocated to every thought unit (in solo-on-solo negotiation that would be A for one party and B for the other; in team-on-team negotiations with three negotiators per team, that would mean different persons for party A: A1, A2, A3,...; and also different persons for party B: B1, B2, B3...). If both/all negotiators are speaking at the same time, the role "all" must be assigned. If none of the negotiators are speaking but, for instance, an assistant or researcher, the code "Other noise" should be
+
+applied. If none of the codes fit, the code "Others" should be applied. When in doubt, first decide which category the statement falls in and then choose the most appropriate code (see Figure S1).
+Figure S1
+
+Example statement and coding decision tree
+
+
+
+
+
+Splitting up codes
+
+      If the research question requires a more fine-grained analysis of certain behaviors (e.g., different types of humor), the codes in our coding scheme can be further split into more fine-grained codes (e.g., self-defeating or aggressive humor). A few examples are given in the following overview (e.g., for affective reactions or humor).
+
+Categories - Overview Table S2
+Categories and respective definitions
+
+Acts of providing and asking about negotiation- related information"Negotiators' queries and provision of information to the other party regarding their preferences, reservation point, best alternative to negotiated agreement (BATNA), general needs, desires and goals" (Weingart et al., 1987, p. 286)OffersStatements that capture the parties' "offer- counteroffer process" (Lewicki et al., 2014, p.236)Acts of persuasive communicationForcing behaviors and statements "that individuals deploy to bring out desired attitudinal or behavioral change [...] to adjust the other party's positions, perceptions, and opinions" (Lewicki et al., 2014, p. 285), and that "aim at convincing the opponent to comply with one's own proposals" (Giebels et al., 2000, p. 262)Socio-emotional statementsStatements that capture the relational interaction between parties, such as "lightening the atmosphere, separating opinions from facts, expressing feelings [...] and offering praise" (Kauffeld & Lehmann-Willenbrock, 2012, p. 140)Unethical behaviorsBehavior that is commonly regarded as ethically unacceptable and inappropriate (Fulmer et al., 2009; Robinson et al., 2000), exceeding "traditional competitive bargaining" behaviors (Lewicki et al., 2014)Acts of process-related communication"Statements that refer to the process or rules of the negotiation itself, or how the negotiation is to proceed, or is not proceeding." (Brett et al., 1998, p. 415 )Residual categoryExternal or internal issues that disrupt the interaction (e.g., someone entering the room, traffic noise, coughing or sneezing); statements that are aborted without being interrupted by the other party and all statements that do not fit into the above categories.
+Codes - Overview Table S3
+Behavioral codes and respective definitions
+
+Acts of providing and asking about negotiation-related information
+OffersActs of persuasive communication
+Socio-emotional statements
+Unethical behaviorsActs of process-related communication
+Residual categoryProviding priority-related information
+Providing information that reveals the own priorities among issuesSingle-issue activity
+Making a single-issue offer (proposal that comprises only one of several possible issues)Substantiation
+Statements that follow an argumentative structure and statements that connect information with opinions or recommendationsNegative affective reaction Negative emotional reactions to the other party's offer(s), idea(s), and arguments(s) (does not include rejection of offer but focuses on the emotional response)Omission*
+Withholding information which was explicitly requested by the other party or concealing indifference/compatibility toward options (misrepresentation by
+omission)Procedural suggestion Commenting on the mode, approach or process of the negotiation or suggesting an action or a course of action regarding the process of the interactionInterruption of the conversation
+External or internal issues that disrupt the interactionAsking for priority-related information
+Asking for the other party's priorities among issuesMulti-issue activity
+Making a multi-issue offer (proposal that comprises two or more of several possible issues)Asking for substantiation Requesting the other party to substantiate or questioning the substantiationPositive affective reaction Positive emotional reactions to the other party's offer(s), idea(s), and argument(s)Threat
+Warning of the costs if other party does not comply with made propositionsProcedural discussion Agreeing, disagreeing, clarifying or asking for clarification regarding a procedural suggestion/commentInaction
+Statements that are aborted without being interrupted by the other partyProviding preference-related information
+Providing information that reveals the own preferences within an issue or time preferencesRequesting action Asking the other party to make an offer, to show a
+response/reaction to an offer or on an idea or making an open-ended comment that needs a replyStressing power
+Referring to having more power than the other party, to being superior, to the lack of power, competence or experience of the other partyActive listening Paraphrasing the other party's statements and generic paraverbal responses such as "mm hmm" or "yeah"Lying* Misrepresenting by commission (e.g., misrepresenting one's preferences)Time management
+Time checks, remarks about time that is running-out and suggestion to hurry and come to quick solutionsOthers
+All statements that do not fit within any of the categoriesAsking for preference- related information
+Asking for the other party's preferences within an issue or time preferencesRequesting for offer modification
+Demanding a concession/offer modification without altering the own position/offer (not fostering mutual concession making)Rejecting substantiation Disagreeing with the other party's arguments, denying their relevance, disagreeing or rejecting the other party's accusationsHumor
+Use of humor and laughterHostility
+Use of indecent language directed at the other party, teasing and provoking or directly insulting the other partyChange of mode
+Changing the mode of discussion by using visual aids, by suggesting a break to calculate, think, or consult
+with the own party or when changing the mode of communication*can only be coded with data from experimental settings where role instructions and information given to the negotiators are disclosed to coders.
+
+
+Acts of providing and asking about negotiation-related information
+OffersActs of persuasive communication
+Socio-emotional statements
+Unethical behaviorsActs of process-related communication
+Residual categoryAsking for positional information
+Asking the other party for their reservation point, BATNA, minimum terms or information about competitors (i.e., every question that is aiming for positional information)Rejecting offer
+Rejecting the other party's offer or part of it, disagreeing with an agreement proposalInterrupting
+Disrupting the other party's speaking turn (when it is clear that the other party is not yet done articulating an idea/statement)Positive relationship remark Statements that reflect a (positive) relationship between the partiesUse of extreme anchors* Making an offer that is far greater than the other party's reservation pointProviding positional information Statements that reveal
+information about the own party's reservation point, BATNA, minimum terms, competitors or statements of an exact value of one party's profits or profit tableAccepting offer
+Agreeing with or accepting the other party's offer/concession or part of itCriticism
+Criticizing the other party's behavior or accusing them of performing (or not performing) a particular action (not rejecting the other party's accusations, not questioning the other party's ability or referring to a lack of power)Negative relationship remark Statements that reflect a negative relationship between the partiesFacts/Additional information Any information that is not related to preferences, priorities, positional information and does not follow an argumentative structure but consists of purely providing information.Encouragement
+Encouraging the other party to perform a particular actionPersonal communication Asking the other party for personal information that is not related to the negotiation or providing the other party with personal information not related to the negotiationExtension questions Asking for additional information or clarification
+(not substantiation), that are not related to preferences, priorities, positional informationPositional commitments Communicating positional commitments to the other partyNonpersonal chit-chat Miscellaneous statements unrelated to negotiation (e.g. remarks about the weather)*can only be coded with data from experimental settings where role instructions and information given to the negotiators are disclosed to coders.
+
+
+Acts of providing and asking about negotiation-related information
+OffersActs of persuasive communication
+Socio-emotional statements
+Unethical behaviorsActs of process-related communication
+Residual categoryAdditional issues Mentioning or asking for potential additional issues that are not yet part of the agendaAvoiding
+Changing subject or shift discussion to new issue without terminating/agreeing on a previous issue, refusing to answer and/or replying vaguelyFuture-related communication Stating expectations about negotiations in the future,Clarification
+Paraphrasing the own party's previous statements, asking for clarification of the other's previous statements, summarizing previous agreementsApologizing
+Expressing regret and apologizing for a previous action, stating to be wrong
+Codes - Definitions and Examples Table S4
+Acts of providing and asking about negotiation-related information
+
+CodeDefinition/contentExampleDelimitAdditional informationProviding priority- related informationProviding information that reveals the own priorities among issues (must reflect a hierarchy between issues)* "For us, it's more important to agree on the price than on the construction of the cooling system."
+* "We care about all issues equally."
+* "The contract duration is also of less importance to us."Not: "Because the price is very important to us." (Substantiation)
+And also not: if the provided information is false (Lying)If the research focus is on priority-related information provision, this code can be split up in different kinds of priority-related information, e.g.,
+* Stating priorities without relating to others' priorities
+* Noting similar priorities
+* Noting different prioritiesAsking for priority- related informationAsking for the other party's priorities among issues (asking for a hierarchy between issues)* "Is the distribution of rental incomes more important to you than the contract duration?"
+* "What is the most important issue for you?"
+* "Is there an issue that you care more about than others?"Also: "How important is a financial contribution to you?"
+Not: "Is the financial contribution important to you?" (Asking for positional information)
+
+CodeDefinition/contentExampleDelimitAdditional informationProviding preference-related informationProviding information that reveals the own preferences within an issue or time preferences (must reflect a hierarchy between options within an issue)* "We'd rather work with our old supplier again."
+* "We'd rather have the money sooner than later."
+* "It would be best if we could work with project leader X."Not: "We'd like to work with our old supplier again." (no hierarchy reflected --> Single-issue activity)
+And also not: if the provided information is false (Lying)If the research focus is on preference-related information provision, this code can be split up in different kinds of preference-related information, e.g.,
+* Stating preferences without relating to others' preferences
+* Noting similar preferences
+* Noting different preferencesAsking for preference-related informationAsking for the other party's preferences within an issue (asking for a hierarchy between options within an
+issue) or time preferences* "So which supplier do you prefer?"
+* "And what is your preference regarding the project leader?"
+* "Would you prefer 24 months or 6 months for the duration of the maintenance agreement?"
+
+CodeDefinition/contentExampleDelimitAdditional informationProviding positional informationStatements that reveal information about the own party's reservation point, BATNA, minimum terms, competitors or statements of an exact value of one party's profits or profit table* "So, my lower price limit is
+€50.000 at the moment."
+* "We already have an offer of
+€ 2.5 million for the property."
+* "We can only pay for transportation until Genoa."Also: "Your offer is very low."
+Not: Lies regarding positional information (Lying)
+And also not: "There are many companies out there that did offer more." (Stressing power)
+And also not: "I won't go
+any higher, that's it." (Positional Commitment)Asking for positional informationAsking the other party for their reservation point, BATNA, minimum terms or information about competitors (i.e., every question that is aiming for
+positional information)* "How much is the other offer you've received?"
+* "What is your limit regarding the number of inspections?"
+* 	"Who is offering you more, may I ask?"Also: "How much would you have to pay for supplier X?"
+Not: "Would it be better for you to switch to supplier McCogan?"(Asking for preference-related information)
+
+CodeDefinition/contentExampleDelimitAdditional informationFacts/Additional informationAny information that is not related to preferences, priorities, positional information and does not follow an argumentative structure ("..., because") but consists of purely providing information
+e.g. providing information about the own company or
+strategic plan* "I'm Mrs. X from the Y group."
+* "We are currently working on a project together with Russia."
+* "Our company is located in Germany."Also: "We want to build a thermal cracker in Oman."
+Not: if the provided information is false (Lying)Extension questionsAsking for additional information or clarification (not substantiation), that are not related to preferences,
+priorities, positional information* "Do you have any information about the production?"
+* "Then the question is, how long are we allowed to use the property?"
+* "Is there a building on the property"Additional issuesMentioning or asking for potential additional issues that are not yet part of the agenda* "Do you have anything else that might be of interest to us?"
+* "Yes, we would also be interested in a property."
+* "We might have something else of interest for you."Not: "So, we agreed to exclude the property from our agreement?" (Clarification)
+
+CodeDefinition/contentExampleDelimitAdditional informationClarificationParaphrasing the own party's previous statements, asking for clarification of the other's previous statements, summarizing previous agreements* "I mean..."
+* "So, €50,000 for the property?"
+* "In summary, we agree on..."
+* "And the property would be
+€100,000 if we split it up, in my calculations."
+* "And we agreed on the contract period, right?"Also: If negotiators repeat offers or arguments
+Not: if negotiators change the offer/make a new offer ("So, 50000 for the property" when 50000 was not yet offered)If the research focus is on clarification, this code can be split up in different kinds of clarification, e.g.,
+* Repeating ("As I said, we can offer you 100,000€ for the property")
+* Reassuring ("You said 100,000€, right?")
+* Explaining ("I mean, transportation until Genoa, not Oman."
+Table S5
+
+Offers
+
+CodeDefinition/contentExampleDelimitAdditional informationSingle-issue activityMaking a single- issue offer (proposal that comprises only one of several possible issues)
+e.g. compromise agreement offer, range offers* "We would like to sell for
+€400,000."
+* "We would like you to fully pay for the cooling system."
+* "How about we split the delivery costs?"
+* "Would you pay, let's say, 15% to 20% more"?Also: Compromise agreement offers, e.g., "Let's meet halfway" Not: If negotiators only repeat the same offer (Clarification)
+And also not: if an offer is far greater than the other party's reservation point (Use of extreme anchors; i.e., if (a) the offer exceeds twice as much as the differences between the options of a (fixed- steps) payoff schedule above the upper limit/below the lower limit or (b) the offer exceeds twice as much as the space between both parties' reservation points above/below the other party's reservation point)Issues and price details that are referred to in the offer should be noted in the comment section that pops up after assigning this code (when coding with INTERACT software).
+
+CodeDefinition/contentExampleDelimitAdditional informationMulti-issue activityMaking a multi-issue offer (proposal that comprises two or more of several possible issues)
+e.g. conditional offers ("If I agree with you on this issue, you have to accommodate on the next issue."), incorporating requests, ideas, part of the other party's offer into a new offer* "If I agree with you on this issue, you have to accommodate me on the next issue."
+* "We could pay 25% when it is delivered, then we have to go down on the price though."
+* "Okay, then you pay for the property, we pay for the tank and we split the costs for the sending station in half."
+* "I have a different idea, that we connect the last issue with this one, so that you fully pay for the sending station and we pay for the cooling system."Not: If negotiators only repeat the same offer (Clarification)
+And also not: if an offer is far greater than the other party's reservation point (Use of extreme anchors; i.e., if (a) the offer exceeds twice as much as the differences between the options of a (fixed- steps) payoff schedule above the upper limit/below the lower limit or (b) the offer exceeds twice as much as the space between both parties' reservation points above/below the other party's reservation point) And also not: Using a compatible/indifference issue for a trade-off (Omission)Issues and price details that are referred to in the offer should be noted in the comment section that pops up after assigning this code (when coding with INTERACT software). This allows to screen for multiple equivalent simultaneous offers (MESOs; see Leonardelli et al., 2019) afterwards.Requesting actionAsking the other party to make an offer, to show a response/reaction to an offer or on an idea or making an open-
+ended comment that needs a reply* "What can you offer?"
+* "How much would you pay for the tank?"
+* "Then we have to see what to do with the terms of payment..."Also: "What options do we have?"
+Not: "...that's why it's a bit difficult without a deposit..." (Substantiation)
+
+CodeDefinition/contentExampleDelimitAdditional informationRequesting for offer modificationDemanding a concession/offer modification without altering the own position/offer (not fostering mutual concession making)* "Now it's your turn to make a concession."
+* "You really need to lower the price to get us on board."
+* "We really need you to agree on our supplier."Not: Fostering mutual concession making (Single-issue activity)Issues and price details that are referred to in the request should be noted in the comment section that pops up after assigning this code (when coding with INTERACT
+software).Rejecting offerRejecting the other party's offer or part of it, disagreeing with an agreement proposal* "No" (as a reaction to an offer)
+* "That won't work."
+* "I have to reject this offer"Not: "That's very high." (Positional information) And also Not: "That's impossible." (Positional commitment)
+And also not: "That's bad." (Negative affective reaction)Accepting offerAgreeing with or accepting the other party's offer/concession or
+part of it* "Yes, let's put that down."
+* "Okay."
+* "Yes, we can agree on that."Not: "That would be awesome." (Positive affective reaction)
+Table S6
+
+Acts of persuasive communication
+
+CodeDefinition/contentExampleDelimitAdditional informationSubstantiationStatements that follow an argumentative structure ("..., because"), and statements that connect information with opinions or recommendations ("You need this...")
+e.g. reasons for preferences and priorities* "The problem is, we need a deposit to cover all the costs."
+* "...with this high quality, we offer..."
+* "Because I made concessions all the way..."
+* "Keep in mind, we don't get a subsidy."Also: "You should agree, because there's no time to discuss this further." (Make sure when assigning this code that the negotiator does not include themselves when pointing out to hurry.) Not: "With regards to the time, we should better find a quick solution." (Time management)
+Not: Referring to having more power than the other party, to having alternatives, to the lack of power, competence or experience of the other party (Stressing power) And also not: if the
+substantiation reflects false information (Lying)If the research focus is on substantiation, this code can be split up in different kinds of substantiation, e.g.,
+* Referring to statistics
+* Referring to norms
+* Positive substantiation ("This is good for you,...")
+* Negative substantiation ("You don't need this, ...")Asking for substantiationRequesting the other party to substantiate ("Why should I...?", "Why do you prefer this...?") or questioning the substantiation ("Do
+you really think...?")* "Why should I agree to this?"
+* "Why do you prefer to buy this only next year?"
+* "Do you really think the price will decrease in the next months?"Not: "To be honest, that seems a bit strange to me." (Negative affective reaction)
+
+CodeDefinition/contentExampleDelimitAdditional informationStressing powerReferring to having more power than the other party, to being superior, to the lack of power, competence or experience of the other party* "If you don't want our property, there are many others out there that would love to take it" (referring to BATNA)
+* "I don't think you understand what we are talking about here."
+* "Well, unlike you we're dealing with this issue on a daily basis "
+* "We are in charge regarding
+this issue, so you shouldn't have a say."Not: "We already have an offer of € 2.5 million for the property." (Positional information)
+
+Attention:
+Stating BATNA (i.e. mentioning a concrete number) --> Positional information
+Vs.
+Referring to BATNA (see example) --> Stressing powerRejecting
+substantiationDisagreeing with the
+other party's arguments, denying their relevance, disagreeing or rejecting the other party's accusations* "No, that's not what I meant."
+* "We've had different experiences."
+* "I don't think this is true."Not: "Are you really
+sure?" (Asking for substantiation)
+And also not: Substantiate own arguments, but simultaneously disagreeing with the other party's arguments or accusations
+(Substantiation)
+
+CodeDefinition/contentExampleDelimitAdditional informationInterruptingDisrupting the other party's speaking turn (when it is clear that the other party is not yet done articulating an idea/statement)* "Wait!..."
+* "Stop it!"
+* "Yes, yes, but..."Not: "No, no, we can't accept that." (Rejecting offer)"In case one negotiator is interrupting the other party and continues with a statement, assign "Interrupting" to one short unit (~5 milliseconds) and the respective code to the
+following unitCriticismCriticizing the other party's behavior or accusing them of performing (or not performing) a particular action (not rejecting the other party's accusations, not questioning the other party's ability or referring to a lack
+of power)* "I'm sure, you could reach out a bit more."
+* "I feel like you're not even trying to understand me."
+* "Are you trying to bribe me?"Not: "I think you don't understand what we're talking about." (Stressing power)
+And also not: "You really are a coward." (Hostility)EncouragementEncouraging the other party to perform a particular action* "Go on..."
+* "Please, finish your thought."
+* "Good" or "Okay" (as a signal to proceed)Not: "I can only recommend you to go for the highest quality, it's in your own interest."(Substantiation) And also not: "Mm mmh" or "Yeah" as a generic paraverbal response to the other party (Active
+listening)
+
+CodeDefinition/contentExampleDelimitAdditional informationPositional commitmentsCommunicating positional commitments to the other party* "I won't go any higher, that's it."
+* "There is no room for negotiation anymore."
+* "This is my last offer."Not: "So, my lower price limit is €50.000 at the moment."AvoidingChanging subject or shift discussion to new issue without terminating/agreeing on a previous issue, refusing to answer and/or replying vaguely* "I'd rather not talk about my reasons." (when the other party is asking for a substantiation)
+* "Yeah, this would be a possibility...",
+* "Hm, I don't know, maybe..." (vague answers in response to offers or suggestions)Not: "Let's just talk about something else then."(Procedural suggestion)
+Table S7
+
+Socio-emotional statements
+
+CodeDefinition/contentExampleDelimitAdditional informationNegative affective reactionNegative emotional reactions to the other party's offer(s), idea(s), and arguments(s)* "Honestly, you can't be serious."
+* "This is really annoying!"
+* "That's really a pity."
+* "I feel a little insecure about this."Not: Rejection of offer, but the emotional response towards offers, ideas, and arguments; look out for words that reflect feelings (e.g., annoying, skeptical, angry)If the research focus is on emotions, this code can be split up in different negative emotions, e.g.:
+* Anger
+* Disappointment
+* Disgust
+* Shame
+* FearPositive affective reactionPositive emotional reactions to the other party's offer(s), idea(s), and argument(s)* "This is going really well."
+* "Good, that was quick."
+* "Then, we'd be very satisfied."
+* "Nice, that was fun."
+* ''I'm happy to be here."Not: "Good" as a signal to proceed with the negotiation (Encouragement);
+look out for words that reflect feelings (e.g., happy, satisfied, thankful)If the research focus is on emotions, this code can be split up in different positive emotions, e.g.:
+* Joy
+* Satisfaction
+* Excitement
+
+CodeDefinition/contentExampleDelimitAdditional informationActive listeningParaphrasing the other party's statements and generic paraverbal responses such as "mm hmm" or "yeah"* "I understand."
+* "Uhu."
+* "Mm hmm."
+* "Yes, yes..."
+* "Hmm, I see."
+* "I see where you're going with this."
+* "I thought so."Also: Repeating the other's statement
+Not: "Good" or "Okay" as a signal to proceed (Encouragement)
+Not: Agreeing with the other party's substantiation, e.g., "Yes, indeed!"(Positive relationship remark)If the research focus is on active listening, this code can be split up in different kinds of active listening, e.g.,
+* Paraphrasing and repeating the other party's statements
+* "Mm hmm" and "yes, yes"
+* "I understand." and "I thought so."HumorUse of humor and laughter
+(e.g. using two opposing semantic scripts in one sentence)* "Wow, that really makes a difference(!)"(sarcastic)
+* "Well, my final offer is $1000 and I'll throw in my pet frog."
+* "Hahahaha!"
+* "Maybe that's a magic trick."If the research focus is on humor, this code can be split up in different
+kinds of humor, e.g.,
+* Self-defeating
+* Aggressive
+* Affiliative
+* Self-enhancing
+
+CodeDefinition/contentExampleDelimitAdditional informationPositive relationship remarkStatements that reflect a (positive) relationship between the parties
+e.g. complementing the other party, showing support* "We've worked well together in the past." (e.g., as a compliment in the beginning of a negotiation)
+* "Great to be working together again."
+* "I trust you on this."
+* "I think we will manage to find a solution."
+* 	"Then, thank you very much."Also: If negotiators advocate for the other party (e.g., "If we ask for a higher price, this would of course be worse for you."), agree with their substantiation (e.g., "Yes, indeed, yes, that's correct."), or show empathy "I understand that this is hard for you."Negative relationship remarkStatements that reflect a negative relationship between the parties* "I feel like we're not on the same page."
+* "Well, I can't take your word for it, can I?"
+* "You don't seem comfortable discussing this with me."Not: "I feel like you're lying to me." (Criticism) And also not: "I'd rather not tell you precise numbers." (Avoiding)Personal communicationAsking the other party for personal information that is not related to the negotiation or providing the other party with personal information not
+related to the negotiation* "So you like playing chess?"
+* "So, do you like strategic games?"
+* "I'm really into cars."
+
+CodeDefinition/contentExampleDelimitAdditional informationNonpersonal chit- chatMiscellaneous statements unrelated to negotiation
+e.g. remarks about the weather* "Hello, welcome.."
+* "It's getting very chilly these last days."
+* "The traffic was heavy this morning"Future-related communicationStating expectations about negotiations in the future,
+e.g. promises, or expressing the expectation of
+reciprocity* "I hope you'll think of us in the future."
+* "We'll return the favor in our next collaboration."
+* "I hope we'll work together again in the future."ApologizingExpressing regret and apologizing for a previous action, stating to be wrong* "Oh, yes, sorry I made a mistake."
+* "Yes, you're right" (after the other party pointed out a mistake)
+* "Oh, that was a stupid suggestion, sorry."
+Table S8
+
+Unethical behaviors
+
+CodeDefinition/contentExampleDelimitAdditional informationOmission*Withholding information which was explicitly requested by the other party or concealing indifference/compati bility toward options (misrepresentation by omission)* "If we agree on the supplier you prefer, you have to accommodate on the price" (using a compatible issue [i.e. the supplier] for a trade-off)
+* Can we agree on purchasing the buffer tank right away if we decide for the longest contract duration?" (using a compatible issue [i.e. contract duration] for a trade-off)Also: Paltering (using truthful statements to create a false impression), e.g., "You decided fully on the contract duration, so we want to decide who's responsible for the construction of the gateway cooling system" - leaving the impression that the first decision was not in line with the negotiator's preference, even though it was (compatible issue)
+Not: "I'd rather talk about something else" (Avoiding);
+And also not: Answering "a lot" or "probably more than you would have to pay" to the question "How much precisely does the construction of the cooling system cost
+                                                 you?" (Avoiding)	*Can only be coded when coders have required information (e.g. instructions, payoff schedule).
+For further analyses the code that would have been assigned if behavior was not an Omission can be written down (comment section or additional code).
+
+CodeDefinition/contentExampleDelimitAdditional informationThreatWarning of the costs if other party does not comply with made propositions,
+e.g. giving the other party an ultimatum* "Well, if you can't go any higher, you won't get the chance to talk about the other issues at all."
+* "If you don't collaborate, it will be much harder for you to get what you want from me."
+* "We can also leave it and you
+don't get the pump head at all."Also: "If you don't agree in the next minutes, you'll leave with nothing."
+Not: "I don't need you. I have other options" (Stressing power)
+And also not: "This is my limit, I won't lower the price anymore" (Positional commitment)Lying*Misrepresenting by commission,
+e.g. misrepresenting one's preferences, pretending to be obliged to consult with a third party* "This is really important to us." (even though it is not)
+* "I don't know." (even though the negotiator knows the answer to the specific question the other party asked)
+* "We have a much higher offer from a different company." (even though the party does not have a higher alternative offer)*Can only be coded when coders have required information (e.g. instructions, payoff schedule).
+For further analyses (to see what negotiators lie about) the code that would have been assigned if behavior was not Lying can be written down (comment section or
+additional code).
+
+CodeDefinition/contentExampleDelimitAdditional informationHostilityUse of indecent language directed at the other party, teasing and provoking or directly insulting the other
+party* "This sounds a bit childish."
+* "Why are you so wimpy?"
+* "Bullshit!" (for assigning this code, this utterance must be directed at the other party)Use of extreme anchors*Making an offer that is far greater than the other party's reservation pointIf one of the following applies:
+* a) The offer exceeds twice as much as the differences between the options of a (fixed-steps) payoff schedule above the upper limit/below the lower limit.
+Example:*Can only be coded when coders have required information (e.g. instructions, payoff schedule).Maintenance agreement	Score A	Score B24 months	0	320018 months	200	240012 months	400	16006 months	600	800no maintenance included	800	0Party B offers 37 months* b) The offer exceeds twice as
+much as the space between both parties' reservationpoints above/below the other party's reservation point.
+
+
+
+Table S9
+
+Acts of process-related communication
+
+CodeDefinition/contentExampleDelimitAdditional informationProcedural suggestionCommenting on the mode, approach or process of the negotiation or suggesting an action or a course of action regarding the process of the interaction* "Then let's start with negotiating about the price, shall we?"
+* "What I'd suggest is that we put the financial subsidy on hold until the end of the negotiation."
+* "There are still a few open issues on which we have to agree."Also: "So, we're done!" And also: "It's difficult to find an agreement."
+Not: "It's difficult to go any higher." (Positional commitments)If the research focus is on procedural suggestions, this code can be split up in different kinds of procedural suggestions, e.g.,
+* Suggesting to discuss one issue at a time
+* Suggesting to do package trade- offs
+* Positive comments on process
+* Negative
+comments on processProcedural discussionAgreeing, disagreeing, clarifying, or asking for clarification regarding a procedural suggestion/comment* "Right, let's do that."
+* "So, you mean discussing issue X first?"
+* "What other issues are there to discuss?"
+* "We skipped talking about the tank so far, right?"Not: "We still have two issues to discuss." (Procedural suggestion)
+
+CodeDefinition/contentExampleDelimitAdditional informationTime managementTime checks, remarks about time that is running-out and suggestion to hurry and come to quick solutions* "With regards to the time, we should better find a quick solution." (make sure when assigning this code that the negotiator includes himself/herself when pointing out to hurry)
+* "Can you watch the time? I'm not wearing a watch."
+* "We still have 10 minutes."Not: Putting time pressure on the other party as a means of distributive bargaining, e.g., "With regards to the time, you should better agree to my proposal." (Substantiation)Change of modeChanging the mode of discussion, for instance, by using visual aids (e.g.
+Whiteboard, pen and paper, Excel-sheet), by suggesting a break to calculate, think, or consult with the own party, or when changing the mode of communication* "One moment, I have to think about this."
+* Negotiators then read their materials or take notes.
+* Negotiators use a whiteboard or a piece of paper to illustrate something.
+* Negotiators move from e-mail to negotiating live (time in between the last e-mail and first contact in person)
+* Time in between communication via e-mailAlso: Negotiator reads out instructions aloud
+Not: "I'd rather think about this a little more" (Avoiding)If the research focus is on change of mode, this code can be split up in different kinds of actions, e.g.,
+* Reading materials
+* Changing the mode of communication
+* Using a whiteboard or a piece of paper to illustrate something
+* Announcing a break for consulting with the own party
+* Remark about
+having to contemplate
+Table S10
+
+Residual category
+
+CodeDefinition/contentExampleDelimitAdditional informationInterruption of the conversationExternal or internal issues that disrupt the interaction (e.g., traffic noise, coughing, or
+sneezing)* One of the negotiators sneezes or coughs
+* Someone enters the room.InactionStatements that are aborted without being interrupted by the other party* "Yes, so we can...ah..hmm..."
+* "Or maybe if you...ah..no..."
+* "Yeah, but...(nothing follows)"Not: "Ah, hmm" in response to the other's statement (Active listening)OthersAll statements that do not fit within any of the categories* Humming, while thinking
+* Silence
+* Incomprehensible speechNot: Silence because negotiators take notes or read the material (Change of mode)
+And also not: People start a sentence with "Uhhh" but do not finish
+(Inaction)
+Payoff-matrices
+
+Table S11
+
+Summary chart - Negotiation task 1
+
+PriceScore (Buyer)Score (Seller)Transfer of risk and shipping costsScore (Buyer)Score (Seller)7,500,000€24000CIP Yibal0-60007,600,000€1800600CIF Mina al-Fahal, Maskar-1500-45007,700,000€12001200CFR Mina al-Fahal, Maskar-3000-30007,800,000€6001800FOB Genua-4500-15007,900,000€02400EXW-60000Payment conditionsScoreScoreIncluded inspectionsScoreScore0% at time of contract conclusion / 0% on delivery / 100% after acceptance80004 inspections included160000% / 50% / 50%6008003 inspections included1200100010% / 30% / 60%40016002 inspections included800200010% / 40% / 50%20024001 inspection included400300030% / 30% / 40%03200no inspections included04000Date of deliveryScoreScoreMaintenance agreementScoreScoreOctober 154000024 months03200October 29300040018 months2002400November 12200080012 months4001600November 26100012006 months600800December 1001600no maintenance included8000Portion of companies from Oman participating in the installation of the pumpsScoreScoreSupplier of connection pipesScoreScore100%00Tuyanterie Francois Marchand SA (France)-2400-240075%300300Smithson Pipe Systems Inc. (USA)-1800-180050%600600Tubos Rocco Roletti SA (Italy)-1200-120025%900900Rohrsysteme Vulkan GmbH (Germany)-600-6000%12001200MacCogan Pipes PLC (UK)00Note. The negotiation task was adapted from Thompson et al. (1996). For more information, see the supplementary file by Hüffmeier et al. (2019).
+
+Table S12
+
+Summary chart - Negotiation task 2
+
+Financial contributionScore (Seller)Score (Buyer)Construction of pig launcherScore (Seller)Score (Buyer)No contribution0 €0 €Buyer constructs pig launcher0€-100,000€Small contribution250,000€-250,000€Buyer and Seller construct pig launcher together-100,000€-50,000€Big contribution500,000€-500,000€Seller constructs pig launcher-200,000€0€Construction of the gateway cooling systemScoreScoreContract durationScoreScoreBuyer constructs cooling system0€-200,000€8 years0€0€Buyer and Seller construct cooling system together-50,000€-100,000€9 years50,000€50,000€Seller constructs cooling system-100,000€0€10 years100,000€100,000€Purchase of the buffer tankScore (Seller)Score (Buyer)Distribution of rental incomesSellerBuyerExpectationPrice decreasesPrice increasesRent to be distributed per year (over 3 years)2,000,000€Costs now-400,000€-400,000€Tax rate year 10%30%Expected costs later-350,000€-450,000€Tax rate year 230%30%Tax rate year 330%30%Parcel of land in RotterdamSellerBuyerSituationWants to buy such a propertySells the propertyAlternative if not included in the negotiation Buys the other
+(similar) property for 3,000,000€Sells to other buyer for 2,600,000€Note. The negotiation task was adapted from Moran et al. (2008). For more information, see the supplementary file by Hüffmeier et al. (2019).
+
+Additional analyses - Correlation matrices and lag sequential analyses
+
+Table S13
+
+Correlations between the frequency of codes, joint gains, individual gains
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerNegotiation task 1Negotiation task 2Providing priority-related information.40.16.21.48.41-.41Asking for priority-related information.49-.02.30.28.27-.27Providing preference-related information-.16-.36.24.78*.55-.55Asking for preference-related information.38-.44.72*-.18-.34.26Asking for positional information-.12-.47.67*.24-.23.29Providing positional information
+-.36
+-.17
+.10
+.22
+.04
+.01Facts/Additional information-.13.23-.32.47.41-.37Extension questions.38.53-.29.33.56-.46Additional issues///.15-.13.13Clarification.07.07.32.66.18-.12Single-issue activity-.22.26-.05-.52-.79*.74*Multi-issue activity.35-.35.64.45.77*-.87*Requesting action.14.28.09.38.52-.53Requesting for offer modification-.15-.31.02.05.42-.46Rejecting offer.10.12.08-.23-.05-.08Accepting offer-.29-.46.19-.50-.48.55Substantiation.14-.14.35-.16.00-.04Asking for substantiation-.28-.41.27.30.40-.33Stressing power///-.04-.01-.01Rejecting substantiation.21-.30.66-.32-.11.06Interrupting-.41-.55.41-.27-.14.17Criticism.32-.28.55-.06-.39.49Encouragement-.13.37-.67*-.77*-.77*.74*Positional commitments.10-.38.68*.03.00-.03Avoiding.19-.15.36.65.62-.73*
+Table S13 (continued)
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerNegotiation task 1Negotiation task 2Negative affective reaction-.05.18-.11-.03-.24.32Positive affective reaction-.07-.42.15-.69*-.53.42Active listening.21.13-.02.54.55-.63Humor-.54-.13-.19-.36.04-.11Positive relationship remark-.08-.45.30.12-.13.28Negative relationship remark-.06.00.15.47.52-.52Personal communication.13-.14.27.48.41-.41Nonpersonal chit-chat-.46-.34.07-.26.01.03Future-related communication///-.18-.37.48Apologizing-.66-.30-.35.31.25-.33Omission.00-.77.91**.08-.06.11Threat-.10-.62.73*///Lying.27-.30.61.10-.15.29Hostility///-.14-.27.41Use of extreme anchors-.05-.60.73*.28.27-.27Procedural suggestion-.29.09-.29.59.52-.58Procedural discussion-.18.12-.39.09-.05-.07Time management-.07-.33.20-.05.21-.31Change of mode.11.46-.15.28.66-.76*Interruption of the conversation.28.14.09.32.09-.09Inaction.38-.22.48.27.08-.05Note: Spearman's correlation (two-tailed); frequency of codes and joint gains at the dyad level. N = 9 for negotiation task 1; N = 9 for negotiation task 2.
+p* < .05, p** < .01
+
+Table S14
+
+Correlations between the frequency of sellers' codes, joint gains, individual gains
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerSellerNegotiation task 1Negotiation task 2Providing priority-related information.37-.19.42///Asking for priority-related information.73*.24.11.28.27-.27Providing preference-related information-.26-.43.21.78*.55-.55Asking for preference-related information.11-.64.77*.28.27-.27Asking for positional information-.57-.36.25.29-.03.07Providing positional information
+-.06
+-.09
+.24
+.40
+.16
+.02Facts/Additional information.32.59-.15.46.10-.10Extension questions///.00.00.14Additional issues///-.04.00.15Clarification.03.30.08.69*.22-.13Single-issue activity.12.35.04-.35-.60.63Multi-issue activity.24-.37.66.67*.83*-.83*Requesting action.16.12.32.39.55-.67*Requesting for offer modification-.09.30-.32-.01.33-.39Rejecting offer.15.27-.14-.33-.12-.04Accepting offer-.05-.61.45-.77*-.59.59Substantiation.15-.08.20-.07.26-.34Asking for substantiation-.28-.41.27.32.09-.09Stressing power//////Rejecting substantiation.00-.29.50-.22-.14.09Interrupting-.41-.55.41.00.21-.10Criticism.16-.10.21.05-.27.37Encouragement-.18.56-.82**-.23-.07.12Positional commitments.05-.36.66.55.50-.50Avoiding-.04-.04-.01.00.27-.37
+Table S14 (continued)
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerSellerNegotiation task 1Negotiation task 2Negative affective reaction-.33-.06-.12-.15-.44.55Positive affective reaction.26-.08.13-.30-.21.25Active listening.20-.09.23.34.30-.35Humor-.30-.11.05-.24.28-.33Positive relationship remark.32-.11.27.04-.12.17Negative relationship remark-.06.00.15.14.55-.55Personal communication.48.28.00.48.41-.41Nonpersonal chit-chat-.16.06-.04-.57-.31.31Future-related communication///-.21-.41.52Apologizing.10.33-.30.58.53-.53Omission.59-.13.48.31-.07.16Threat//////Lying.28-.11.38.12.14-.14Hostility///-.14-.27.41Use of extreme anchors-.05-.60.73*///Procedural suggestion.13.62-.61.37.62-.74*Procedural discussion-.18.11-.33.51.19-.22Time management.04.14-.37-.55-.14.00Change of mode.41.51-.14.42.52-.52Inaction-.09.14-.27.45.15-.10Note: Spearman's correlation (two-tailed); frequency of codes and individual gains at the individual level. N = 9 for negotiation task 1;
+
+N = 9 for negotiation task 2. p* < .05, p** < .01
+
+Table S15
+
+Correlations between the frequency of buyers' codes, joint gains, individual gains
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerBuyerNegotiation task 1Negotiation task 2Providing priority-related information.36.25.11.48.41-.41Asking for priority-related information.36-.10.34.28.28-.28Providing preference-related information.20-.24.45.57.52-.52Asking for preference-related information.43-.06.32-.52-.73*.62Asking for positional information.10-.48.68*.31-.14.25Providing positional information
+-.65
+-.28
+-.03
+.12
+.10
+-.17Facts/Additional information-.50-.26-.15.21.41-.36Extension questions.38.53-.29.44.73*-.73*Additional issues///.36-.14.22Clarification.27.11.33.36-.14.22Single-issue activity-.47-.22-.09-.42-.61.49Multi-issue activity.27-.31.46.37.72*-.82**Requesting action-.09.21-.18.20.21-.18Requesting for offer modification-.01-.23.02.30.54-.46Rejecting offer-.09-.02.12-.19-.17.12Accepting offer-.07.39-.33.03-.15.22Substantiation-.13-.41.39-.26-.13.10Asking for substantiation///.02.27-.18Stressing power///-.04-.01-.01Rejecting substantiation.25-.38.68*-.15.12-.17Interrupting///-.42-.52.52Criticism.28-.28.55-.31-.62.73*Encouragement-.16-.51.09-.74*-.71*.58Positional commitments-.13-.53.69*-.34-.34.32Avoiding.28-.37.64.58.47-.54
+Table S15 (continued)
+
+VariableJoint gains Individual gain - Seller Individual gain - BuyerJoint gains Individual gain - Seller Individual gain - BuyerBuyerNegotiation task 1Negotiation task 2Negative affective reaction.11.07.13.09.02.05Positive affective reaction-.18-.30-.10-.84**-.75*.62Active listening.44.37-.10.43.68*-.78*Humor-.36-.30.03.34-.03.12Positive relationship remark-.36-.71*.36-.03-.29.40Negative relationship remark.48.28.00.48.14-.14Personal communication.13-.14.27.48.41-.41Nonpersonal chit-chat-.47-.77*.40-.06.17-.15Future-related communication///.00.00.14Apologizing-.84**-.67*-.04-.41-.41.27Omission-.18-.78*.84**-.27-.14.17Threat-.10-.62.73*///Lying.06-.55.72*.17-.03.16Hostility//////Use of extreme anchors-.10-.62.73*.28.27-.27Procedural suggestion.38-.32.54.46-.14.19Procedural discussion-.20.15-.50-.33-.19.03Time management-.10-.50.44.48.41-.41Change of mode-.08.24.03.55.76*-.81**Inaction.52-.45.85**-.24.05-.05Note: Spearman's correlation (two-tailed); frequency of codes and individual gains at the individual level. N = 9 for negotiation task 1;
+
+N = 9 for negotiation task 2. p* < .05, p** < .01
+
+Lag sequential analysis
+
+      Results of a first exploratory analysis of behavioral patterns concerning socio-emotional statements and unethical behaviors are presented in Table S16.
+To illustrate the inner workings of lag sequential analysis you will find the respective formulas below that allow following the single steps for each calculation mathematically (see Bakeman & Gottman, 1997).
+(1) The estimate of transition probabilities (tGT) is calculated as follows (Bakeman & Gottman, 1997; p. 98):
+
+??????
+
+= ??????
+????+
+
+(1)
+
+
+Note. xGT = observed frequency value (i.e., how often behavior T followed behavior G); xG+ = frequency of behavior G in total
+
+
+(2) The estimate of expected frequencies (mGT; i.e., chance joint frequency) is calculated as follows (Bakeman & Gottman, 1997, p. 108):
+
+??????
+
+= ????+*??+??
+??++
+
+(2)
+
+
+Note. xG+ = frequency of behavior G in total; x+T = frequency of behavior T in total; x++ = total number of thought units - number of interactions
+
+
+(3) Z-values are calculated as follows (Bakeman & Gottman, 1997, p. 109):
+
+??????
+
+= 	??????-??????	
+v??????*(1-????+)*(1-??+??)
+
+(3)
+
+
+Note. xGT = observed frequency value (i.e., how often behavior T followed behavior G); mGT
+
+= estimate of expected frequencies; pG+ = frequency of behavior G in total/total number of thought units - number of interactions; pT+ = frequency of behavior T in total/total number of thought units - number of interactions
+
+Table S16
+
+Exploratory lag sequential analyses concerning socio-emotional statements and unethical behaviors
+
+BehaviorIs promoted byPromotesNegative affective reaction* Criticism (z = 3.25)
+* Negative affective reactions (z = 4.73)
+* Negative relationship remarks (z = 3.03)
+* Providing preference-related information (z = 2.02)
+* Threats (z = 6.93)* Asking for positional information (z = 2.97)
+* Extension questions (z = 2.68)
+* Humor (z = 3.05)
+* Negative affective reactions (z = 4.73)Positive affective reaction* Accepting offer (z = 2.98)
+* Positive affective reactions (z = 14.92)
+* Positive relationship remarks (z = 2.47)* Positive affective reactions (z = 14.92)
+* Positive relationship remarks (z = 3.37)
+* Nonpersonal chit-chat (z = 2.79)Active listening* Additional issues (z = 6.29)
+* Facts (z = 9.79)
+* Hostility (z = 2.37)
+* Lying (z = 6.44)
+* Multi-issue activity (z = 8.90)
+* Positional commitments (z = 3.10)
+* Positive relationship remarks (z = 3.25)
+* Procedural suggestions (z = 3.41)
+* Providing positional information (z
+= 2.53)
+* Providing preference-related information (z = 2.29)
+* Providing priority-related information (z = 2.39)
+* Stressing power (z = 3.07)
+* Substantiations (z = 9.87)
+* Use of extreme anchors (z = 3.52)* Additional issues (z = 3.41)
+* Facts (z = 5.96)
+* Lying (z = 5.19)
+* Multi-issue activity (z = 7.74)
+* Negative relationship remarks (z = 3.38)
+* Omissions (z = 2.53)
+* Positive relationship remarks (z = 2.45)
+* Procedural suggestions (z = 2.91)
+* Providing preference-related information (z = 2.29)
+* Requesting action (z = 2.42)
+* Stressing power (z = 3.07)
+* Substantiations (z = 6.39)Humor* Apologizing (z = 2.48)
+* Humor (z = 6.61)
+* Negative affective reactions (z = 3.05)
+* Positional commitments (z = 2.56)
+* Positive relationship remarks (z = 2.13)
+* Providing positional information (z
+= 2.41)
+* Rejecting offers (z = 2.21)
+* Rejecting substantiation (z = 3.50)
+* Nonpersonal chit-chat (z = 5.78)* Asking for priority-related information (z = 2.19)
+* Change of mode (z = 2.73)
+* Encourage (z = 4.02)
+* Hostility (z = 5.24)
+* Humor (z = 6.61)
+* Positive relationship remarks (z = 2.13)Positive relationship remark* Active listening (z = 2.45)
+* Humor (z = 2.13)
+* Positional commitments (z = 3.37)
+* Positive affective reactions (z = 7.20)
+* Providing preference-related information (z = 2.81)
+* Substantiations (z = 2.07)* Active listening (z = 3.25)
+* Asking for substantiation (z = 4.92)
+* Humor (z = 2.13)
+* Positive affective reactions (z = 2.47)
+* Positive relationship remarks (z = 7.20)Note. N = 5,365 thought units. All z-values indicate significant patterns (z > 1.96).
+
+Table S16 (continued)
+
+BehaviorIs promoted byPromotesNegative relationship remark* Active listening (z = 3.38)
+* Rejecting offer (z = 2.97)
+* Requesting for offer modification (z = 2.71)* Avoiding (z = 3.96)
+* Negative affective reaction (z = 3.03)
+* Providing preference-related information (z = 3.07)Personal communication* Encourage (z = 3.18)
+* Personal communication (z = 36.52)
+* Providing positional information (z
+= 1.99)* Change of mode (z = 3.25)
+* Personal communication (z = 36.52)Nonpersonal chit- chat* Positive affective reaction (z = 2.79)
+* Nonpersonal chit-chat (z = 30.42)* Encourage (z = 3.93)
+* Humor (z = 5.78)
+* Nonpersonal chit-chat (z = 30.42)Future-related communication* Encourage (z = 4.70)
+* Procedural discussion (z = 3.17)* Procedural discussion (z = 3.17)Apologizing* Inaction (z = 2.35)
+* Rejecting substantiation (z = 2.40)* Facts (z = 2.25)
+* Humor (z = 2.48)
+* Time management (z = 4.65)Omission* Active listening (z = 2.53)
+* Asking for preference-related information (z = 5.39)
+* Inaction (z = 2.26)
+* Lying (z = 4.15)* Accepting offer (z = 5.25)
+* Additional issue (z = 2.62)
+* Lying (z = 2.09)Threat* Positional commitments (z = 5.65)
+* Providing positional information (z
+= 3.94)* Lying (z = 4.42)
+* Negative affective reaction (z = 6.93)Lying* Active listening (z = 5.19)
+* Asking for positional information (z = 6.10)
+* Asking for substantiation (z = 4.55)
+* Extension questions (z = 3.45)
+* Omission (z = 2.09)
+* Threat (z = 4.42)* Active listening (z = 6.44)
+* Asking for positional information (z = 3.77)
+* Asking for preference-related information (z = 2.66)
+* Omission (z = 4.15)
+* Rejecting substantiation (z = 2.23)Hostility* Humor (z = 5.24)* Active listening (z = 2.37)Use of extreme anchors* Facts (z = 3.46)
+* Inaction (z = 3.58)
+* Requesting action (z = 2.84)* Active listening (z = 3.52)
+* Positional commitments (z = 3.06)
+References
+
+Bakeman, R., & Gottman, J. M. (1997). Observing interaction: An introduction to sequential analysis. Cambridge University Press. https://doi.org/10.1017/CBO9780511527685
+Bales, R. F. (1950). Interaction process analysis: A method for the study of small groups.
+
+University of Chicago Press.
+
+Brett, J. M., Shapiro, D. L., & Lytle, A. L. (1998). Breaking the bonds of reciprocity in negotiations. Academy of Management Journal, 41(4), 410-424. https://doi.org/cscxv5
+Fulmer, I. S., Barry, B., & Long, D. A. (2009). Lying and smiling: Informational and emotional deception in negotiation. Journal of Business Ethics, 88(4), 691-709. https://doi.org/10.1007/s10551-008-9975-x
+Giebels, E., De Dreu, C. K., & Van De Vliert, E. (2000). Interdependence in negotiation: Effects of exit options and social motive on distributive and integrative negotiation. European Journal of Social Psychology, 30(2), 255-272. https://doi.org/bpr7bf
+Hatfield, J. D., & Weider-Hatfield, D. (1978). The comparative utility of three types of behavioral units for interaction analysis. Communications Monographs, 45(1), 44-50. https://doi.org/10.1080/03637757809375950
+Hüffmeier, J., Zerres, A., Freund, P. A., Backhaus, K., Trötschel, R., & Hertel, G. (2019). Strong or weak synergy? Revising the assumption of team-related advantages in integrative negotiations. Journal of Management, 45(7), 2721-2750. https://doi.org/gfgvt5
+Kauffeld, S., & Lehmann-Willenbrock, N. (2012). Meetings matter: Effects of team meetings on team and organizational success. Small Group Research, 43(2), 130-158. https://doi.org/10.1177/1046496411429599
+
+Leonardelli, G. J., Gu, J., McRuer, G., Medvec, V. H., & Galinsky, A. D. (2019). Multiple equivalent simultaneous offers (MESOs) reduce the negotiator dilemma: How a choice of first offers increases economic and relational outcomes. Organizational Behavior and Human Decision Processes, 152, 64-83. https://doi.org/g3qr
+Lewicki, R. J., Saunders, D. M., & Barry, B. (2014). Negotiation (Seventh edition). McGraw- Hill Education.
+Moran, S., Bereby-Meyer, Y., & Bazerman, M. (2008). Stretching the effectiveness of analogical training in negotiations: Teaching diverse principles for creating value. Negotiation and Conflict Management Research, 1(2), 99-134. https://doi.org/fbcsmf
+Robinson, R. J., Lewicki, R. J., & Donahue, E. M. (2000). Extending and testing a five factor model of ethical and unethical bargaining tactics: Introducing the SINS scale. Journal of Organizational Behavior, 21(6), 649-664. https://doi.org/fr8cs7
+Thompson, L., Peterson, E., & Brodt, S. E. (1996). Team negotiation: An examination of integrative and distributive bargaining. Journal of Personality and Social Psychology, 70(1), 66-78. https://doi.org/10.1037/0022-3514.70.1.66
+Weingart, L. R., Thompson, L., Bazerman, M. H., & Carroll, J. S. (1987). Tactics in integrative negotiations. Academy of Management Proceedings, 1987(1), 285-289. https://doi.org/10.5465/ambpp.1987.17534300
+
+
+
+
+
+
+
+
