@@ -2,8 +2,16 @@
 .godot/
 /android/
 
+# GdUnit4 插件（不纳入版本控制，但保留目录供 Agent 访问）
+/addons/gdUnit4/
+
+# 旧的报告目录（如果存在）
+/reports/
+
 # Test artifacts (keep folder structure with .gitkeep)
 tests/logs/*
 !tests/logs/.gitkeep
 tests/snapshots/*
 !tests/snapshots/.gitkeep
+tests/reports/*
+!tests/reports/.gitkeep

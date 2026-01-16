@@ -49,9 +49,21 @@ enum TriggerAction {
 
 ## ===== 预设反应工厂 =====
 
+## 脚本路径常量，用于静态方法中动态加载自身类
+## 注意：Godot 4.x 的 static func 内无法直接使用 class_name 实例化
+const _SCRIPT_PATH: String = "res://scenes/negotiation/resources/NegotiationReaction.gd"
+
+
+## 内部辅助函数：创建反应实例
+## 在静态方法中使用 load() + new() 规避 class_name 引用问题
+static func _create_instance() -> Resource:
+	var script: GDScript = load(_SCRIPT_PATH)
+	return script.new()
+
+
 ## 创建"接受成交"反应
 static func create_accept() -> Resource:
-	var reaction := NegotiationReaction.new()
+	var reaction: Resource = _create_instance()
 	reaction.id = "react_accept"
 	reaction.display_name = "接受成交"
 	reaction.description = "同意当前提案，结束谈判。"
@@ -62,7 +74,7 @@ static func create_accept() -> Resource:
 
 ## 创建"温和拒绝"反应
 static func create_reject_soft() -> Resource:
-	var reaction := NegotiationReaction.new()
+	var reaction: Resource = _create_instance()
 	reaction.id = "react_reject_soft"
 	reaction.display_name = "委婉拒绝"
 	reaction.description = "礼貌地拒绝当前提案，继续谈判。"
@@ -73,7 +85,7 @@ static func create_reject_soft() -> Resource:
 
 ## 创建"强硬拒绝"反应
 static func create_reject_hard() -> Resource:
-	var reaction := NegotiationReaction.new()
+	var reaction: Resource = _create_instance()
 	reaction.id = "react_reject_hard"
 	reaction.display_name = "愤怒拒绝"
 	reaction.description = "强硬地拒绝提案，表达不满。\n会增加对方的紧张度。"
@@ -84,7 +96,7 @@ static func create_reject_hard() -> Resource:
 
 ## 创建"要求改进"反应
 static func create_request_improvement() -> Resource:
-	var reaction := NegotiationReaction.new()
+	var reaction: Resource = _create_instance()
 	reaction.id = "react_request_improvement"
 	reaction.display_name = "要求让步"
 	reaction.description = "要求对方在当前基础上做出更多让步。"
@@ -95,7 +107,7 @@ static func create_request_improvement() -> Resource:
 
 ## 创建"直接离开"反应
 static func create_walk_away() -> Resource:
-	var reaction := NegotiationReaction.new()
+	var reaction: Resource = _create_instance()
 	reaction.id = "react_walk_away"
 	reaction.display_name = "直接离开"
 	reaction.description = "结束谈判，不达成任何协议。"

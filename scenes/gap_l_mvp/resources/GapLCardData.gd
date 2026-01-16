@@ -35,13 +35,19 @@ extends Resource
 
 ## ===== 工厂方法 =====
 
+## 脚本路径常量，用于静态方法中动态加载自身类
+## 注意：Godot 4.x 的 static func 内无法直接使用 class_name 实例化
+const _SCRIPT_PATH: String = "res://scenes/gap_l_mvp/resources/GapLCardData.gd"
+
+
 ## 快速创建卡牌数据的静态工厂方法
 ## @param name: 卡牌名称
 ## @param self_gain: 我方收益（G 值）
 ## @param opponent_gain: 对手收益（用于 P 维度）
 ## @return: 配置好的 GapLCardData 实例
 static func create(name: String, self_gain: float, opponent_gain: float) -> Resource:
-	var card := GapLCardData.new()
+	var script: GDScript = load(_SCRIPT_PATH)
+	var card: Resource = script.new()
 	card.card_name = name
 	card.g_value = self_gain
 	card.opp_value = opponent_gain

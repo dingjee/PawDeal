@@ -35,11 +35,21 @@
     * *Inline*: Explain complex "Why".
 * **Snapshots**: Read/Write only in `tests/snapshots/`.
 
-## 5. UI TESTING (Harness)
+## 5. UI TESTING
+**A. Basic (Harness)**
 **Do not mod production scenes.** Use `tests/scenes/universal_test_harness.tscn`.
 * **Core API**: `load_test_scene(path)`, `capture_snapshot(name)`, `simulate_click(vec)`, `assert_true(desc, cond)`.
 * **Method A (Config)**: Set `target_scene_path` in harness `.tscn` -> Run Wrapper.
 * **Method B (Inherit)**: Extend `TestHarness` -> Override `_run_test()`.
+
+**B. Advanced (GdUnit4)**
+* **Use**: For Drag&Drop/Complex Interaction.
+* **Path**: `tests/gdunit/` (Inherit `ui_interaction_test_base.gd`).
+* **API**: `click_control`, `drag_control_to_control`, `capture_test_snapshot`.
+* **CRITICAL LIMITATION**: Headless mode **ignores InputEvents**.
+    * *Logic Test (Headless)*: Use Signals/Direct API calls.
+    * *Interaction Test (Drags/Clicks)*: **MUST** use `--gui`.
+
 
 ## 6. ARCHITECTURE (Decoupling)
 * **Pattern**: **Call Down, Signal Up**. Kids never `get_node("Parent")`.

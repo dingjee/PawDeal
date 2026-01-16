@@ -65,9 +65,21 @@ enum ActType {
 
 ## ===== 预设战术工厂 =====
 
+## 脚本路径常量，用于静态方法中动态加载自身类
+## 注意：Godot 4.x 的 static func 内无法直接使用 class_name 实例化
+const _SCRIPT_PATH: String = "res://scenes/negotiation/resources/NegotiationTactic.gd"
+
+
+## 内部辅助函数：创建战术实例
+## 在静态方法中使用 load() + new() 规避 class_name 引用问题
+static func _create_instance() -> Resource:
+	var script: GDScript = load(_SCRIPT_PATH)
+	return script.new()
+
+
 ## 创建"直接提交"战术（无修正）
 static func create_simple() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_simple"
 	tactic.display_name = "直接提交"
 	tactic.act_type = ActType.SIMPLE
@@ -79,7 +91,7 @@ static func create_simple() -> Resource:
 ## 创建"理性论证"战术
 ## 效果：降低 AI 的心理预期门槛（A 维度），减弱零和博弈心态（P 维度）
 static func create_substantiation() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_substantiation"
 	tactic.display_name = "理性分析"
 	tactic.act_type = ActType.SUBSTANTIATION
@@ -94,7 +106,7 @@ static func create_substantiation() -> Resource:
 ## 创建"展示实力"战术
 ## 效果：提及替代方案，适度降低 AI 的 BATNA，削弱其权力感
 static func create_stressing_power() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_stressing_power"
 	tactic.display_name = "展示实力"
 	tactic.act_type = ActType.STRESSING_POWER
@@ -109,7 +121,7 @@ static func create_stressing_power() -> Resource:
 ## 创建"威胁"战术
 ## 效果：大幅降低 AI 底线，但极大激怒 AI（高风险高回报）
 static func create_threat() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_threat"
 	tactic.display_name = "威胁施压"
 	tactic.act_type = ActType.THREAT
@@ -128,7 +140,7 @@ static func create_threat() -> Resource:
 ## 创建"拉关系"战术
 ## 效果：屏蔽零和博弈心态，降低贪婪度
 static func create_relationship() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_relationship"
 	tactic.display_name = "打感情牌"
 	tactic.act_type = ActType.RELATIONSHIP
@@ -143,7 +155,7 @@ static func create_relationship() -> Resource:
 ## 创建"正面情绪"战术
 ## 效果：缓和氛围，降低锚定效应和权力感
 static func create_positive_emotion() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_positive_emotion"
 	tactic.display_name = "积极鼓励"
 	tactic.act_type = ActType.POSITIVE_EMOTION
@@ -158,7 +170,7 @@ static func create_positive_emotion() -> Resource:
 ## 创建"道歉"战术
 ## 效果：减缓 AI 的时间焦虑
 static func create_apologize() -> Resource:
-	var tactic := NegotiationTactic.new()
+	var tactic: Resource = _create_instance()
 	tactic.id = "tactic_apologize"
 	tactic.display_name = "道歉示弱"
 	tactic.act_type = ActType.APOLOGIZE

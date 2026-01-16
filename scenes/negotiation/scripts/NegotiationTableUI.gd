@@ -113,9 +113,18 @@ func _ready() -> void:
 	
 	# 启用拖拽转发 (Drag Forwarding)
 	# 让 topic_layout (提案区) 和 hand_layout (手牌区) 的拖拽事件转发给本脚本处理
-	# 这样我们可以在这里集中处理放置逻辑
-	topic_layout.set_drag_forwarding(Callable(), _can_drop_data_fw, _drop_data_fw)
-	hand_layout.set_drag_forwarding(Callable(), _can_drop_data_fw, _drop_data_fw)
+	# 注意：Godot 4.x 的 set_drag_forwarding 回调只接受 (Vector2, Variant) 两个参数
+	# 使用 bind() 绑定第三个参数（目标控件）来区分拖放目标
+	topic_layout.set_drag_forwarding(
+		Callable(),
+		_can_drop_data_topic.bind(topic_layout),
+		_drop_data_topic.bind(topic_layout)
+	)
+	hand_layout.set_drag_forwarding(
+		Callable(),
+		_can_drop_data_hand.bind(hand_layout),
+		_drop_data_hand.bind(hand_layout)
+	)
 	
 	print("[NegotiationTableUI] 初始化完成")
 
@@ -200,57 +209,82 @@ func _create_hand_card_ui(card: Resource) -> void:
 	card_ui.set_card_data(card)
 
 ## ===== 拖拽系统回调 (Drag & Drop) =====
+## 注意：Godot 4.x 的 set_drag_forwarding 回调签名为 (Vector2, Variant)
+## 使用 bind() 绑定额外参数来传递目标控件信息
 
-## 判断是否可以放置（由 set_drag_forwarding 触发）
-func _can_drop_data_fw(at_position: Vector2, data: Variant, target_control: Control) -> bool:
+## 提案区：判断是否可以放置
+## @param at_position: 放置位置
+## @param data: 拖拽数据
+## @param target: bind() 绑定的目标控件
+func _can_drop_data_topic(at_position: Vector2, data: Variant, target: Control) -> bool:
+	print("[Drag] _can_drop_data_topic called")
+	return _can_drop_to_target(data, target, false) # 提案区
+
+
+## 手牌区：判断是否可以放置（撤回卡牌）
+## @param at_position: 放置位置
+## @param data: 拖拽数据
+## @param target: bind() 绑定的目标控件
+func _can_drop_data_hand(at_position: Vector2, data: Variant, target: Control) -> bool:
+	print("[Drag] _can_drop_data_hand called")
+	return _can_drop_to_target(data, target, true) # 手牌区
+
+
+## 提案区：处理放置数据
+## @param at_position: 放置位置
+## @param data: 拖拽数据
+## @param target: bind() 绑定的目标控件
+func _drop_data_topic(at_position: Vector2, data: Variant, target: Control) -> void:
+	print("[Drag] _drop_data_topic called")
+	_handle_drop(data, false) # 添加到桌面
+
+
+## 手牌区：处理放置数据（撤回卡牌）
+## @param at_position: 放置位置
+## @param data: 拖拽数据
+## @param target: bind() 绑定的目标控件
+func _drop_data_hand(at_position: Vector2, data: Variant, target: Control) -> void:
+	print("[Drag] _drop_data_hand called")
+	_handle_drop(data, true) # 从桌面移除
+
+
+## 通用判断逻辑
+## @param data: 拖拽数据
+## @param target: 目标控件
+## @param is_hand_area: 是否是手牌区（用于判断撤回操作）
+func _can_drop_to_target(data: Variant, target: Control, is_hand_area: bool) -> bool:
+	# 验证数据格式
 	if not data is Dictionary or data.get("type") != "negotiation_card":
 		return false
 	
 	# 检查状态：只有玩家回合可以移动卡牌
-	# TODO: 之后可能需要在 IDLE 或其他状态也允许查看卡牌
 	if manager.get_current_state() != manager.State.PLAYER_TURN:
 		return false
 	
-	var card_data = data["card_resource"]
-	var source_parent = data["source_parent"]
+	var card_data: Resource = data["card_resource"]
 	
-	# 如果目标是提案区 (topic_layout)，且卡牌不在桌面，可以放置
-	if target_control == topic_layout:
-		return not card_data in manager.table_cards
-	
-	# 如果目标是手牌区 (hand_layout)，且卡牌在桌面，可以放置（撤回）
-	if target_control == hand_layout:
+	if is_hand_area:
+		# 手牌区：只接受已在桌面的卡牌（撤回操作）
 		return card_data in manager.table_cards
-	
-	return false
+	else:
+		# 提案区：只接受不在桌面的卡牌（添加操作）
+		return not card_data in manager.table_cards
 
 
-## 处理放置数据（由 set_drag_forwarding 触发）
-func _drop_data_fw(at_position: Vector2, data: Variant, target_control: Control) -> void:
-	var card_data = data["card_resource"]
+## 通用放置处理逻辑
+## @param data: 拖拽数据
+## @param is_remove: 是否是移除操作
+func _handle_drop(data: Variant, is_remove: bool) -> void:
+	var card_data: Resource = data["card_resource"]
 	
 	# 执行逻辑移动
-	if target_control == topic_layout:
-		manager.add_card_to_table(card_data)
-	elif target_control == hand_layout:
+	if is_remove:
 		manager.remove_card_from_table(card_data)
+	else:
+		manager.add_card_to_table(card_data)
 	
 	# 刷新 UI 显示
-	# 1. 更新桌面显示（重新生成提案区）
 	_update_table_display()
-	
-	# 2. 如果是从手牌移到桌面，原来的手牌 UI 应该消失（或变暗/禁用）
-	# 在 MVP 版本中，为了简单，我们可以简单地：
-	# A. 提案区显示卡牌时，手牌区对应卡牌应移除
-	# B. 撤回提案时，手牌区重新显示卡牌
-	# 但由于我们分别在两个方法里生成 UI，这里需要协调一下
-	
-	# 简单方案：每次操作后刷新所有卡牌 UI 是最稳健的，但可能重开销较大。
-	# 更优方案：
-	# - 手牌区的 DraggableCard 实例一直存在，只是在 added to table 时隐藏
-	# - 提案区每次重新生成
-	
-	# 为了配合 MVP，我们现在手动管理手牌区的可见性
 	_update_hand_display()
 
 
