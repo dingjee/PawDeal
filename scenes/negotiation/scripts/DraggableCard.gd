@@ -105,8 +105,8 @@ func _update_display() -> void:
 		return
 	
 	if _name_label: _name_label.text = card_data.card_name
-	if _g_label: _g_label.text = "我方: %.0f" % card_data.g_value
-	if _opp_label: _opp_label.text = "对方: %.0f" % card_data.opp_value
+	if _g_label: _g_label.text = "AI方: %.0f" % card_data.g_value
+	if _opp_label: _opp_label.text = "玩家: %.0f" % card_data.opp_value
 	
 	# 设置简单的样式背景
 	var style = StyleBoxFlat.new()

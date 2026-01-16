@@ -1,11 +1,13 @@
 ## NegotiationManager.gd
-## 谈判游戏主控脚本 - 状态机实现
+## 谈判游戏主控脚本 - 状态机实现（主动权转移机制）
 ##
 ## 管理谈判游戏的完整生命周期：
+## - 主动权转移：谁被拒绝谁需要调整提案
 ## - 玩家回合：拖拽议题卡、选择战术、提交提案
-## - AI 评估：调用 GapLAI 计算效用
-## - AI 回应：接受/拒绝/反提案
-## - 玩家反应：选择回应方式
+## - AI 回合：AI 生成/调整反提案
+## - 评估与响应：对方评估并选择接受/拒绝
+##
+## 回合定义：每次提案或响应算 1 回合
 ##
 ## 负责协调 UI 层与逻辑层的交互
 class_name NegotiationManager
@@ -29,15 +31,19 @@ signal counter_offer_generated(counter_offer: Dictionary)
 ## 谈判结束信号
 signal negotiation_ended(outcome: Outcome, final_score: float)
 
+## 主动权转移信号
+signal proposer_changed(new_proposer: Proposer)
+
 
 ## ===== 状态枚举 =====
 
 enum State {
 	IDLE, ## 空闲/未开始
-	PLAYER_TURN, ## 玩家回合：选择卡牌和战术
-	AI_EVALUATE, ## AI 评估中（播放思考动画）
-	AI_RESPONSE, ## AI 回应：显示结果和反提案
-	PLAYER_REACTION, ## 玩家反应：选择回应方式
+	PLAYER_TURN, ## 玩家回合：编辑和提交提案
+	AI_EVALUATE, ## AI 评估玩家提案中
+	AI_TURN, ## AI 回合：生成/调整反提案
+	PLAYER_EVALUATE, ## 玩家评估 AI 提案中
+	PLAYER_REACTION, ## 玩家选择反应（接受/拒绝/修改）
 	GAME_END, ## 游戏结束
 }
 
@@ -45,7 +51,21 @@ enum Outcome {
 	NONE, ## 进行中
 	WIN, ## 玩家达成有利协议
 	LOSE, ## AI 占优或谈判破裂
-	DRAW, ## 双方平局
+	DRAW, ## 双方妥协成交
+}
+
+## 主动权枚举：当前谁在提案
+enum Proposer {
+	PLAYER, ## 玩家主动
+	AI, ## AI 主动
+}
+
+## 玩家反应类型
+enum ReactionType {
+	ACCEPT, ## 接受 AI 提案
+	REJECT, ## 拒绝（AI 需再次调整）
+	MODIFY, ## 玩家要求修改自己的提案
+	WALK_AWAY, ## 离场
 }
 
 
@@ -54,7 +74,7 @@ enum Outcome {
 ## AI 决策核心（通过 @export 注入或代码创建）
 var ai: RefCounted = null
 
-## 当前桌面上的卡牌（玩家提案）
+## 当前桌面上的卡牌（当前提案）
 var table_cards: Array = []
 
 ## 当前选择的战术
@@ -72,6 +92,9 @@ var _last_counter_offer: Dictionary = {}
 ## 当前状态
 var _current_state: State = State.IDLE
 
+## 当前主动权（谁在提案）
+var _current_proposer: Proposer = Proposer.PLAYER
+
 ## 当前回合数
 var _current_round: int = 1
 
@@ -80,6 +103,9 @@ var _max_rounds: int = 10
 
 ## 最新的 AI 评估结果
 var _last_result: Dictionary = {}
+
+## AI 连续被拒绝次数（用于调整策略）
+var _ai_reject_count: int = 0
 
 
 ## ===== 生命周期 =====
@@ -103,9 +129,11 @@ func _ready() -> void:
 ## 开始新的谈判
 func start_negotiation() -> void:
 	_current_round = 1
+	_ai_reject_count = 0
 	table_cards.clear()
+	_current_proposer = Proposer.PLAYER
 	_transition_to(State.PLAYER_TURN)
-	print("[NegotiationManager] 谈判开始！第 %d 回合" % _current_round)
+	print("[NegotiationManager] 谈判开始！第 %d 回合，玩家先手" % _current_round)
 
 
 ## 添加卡牌到桌面
@@ -148,40 +176,53 @@ func submit_proposal() -> void:
 		push_warning("桌面上没有卡牌，无法提交")
 		return
 	
-	print("[NegotiationManager] 提交提案，进入 AI 评估阶段")
+	print("[NegotiationManager] 玩家提交提案，进入 AI 评估阶段")
+	_current_proposer = Proposer.PLAYER
+	proposer_changed.emit(_current_proposer)
 	_transition_to(State.AI_EVALUATE)
 	
-	# 开始评估（可添加延迟模拟思考时间）
-	_evaluate_proposal()
+	# 开始评估
+	_evaluate_player_proposal()
 
 
-## 玩家选择反应
-## @param reaction: NegotiationReaction 实例
-func submit_reaction(reaction: Resource) -> void:
+## 玩家选择反应（针对 AI 的反提案）
+## @param reaction_type: ReactionType 枚举值
+func submit_reaction(reaction_type: int) -> void:
 	if _current_state != State.PLAYER_REACTION:
 		push_warning("当前状态不允许提交反应")
 		return
 	
-	print("[NegotiationManager] 玩家反应: %s" % reaction.display_name)
+	_advance_round()
 	
-	# 根据反应类型处理
-	var trigger: int = reaction.trigger_action
-	
-	match trigger:
-		0: # CONTINUE
-			_next_round()
-		1: # FORCE_RECALC
-			_transition_to(State.AI_EVALUATE)
-			_evaluate_proposal()
-		2: # REQUEST_IMPROVEMENT
-			# 生成 AI 反提案
-			_generate_counter_offer()
-			_next_round()
-		3: # END_NEGOTIATION
-			_end_negotiation(Outcome.LOSE, 0.0)
-		4: # ACCEPT_DEAL
-			var score: float = _last_result.get("total_score", 0.0)
+	match reaction_type:
+		ReactionType.ACCEPT:
+			# 接受 AI 的反提案
+			print("[NegotiationManager] 玩家接受 AI 反提案")
+			_apply_counter_offer()
+			var score: float = _last_counter_offer.get("counter_utility", {}).get("total_score", 0.0)
 			_end_negotiation(Outcome.DRAW, score)
+		
+		ReactionType.REJECT:
+			# 拒绝，AI 需要再次调整（主动权仍在 AI）
+			print("[NegotiationManager] 玩家拒绝 AI 反提案，AI 继续调整")
+			_ai_reject_count += 1
+			_current_proposer = Proposer.AI
+			proposer_changed.emit(_current_proposer)
+			_transition_to(State.AI_TURN)
+			_ai_generate_adjusted_offer()
+		
+		ReactionType.MODIFY:
+			# 玩家要修改自己的提案（主动权转移到玩家）
+			print("[NegotiationManager] 玩家要求修改提案，主动权转移到玩家")
+			_ai_reject_count = 0
+			_current_proposer = Proposer.PLAYER
+			proposer_changed.emit(_current_proposer)
+			_transition_to(State.PLAYER_TURN)
+		
+		ReactionType.WALK_AWAY:
+			# 离场
+			print("[NegotiationManager] 玩家选择离场")
+			_end_negotiation(Outcome.LOSE, 0.0)
 
 
 ## 获取当前状态
@@ -194,6 +235,11 @@ func get_current_round() -> int:
 	return _current_round
 
 
+## 获取当前主动权
+func get_current_proposer() -> Proposer:
+	return _current_proposer
+
+
 ## ===== 内部方法 =====
 
 ## 状态转换
@@ -203,8 +249,19 @@ func _transition_to(new_state: State) -> void:
 	print("[NegotiationManager] 状态切换 -> %s" % State.keys()[new_state])
 
 
-## 执行 AI 评估
-func _evaluate_proposal() -> void:
+## 回合推进
+func _advance_round() -> void:
+	_current_round += 1
+	round_ended.emit(_current_round - 1)
+	print("[NegotiationManager] 回合推进到第 %d 回合" % _current_round)
+	
+	if _current_round > _max_rounds:
+		print("[NegotiationManager] 回合耗尽，谈判失败")
+		_end_negotiation(Outcome.LOSE, 0.0)
+
+
+## 评估玩家提案
+func _evaluate_player_proposal() -> void:
 	var context: Dictionary = {"round": _current_round}
 	
 	# 调用融合计算接口
@@ -222,39 +279,16 @@ func _evaluate_proposal() -> void:
 		# AI 接受，玩家获胜
 		_end_negotiation(Outcome.WIN, _last_result["total_score"])
 	else:
-		# AI 拒绝，生成反提案并进入回应阶段
-		_generate_counter_offer()
-		_transition_to(State.AI_RESPONSE)
-		# 短暂延迟后进入玩家反应阶段
-		await get_tree().create_timer(1.0).timeout
-		_transition_to(State.PLAYER_REACTION)
+		# AI 拒绝，主动权转移到 AI，生成反提案
+		_advance_round()
+		_current_proposer = Proposer.AI
+		proposer_changed.emit(_current_proposer)
+		_transition_to(State.AI_TURN)
+		_ai_generate_counter_offer()
 
 
-## 进入下一回合
-func _next_round() -> void:
-	_current_round += 1
-	round_ended.emit(_current_round - 1)
-	
-	if _current_round > _max_rounds:
-		# 超时，谈判失败
-		print("[NegotiationManager] 回合耗尽，谈判失败")
-		_end_negotiation(Outcome.LOSE, 0.0)
-	else:
-		print("[NegotiationManager] 进入第 %d 回合" % _current_round)
-		_transition_to(State.PLAYER_TURN)
-
-
-## 结束谈判
-func _end_negotiation(outcome: Outcome, score: float) -> void:
-	_transition_to(State.GAME_END)
-	negotiation_ended.emit(outcome, score)
-	
-	var outcome_str: String = Outcome.keys()[outcome]
-	print("[NegotiationManager] 谈判结束: %s, 最终分数: %.2f" % [outcome_str, score])
-
-
-## 生成 AI 反提案
-func _generate_counter_offer() -> void:
+## AI 生成反提案（首次）
+func _ai_generate_counter_offer() -> void:
 	var context: Dictionary = {"round": _current_round}
 	_last_counter_offer = ai.generate_counter_offer(table_cards, ai_deck, context)
 	
@@ -265,6 +299,79 @@ func _generate_counter_offer() -> void:
 	print("  添加卡牌: %d 张" % _last_counter_offer["added_cards"].size())
 	
 	counter_offer_generated.emit(_last_counter_offer)
+	
+	# 短暂延迟后进入玩家评估阶段
+	await get_tree().create_timer(0.5).timeout
+	_transition_to(State.PLAYER_EVALUATE)
+	
+	# 再短暂延迟后进入玩家反应阶段
+	await get_tree().create_timer(0.5).timeout
+	_transition_to(State.PLAYER_REACTION)
+
+
+## AI 调整反提案（被玩家拒绝后）
+func _ai_generate_adjusted_offer() -> void:
+	var context: Dictionary = {
+		"round": _current_round,
+		"reject_count": _ai_reject_count,
+	}
+	
+	# 根据被拒绝次数调整 AI 的让步程度
+	# 每被拒绝一次，AI 降低一点 BATNA（更容易妥协）
+	var temp_batna: float = ai.base_batna
+	ai.base_batna = maxf(temp_batna - (_ai_reject_count * 20.0), 0.0)
+	
+	_last_counter_offer = ai.generate_counter_offer(table_cards, ai_deck, context)
+	
+	# 恢复原始 BATNA
+	ai.base_batna = temp_batna
+	
+	print("[NegotiationManager] AI 调整反提案 (被拒绝 %d 次):" % _ai_reject_count)
+	print("  成功: %s" % _last_counter_offer["success"])
+	print("  理由: %s" % _last_counter_offer["reason"])
+	print("  移除卡牌: %d 张" % _last_counter_offer["removed_cards"].size())
+	print("  添加卡牌: %d 张" % _last_counter_offer["added_cards"].size())
+	
+	# 如果 AI 连续被拒绝太多次，可能选择放弃
+	if _ai_reject_count >= 3 and not _last_counter_offer["success"]:
+		print("[NegotiationManager] AI 谈判耐心耗尽，选择放弃")
+		_end_negotiation(Outcome.WIN, 0.0) # AI 放弃，玩家获胜
+		return
+	
+	counter_offer_generated.emit(_last_counter_offer)
+	
+	# 进入玩家评估和反应阶段
+	await get_tree().create_timer(0.5).timeout
+	_transition_to(State.PLAYER_EVALUATE)
+	
+	await get_tree().create_timer(0.5).timeout
+	_transition_to(State.PLAYER_REACTION)
+
+
+## 应用 AI 反提案到桌面
+func _apply_counter_offer() -> void:
+	# 移除建议移除的卡牌
+	for item: Dictionary in _last_counter_offer.get("removed_cards", []):
+		var card: Resource = item.get("card")
+		if card and card in table_cards:
+			table_cards.erase(card)
+	
+	# 添加建议添加的卡牌
+	for item: Dictionary in _last_counter_offer.get("added_cards", []):
+		var card: Resource = item.get("card")
+		if card and not card in table_cards:
+			table_cards.append(card)
+	
+	print("[NegotiationManager] 反提案已应用，桌面卡牌数: %d" % table_cards.size())
+
+
+## 结束谈判
+func _end_negotiation(outcome: Outcome, score: float) -> void:
+	_transition_to(State.GAME_END)
+	negotiation_ended.emit(outcome, score)
+	
+	var outcome_str: String = Outcome.keys()[outcome]
+	print("[NegotiationManager] 谈判结束: %s, 最终分数: %.2f" % [outcome_str, score])
 
 
 ## 获取最新的 AI 反提案

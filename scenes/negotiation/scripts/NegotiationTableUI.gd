@@ -73,6 +73,9 @@ var _selected_tactic_index: int = 0
 ## 预设战术列表（与按钮顺序对应）
 var _tactic_presets: Array = []
 
+## 最新的 AI 反提案（用于 UI 显示）
+var _last_counter_offer: Dictionary = {}
+
 
 ## ===== 生命周期 =====
 
@@ -94,6 +97,7 @@ func _ready() -> void:
 	manager.ai_evaluated.connect(_on_ai_evaluated)
 	manager.round_ended.connect(_on_round_ended)
 	manager.negotiation_ended.connect(_on_negotiation_ended)
+	manager.counter_offer_generated.connect(_on_counter_offer_generated)
 	
 	# 连接按钮信号
 	_connect_buttons()
@@ -107,6 +111,9 @@ func _ready() -> void:
 	
 	# 添加测试用的初始手牌
 	_add_test_hand_cards()
+	
+	# 初始化 AI 卡牌库（用于生成反提案）
+	_init_ai_deck()
 	
 	# 初始化预设战术（在谈判开始后设置，避免 IDLE 状态警告）
 	_init_tactic_presets()
@@ -178,11 +185,12 @@ func _connect_buttons() -> void:
 	# 提交按钮
 	submit_btn.pressed.connect(_on_submit_pressed)
 	
-	# 反应按钮
-	btn_accept.pressed.connect(_on_reaction_pressed.bind(4)) # ACCEPT_DEAL
-	btn_reject_soft.pressed.connect(_on_reaction_pressed.bind(0)) # CONTINUE
-	btn_reject_hard.pressed.connect(_on_reaction_pressed.bind(0)) # CONTINUE (with mood impact)
-	btn_walk_away.pressed.connect(_on_reaction_pressed.bind(3)) # END_NEGOTIATION
+	# 反应按钮 - 使用新的 ReactionType 枚举
+	# ReactionType: ACCEPT=0, REJECT=1, MODIFY=2, WALK_AWAY=3
+	btn_accept.pressed.connect(_on_reaction_pressed.bind(0)) # ACCEPT
+	btn_reject_soft.pressed.connect(_on_reaction_pressed.bind(1)) # REJECT
+	btn_reject_hard.pressed.connect(_on_reaction_pressed.bind(2)) # MODIFY (修改提案)
+	btn_walk_away.pressed.connect(_on_reaction_pressed.bind(3)) # WALK_AWAY
 
 
 ## 添加测试用手牌
@@ -200,6 +208,28 @@ func _add_test_hand_cards() -> void:
 	for card_data: Dictionary in test_cards:
 		var card: Resource = CardClass.create(card_data["name"], card_data["g"], card_data["opp"])
 		_create_hand_card_ui(card)
+
+
+## 初始化 AI 卡牌库
+## 为 AI 提供一组可用于反提案的卡牌
+func _init_ai_deck() -> void:
+	var CardClass: GDScript = load("res://scenes/gap_l_mvp/resources/GapLCardData.gd")
+	
+	# AI 专属卡牌（高 G 低 Opp 的对 AI 有利卡牌）
+	var ai_cards: Array = [
+		{"name": "知识产权保护", "g": 50.0, "opp": 20.0},
+		{"name": "市场准入", "g": 45.0, "opp": 25.0},
+		{"name": "技术转让", "g": 35.0, "opp": 15.0},
+		{"name": "投资限制放宽", "g": 40.0, "opp": 30.0},
+	]
+	
+	var deck: Array = []
+	for card_data: Dictionary in ai_cards:
+		var card: Resource = CardClass.create(card_data["name"], card_data["g"], card_data["opp"])
+		deck.append(card)
+	
+	manager.set_ai_deck(deck)
+	print("[NegotiationTableUI] AI 卡牌库已初始化，共 %d 张" % deck.size())
 
 
 ## 创建手牌 UI 元素
@@ -318,6 +348,50 @@ func _on_ai_evaluated(result: Dictionary) -> void:
 	_update_psych_meters(breakdown)
 
 
+## AI 反提案生成处理
+## @param counter_offer: 反提案字典，包含 cards, removed_cards, added_cards, reason 等
+func _on_counter_offer_generated(counter_offer: Dictionary) -> void:
+	_last_counter_offer = counter_offer
+	
+	# 更新反馈气泡，显示反提案说明
+	var message: String = "让我提个建议...\n"
+	
+	# 显示移除卡牌信息
+	var removed: Array = counter_offer.get("removed_cards", [])
+	if not removed.is_empty():
+		message += "建议移除: "
+		for i: int in range(removed.size()):
+			var item: Dictionary = removed[i]
+			var card: Resource = item.get("card")
+			if card:
+				message += card.card_name
+				if i < removed.size() - 1:
+					message += ", "
+		message += "\n"
+	
+	# 显示添加卡牌信息
+	var added: Array = counter_offer.get("added_cards", [])
+	if not added.is_empty():
+		message += "建议添加: "
+		for i: int in range(added.size()):
+			var item: Dictionary = added[i]
+			var card: Resource = item.get("card")
+			if card:
+				message += card.card_name
+				if i < added.size() - 1:
+					message += ", "
+		message += "\n"
+	
+	# 如果没有建议变更
+	if removed.is_empty() and added.is_empty():
+		message = counter_offer.get("reason", "AI 正在思考...")
+	
+	feedback_label.text = message
+	
+	# 更新提案区显示反提案内容
+	_update_counter_offer_display(counter_offer)
+
+
 ## 回合结束处理
 func _on_round_ended(round_number: int) -> void:
 	round_label.text = "回合: %d / 10" % (round_number + 1)
@@ -363,20 +437,10 @@ func _on_submit_pressed() -> void:
 
 
 ## 反应按钮点击
-func _on_reaction_pressed(trigger_action: int) -> void:
-	var reaction: Resource = ReactionClass.new()
-	reaction.trigger_action = trigger_action
-	
-	# 根据不同反应设置 mood_impact
-	match trigger_action:
-		0: # CONTINUE (soft reject)
-			reaction.mood_impact = 1.0
-		3: # END_NEGOTIATION
-			reaction.mood_impact = 10.0
-		4: # ACCEPT_DEAL
-			reaction.mood_impact = -5.0
-	
-	manager.submit_reaction(reaction)
+## @param reaction_type: ReactionType 枚举值 (ACCEPT=0, REJECT=1, MODIFY=2, WALK_AWAY=3)
+func _on_reaction_pressed(reaction_type: int) -> void:
+	# 直接调用 Manager 的新接口
+	manager.submit_reaction(reaction_type)
 
 
 ## 手牌点击
@@ -392,8 +456,9 @@ func _on_hand_card_pressed(card: Resource) -> void:
 ## ===== UI 更新方法 =====
 
 ## 根据状态更新 UI
+## 新状态枚举: IDLE=0, PLAYER_TURN=1, AI_EVALUATE=2, AI_TURN=3, PLAYER_EVALUATE=4, PLAYER_REACTION=5, GAME_END=6
 func _update_ui_for_state(state: int) -> void:
-	var state_names: Array = ["空闲", "玩家回合", "AI思考中", "AI回应", "等待反应", "游戏结束"]
+	var state_names: Array = ["空闲", "玩家回合", "AI评估中", "AI回合", "评估AI提案", "等待反应", "游戏结束"]
 	state_label.text = "状态: %s" % state_names[state]
 	
 	match state:
@@ -406,18 +471,30 @@ func _update_ui_for_state(state: int) -> void:
 			reaction_buttons.visible = false
 			tactic_selector.visible = true
 			submit_btn.disabled = false
+			# 回到玩家回合时，恢复正常桌面显示
+			_update_table_display()
+			_update_hand_display()
 		2: # AI_EVALUATE
 			action_buttons.visible = true
 			submit_btn.disabled = true
 			tactic_selector.visible = false
-		3: # AI_RESPONSE
+			feedback_label.text = "AI 正在评估..."
+		3: # AI_TURN
 			action_buttons.visible = false
+			reaction_buttons.visible = false
 			tactic_selector.visible = false
-		4: # PLAYER_REACTION
+			feedback_label.text = "AI 正在调整提案..."
+		4: # PLAYER_EVALUATE
+			action_buttons.visible = false
+			reaction_buttons.visible = false
+			tactic_selector.visible = false
+		5: # PLAYER_REACTION
 			action_buttons.visible = false
 			reaction_buttons.visible = true
 			tactic_selector.visible = false
-		5: # GAME_END
+			# 更新按钮文字以反映新的功能
+			btn_reject_hard.text = "修改提案"
+		6: # GAME_END
 			action_buttons.visible = false
 			reaction_buttons.visible = false
 			tactic_selector.visible = false
@@ -450,6 +527,79 @@ func _update_table_display() -> void:
 		hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		topic_layout.add_child(hint_label)
+
+
+## 更新反提案显示
+## 用不同颜色标记 AI 建议移除和添加的卡牌
+## @param counter_offer: 反提案字典
+func _update_counter_offer_display(counter_offer: Dictionary) -> void:
+	# 清除现有内容
+	for child: Node in topic_layout.get_children():
+		child.queue_free()
+	
+	# 获取当前桌面卡牌和反提案数据
+	var removed_cards: Array = []
+	var added_cards: Array = []
+	
+	for item: Dictionary in counter_offer.get("removed_cards", []):
+		var card: Resource = item.get("card")
+		if card:
+			removed_cards.append(card)
+	
+	for item: Dictionary in counter_offer.get("added_cards", []):
+		var card: Resource = item.get("card")
+		if card:
+			added_cards.append(card)
+	
+	# 显示当前桌面卡牌（标记被建议移除的）
+	for card: Resource in manager.table_cards:
+		var card_ui = DraggableCardScene.instantiate()
+		topic_layout.add_child(card_ui)
+		card_ui.set_card_data(card)
+		
+		# 检查是否被建议移除（用红色边框标记）
+		var is_removed: bool = false
+		for removed_card: Resource in removed_cards:
+			if removed_card.card_name == card.card_name:
+				is_removed = true
+				break
+		
+		if is_removed:
+			_apply_card_style(card_ui, Color(0.8, 0.2, 0.2), "建议移除")
+	
+	# 显示建议添加的卡牌（用绿色边框标记）
+	for card: Resource in added_cards:
+		var card_ui = DraggableCardScene.instantiate()
+		topic_layout.add_child(card_ui)
+		card_ui.set_card_data(card)
+		_apply_card_style(card_ui, Color(0.2, 0.8, 0.2), "建议添加")
+	
+	# 如果没有任何卡牌显示，添加提示
+	if topic_layout.get_child_count() == 0:
+		var hint_label: Label = Label.new()
+		hint_label.text = "等待 AI 响应..."
+		hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		topic_layout.add_child(hint_label)
+
+
+## 应用卡牌样式（边框颜色 + 悬浮提示）
+## @param card_ui: DraggableCard 实例
+## @param border_color: 边框颜色
+## @param tooltip: 悬浮提示文字
+func _apply_card_style(card_ui: Control, border_color: Color, tooltip: String) -> void:
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.2, 0.22, 0.25)
+	style.border_width_bottom = 3
+	style.border_width_left = 3
+	style.border_width_right = 3
+	style.border_width_top = 3
+	style.border_color = border_color
+	style.corner_radius_top_left = 6
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
+	card_ui.add_theme_stylebox_override("panel", style)
+	card_ui.tooltip_text = tooltip
 
 
 ## 更新心理仪表盘

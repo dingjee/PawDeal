@@ -46,7 +46,7 @@ var weight_laziness: float = 2.0
 
 ## BATNA (Best Alternative To Negotiated Agreement)
 ## 最佳替代方案的效用值，低于此分直接拒绝
-var base_batna: float = 10.0
+var base_batna: float = 500.0
 
 ## 当前心理锚点/预期值
 ## 用于计算 A (Anchor) 维度的损失厌恶

@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvnmxcjtlpaqy"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_counter_offer.gd" id="1_counter"]
+
+[node name="TestCounterOffer" type="Node"]
+script = ExtResource("1_counter")
+auto_exit = true
+snapshot_delay_frames = 10
