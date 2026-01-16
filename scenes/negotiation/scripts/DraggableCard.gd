@@ -22,12 +22,15 @@ var _opp_label: Label
 
 
 func _ready() -> void:
-	# 确保鼠标可以捕获输入
-	mouse_filter = Control.MOUSE_FILTER_PASS
-	custom_minimum_size = Vector2(100, 140)
+	# 确保卡牌能接收鼠标输入用于拖拽
+	# MOUSE_FILTER_STOP 让此控件接收鼠标事件，然后我们通过 _get_drag_data 处理拖拽
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	custom_minimum_size = Vector2(100, 80)
 	
 	_setup_ui()
 	_update_display()
+	
+	print("[DraggableCard] 初始化完成，mouse_filter = STOP")
 
 
 ## 设置卡牌数据
