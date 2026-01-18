@@ -25,6 +25,29 @@
 class_name GapLAI
 extends RefCounted
 
+
+## ===== 情绪系统 (Sentiment System) =====
+## 情绪作为 GAP-L 权重的"透镜"，动态影响 AI 的决策倾向
+## 设计原理：不改变公式结构，只通过乘法修正权重
+
+## 情绪变化信号：供 Manager/UI 监听
+## @param new_value: 新的情绪值 (-1.0 ~ 1.0)
+## @param reason: 变化原因描述
+signal sentiment_changed(new_value: float, reason: String)
+
+## 当前情绪值：-1.0 (愤怒/敌对) 到 1.0 (愉悦/合作)
+## 初始值由 initial_sentiment 决定（支持 NPC 性格预设）
+var current_sentiment: float = 0.0
+
+## NPC 性格预设的初始情绪值
+## 友善 NPC 可从 +0.3 开始，敌对 NPC 可从 -0.3 开始
+var initial_sentiment: float = 0.0
+
+## 情绪波动敏感度：调整所有情绪变化的幅度
+## 高敏感性格：情绪容易波动；低敏感性格：情绪稳定
+var emotional_volatility: float = 1.0
+
+
 ## ===== AI 性格参数 =====
 
 ## 利益权重：AI 对经济收益的敏感程度
@@ -119,11 +142,14 @@ func calculate_utility(cards: Array, context: Dictionary = {}) -> Dictionary:
 		a_raw = gap * 2.5
 	
 	# ========== 第四步：应用权重计算加权分数 ==========
+	# 使用情绪修正后的有效权重（情绪作为"透镜"动态调整权重）
+	var eff_weights: Dictionary = _get_emotional_weights()
 	
-	var g_score: float = g_raw * weight_greed
-	var a_score: float = a_raw * weight_anchor
-	var p_score: float = p_raw * weight_power
-	var l_cost: float = l_raw * weight_laziness
+	var g_score: float = g_raw * eff_weights["weight_greed"]
+	var a_score: float = a_raw * eff_weights["weight_anchor"]
+	var p_score: float = p_raw * eff_weights["weight_power"]
+	var l_cost: float = l_raw * eff_weights["weight_laziness"]
+	var effective_batna: float = eff_weights["base_batna"]
 	
 	# ========== 第五步：计算总效用 ==========
 	# 公式: Total = G_score + A_score + P_score - L_cost
@@ -132,8 +158,8 @@ func calculate_utility(cards: Array, context: Dictionary = {}) -> Dictionary:
 	var total_score: float = g_score + a_score + p_score - l_cost
 	
 	# ========== 第六步：决策判定 ==========
-	
-	var accepted: bool = total_score >= base_batna
+	# 使用情绪修正后的 BATNA 进行判定
+	var accepted: bool = total_score >= effective_batna
 	var reason: String = _generate_reason(
 		total_score, g_score, a_score, p_score, l_cost,
 		p_raw, g_raw, greed_direction, current_round
@@ -157,7 +183,11 @@ func calculate_utility(cards: Array, context: Dictionary = {}) -> Dictionary:
 			"greed_direction": greed_direction, # 贪婪方向
 			"time_pressure": time_pressure, # 时间压力
 			"current_round": current_round, # 当前回合
-			"gap_from_anchor": gap
+			"gap_from_anchor": gap,
+			# 情绪系统信息
+			"sentiment": current_sentiment, # 当前情绪值
+			"effective_batna": effective_batna, # 情绪修正后的 BATNA
+			"sentiment_emoji": get_sentiment_emoji(), # 情绪表情
 		},
 		"reason": reason
 	}
@@ -545,3 +575,112 @@ func select_ai_tactic() -> Dictionary:
 		tactic_params["act_type"] = 1 # SUBSTANTIATION
 	
 	return tactic_params
+
+
+## ===== 情绪系统方法 =====
+
+## 初始化情绪值
+## 在谈判开始时调用，将情绪重置为 NPC 预设值
+func initialize_sentiment() -> void:
+	current_sentiment = initial_sentiment
+	print("[AI Emotion] 情绪初始化: %.2f" % current_sentiment)
+
+
+## 更新情绪值
+## @param delta: 情绪变化量（正值增加，负值减少）
+## @param reason: 变化原因（用于日志和 UI 显示）
+## @return: 是否触发 Rage Quit（情绪达到 -1.0）
+func update_sentiment(delta: float, reason: String = "") -> bool:
+	var old_value: float = current_sentiment
+	
+	# 应用情绪波动敏感度
+	var adjusted_delta: float = delta * emotional_volatility
+	
+	# 更新并限制范围
+	current_sentiment = clampf(current_sentiment + adjusted_delta, -1.0, 1.0)
+	
+	# 日志输出
+	var delta_sign: String = "+" if adjusted_delta >= 0 else ""
+	print("[AI Emotion] %.2f -> %.2f (%s%0.2f) | %s" % [
+		old_value, current_sentiment, delta_sign, adjusted_delta, reason
+	])
+	
+	# 发射信号通知 UI/Manager
+	sentiment_changed.emit(current_sentiment, reason)
+	
+	# 检测 Rage Quit
+	return is_rage_quit()
+
+
+## 检测是否触发 Rage Quit（愤然离场）
+## @return: 当情绪降至 -1.0 时返回 true
+func is_rage_quit() -> bool:
+	return current_sentiment <= -0.99 # 使用 -0.99 避免浮点精度问题
+
+
+## 获取情绪修正后的有效权重
+## 情绪作为"透镜"动态调整 GAP-L 权重
+## @return: 包含修正后权重的字典
+func _get_emotional_weights() -> Dictionary:
+	var mod_weights: Dictionary = {
+		"weight_greed": weight_greed,
+		"weight_anchor": weight_anchor,
+		"weight_power": weight_power,
+		"weight_laziness": weight_laziness,
+		"base_batna": base_batna
+	}
+	
+	if current_sentiment < 0.0:
+		# ===== 愤怒状态：斗气模式 =====
+		# Power 权重随愤怒指数增加（最多增加 150%）
+		# 例：愤怒 -0.5 -> Power 权重增加 75%
+		# 例：愤怒 -1.0 -> Power 权重增加 150%（非理性，只想赢）
+		var anger_factor: float = absf(current_sentiment)
+		mod_weights["weight_power"] *= (1.0 + anger_factor * 1.5)
+		
+		# 提高底线：愤怒时更难达成协议
+		# 最多增加 20%
+		mod_weights["base_batna"] *= (1.0 + anger_factor * 0.2)
+		
+	elif current_sentiment > 0.0:
+		# ===== 愉悦状态：合作模式 =====
+		# Power 权重降低：不在乎相对优势，只在乎双赢
+		# 例：愉悦 +1.0 -> Power 权重变为 0（完全合作）
+		var joy_factor: float = current_sentiment
+		mod_weights["weight_power"] *= maxf(0.0, 1.0 - joy_factor)
+		
+		# 稍微降低底线（友情价）
+		# 最多降低 10%
+		mod_weights["base_batna"] *= (1.0 - joy_factor * 0.1)
+	
+	return mod_weights
+
+
+## 获取情绪对应的表情符号（供 UI 使用）
+## @return: 表情符号字符串
+func get_sentiment_emoji() -> String:
+	if current_sentiment <= -0.6:
+		return "😡" # 非常愤怒
+	elif current_sentiment <= -0.2:
+		return "😠" # 不满
+	elif current_sentiment < 0.2:
+		return "😐" # 中立
+	elif current_sentiment < 0.6:
+		return "🙂" # 友善
+	else:
+		return "😊" # 非常愉悦
+
+
+## 获取情绪描述文本（供 UI 使用）
+## @return: 情绪状态描述
+func get_sentiment_label() -> String:
+	if current_sentiment <= -0.6:
+		return "愤怒"
+	elif current_sentiment <= -0.2:
+		return "不满"
+	elif current_sentiment < 0.2:
+		return "中立"
+	elif current_sentiment < 0.6:
+		return "友善"
+	else:
+		return "愉悦"

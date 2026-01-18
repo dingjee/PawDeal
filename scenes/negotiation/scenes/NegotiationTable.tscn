@@ -66,6 +66,27 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
 text = "0"
 
+[node name="AISentimentBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="SentimentEmoji" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+layout_mode = 2
+text = "😐"
+
+[node name="SentimentBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+custom_minimum_size = Vector2(60, 16)
+layout_mode = 2
+min_value = -100.0
+max_value = 100.0
+value = 0.0
+show_percentage = false
+
+[node name="SentimentValue" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "0%"
+
 [node name="BalanceIcon" type="Label" parent="TopStatusBar/BenefitDisplay"]
 layout_mode = 2
 text = "⚖️"

@@ -34,6 +34,11 @@ signal negotiation_ended(outcome: Outcome, final_score: float)
 ## 主动权转移信号
 signal proposer_changed(new_proposer: Proposer)
 
+## AI 情绪变化信号（用于 UI 更新）
+## @param sentiment: 新的情绪值 (-1.0 ~ 1.0)
+## @param reason: 变化原因
+signal ai_sentiment_changed(sentiment: float, reason: String)
+
 
 ## ===== 状态枚举 =====
 
@@ -132,8 +137,17 @@ func start_negotiation() -> void:
 	_ai_reject_count = 0
 	table_cards.clear()
 	_current_proposer = Proposer.PLAYER
+	
+	# 初始化 AI 情绪（支持 NPC 性格预设）
+	ai.initialize_sentiment()
+	# 连接情绪变化信号（首次连接时）
+	if not ai.sentiment_changed.is_connected(_on_ai_sentiment_changed):
+		ai.sentiment_changed.connect(_on_ai_sentiment_changed)
+	# 发射初始情绪状态
+	ai_sentiment_changed.emit(ai.current_sentiment, "谈判开始")
+	
 	_transition_to(State.PLAYER_TURN)
-	print("[NegotiationManager] 谈判开始！第 %d 回合，玩家先手" % _current_round)
+	print("[NegotiationManager] 谈判开始！第 %d 回合，玩家先手，AI 情绪: %.2f" % [_current_round, ai.current_sentiment])
 
 
 ## 添加卡牌到桌面
@@ -267,12 +281,22 @@ func _evaluate_player_proposal() -> void:
 	# 调用融合计算接口
 	_last_result = ai.evaluate_proposal_with_tactic(table_cards, current_tactic, context)
 	
+	# ===== 情绪系统：根据提案和战术更新情绪 =====
+	_update_ai_sentiment_from_proposal()
+	
 	print("[NegotiationManager] AI 评估完成:")
 	print("  Total: %.2f, BATNA: %.2f" % [_last_result["total_score"], ai.base_batna])
 	print("  决策: %s" % ("接受" if _last_result["accepted"] else "拒绝"))
 	print("  理由: %s" % _last_result["reason"])
+	print("  情绪: %s %.2f" % [ai.get_sentiment_emoji(), ai.current_sentiment])
 	
 	ai_evaluated.emit(_last_result)
+	
+	# ===== 检测 Rage Quit =====
+	if ai.is_rage_quit():
+		print("[NegotiationManager] AI 愤然离场！(Rage Quit)")
+		_end_negotiation(Outcome.LOSE, 0.0)
+		return
 	
 	# 根据结果决定下一步
 	if _last_result["accepted"]:
@@ -384,3 +408,45 @@ func get_last_counter_offer() -> Dictionary:
 func set_ai_deck(deck: Array) -> void:
 	ai_deck = deck
 	print("[NegotiationManager] AI 卡牌库已设置，共 %d 张" % ai_deck.size())
+
+
+## ===== 情绪系统方法 =====
+
+## AI 情绪变化回调：转发信号给 UI
+## @param new_value: 新的情绪值
+## @param reason: 变化原因
+func _on_ai_sentiment_changed(new_value: float, reason: String) -> void:
+	ai_sentiment_changed.emit(new_value, reason)
+
+
+## 根据提案质量和战术更新 AI 情绪
+## 在 _evaluate_player_proposal 中调用
+func _update_ai_sentiment_from_proposal() -> void:
+	var breakdown: Dictionary = _last_result.get("breakdown", {})
+	var g_raw: float = breakdown.get("G_raw", 0.0)
+	var g_score: float = breakdown.get("G_score", 0.0)
+	
+	# ===== 1. 根据提案质量更新情绪 =====
+	if g_raw < 0:
+		# 侮辱性提案：AI 会亏损
+		ai.update_sentiment(-0.15, "侮辱性报价")
+	elif g_score > 30.0:
+		# 非常慷慨的提案
+		ai.update_sentiment(0.10, "慷慨的提案")
+	elif g_score > 0:
+		# 一般慷慨
+		ai.update_sentiment(0.05, "可接受的提案")
+	
+	# ===== 2. 根据战术类型更新情绪 =====
+	var tactic_type: int = current_tactic.act_type if current_tactic else 0
+	
+	match tactic_type:
+		8: # THREAT (威胁)
+			ai.update_sentiment(-0.30, "被威胁")
+		9: # APOLOGIZE (道歉)
+			ai.update_sentiment(0.15, "对方道歉")
+		6: # RELATIONSHIP (拉关系)
+			ai.update_sentiment(0.15, "拉关系")
+	
+	# ===== 3. 回合自然衰减 =====
+	ai.update_sentiment(-0.02, "时间流逝")

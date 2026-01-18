@@ -62,5 +62,6 @@
 
 ## 8. MEMO PROTOCOL
 **Post-Decision (Sec 1):**
-1.  Create/Update `docs/[SYSTEM]_MEMO.md`.
-2.  Content: Selected Option, Upgrade Path (Phase 2+), Decision Log.
+1. **APPEND** to `docs/PROJECT_MEMO.md` (Unified memo; do not create separate files).
+2. Append a new row to the bottom of the **Decision Log** table: `| Date | Subject | Content |`.
+3. If a new system is involved, add design specifications under the corresponding section.

@@ -28,6 +28,11 @@ var manager: Node = null
 @onready var player_benefit_bar: ProgressBar = $TopStatusBar/BenefitDisplay/PlayerBenefitBox/PlayerBar
 @onready var player_benefit_label: Label = $TopStatusBar/BenefitDisplay/PlayerBenefitBox/PlayerValue
 
+## AI 情绪条（顶部状态栏内，在 AI 利益条旁）
+@onready var sentiment_emoji: Label = $TopStatusBar/BenefitDisplay/AISentimentBox/SentimentEmoji
+@onready var sentiment_bar: ProgressBar = $TopStatusBar/BenefitDisplay/AISentimentBox/SentimentBar
+@onready var sentiment_label: Label = $TopStatusBar/BenefitDisplay/AISentimentBox/SentimentValue
+
 ## 对手区域
 @onready var feedback_label: Label = $TopLayer/OpponentHUD/FeedbackBubble/FeedbackLabel
 
@@ -110,6 +115,8 @@ func _ready() -> void:
 	manager.round_ended.connect(_on_round_ended)
 	manager.negotiation_ended.connect(_on_negotiation_ended)
 	manager.counter_offer_generated.connect(_on_counter_offer_generated)
+	# 连接 AI 情绪变化信号
+	manager.ai_sentiment_changed.connect(_on_ai_sentiment_changed)
 	
 	# 连接按钮信号
 	_connect_buttons()
@@ -757,3 +764,60 @@ func _preview_counter_offer_benefit(counter_offer: Dictionary) -> void:
 		player_benefit_label.remove_theme_color_override("font_color")
 	
 	print("[Preview] AI: %.0f (%+.0f), 玩家: %.0f (%+.0f)" % [ai_total, ai_delta, player_total, player_delta])
+
+
+## ===== 情绪系统 UI 更新 =====
+
+## AI 情绪变化回调
+## @param new_sentiment: 新的情绪值 (-1.0 ~ 1.0)
+## @param reason: 变化原因描述
+func _on_ai_sentiment_changed(new_sentiment: float, reason: String) -> void:
+	_update_sentiment_bar(new_sentiment)
+	print("[Sentiment UI] 情绪: %.2f | %s" % [new_sentiment, reason])
+
+
+## 更新情绪条显示
+## @param sentiment: 情绪值 (-1.0 ~ 1.0)
+func _update_sentiment_bar(sentiment: float) -> void:
+	# 更新进度条值（转换为百分比 -100 ~ +100）
+	sentiment_bar.value = sentiment * 100.0
+	
+	# 更新百分比标签
+	var percent: int = int(sentiment * 100.0)
+	sentiment_label.text = "%+d%%" % percent
+	
+	# 更新表情符号
+	if sentiment <= -0.6:
+		sentiment_emoji.text = "😡" # 非常愤怒
+	elif sentiment <= -0.2:
+		sentiment_emoji.text = "😠" # 不满
+	elif sentiment < 0.2:
+		sentiment_emoji.text = "😐" # 中立
+	elif sentiment < 0.6:
+		sentiment_emoji.text = "🙂" # 友善
+	else:
+		sentiment_emoji.text = "😊" # 非常愉悦
+	
+	# 计算颜色渐变
+	# 愤怒（红 #E85454）-> 中立（灰 #888888）-> 愉悦（绿 #54E888）
+	var bar_color: Color
+	if sentiment < 0:
+		# 愤怒区间：红色到灰色
+		var t: float = (sentiment + 1.0) / 1.0 # -1.0~0.0 -> 0~1
+		bar_color = Color(0.91, 0.33, 0.33).lerp(Color(0.53, 0.53, 0.53), t)
+	else:
+		# 愉悦区间：灰色到绿色
+		var t: float = sentiment # 0.0~1.0 -> 0~1
+		bar_color = Color(0.53, 0.53, 0.53).lerp(Color(0.33, 0.91, 0.53), t)
+	
+	# 应用进度条填充颜色
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = bar_color
+	style.corner_radius_top_left = 2
+	style.corner_radius_top_right = 2
+	style.corner_radius_bottom_left = 2
+	style.corner_radius_bottom_right = 2
+	sentiment_bar.add_theme_stylebox_override("fill", style)
+	
+	# 标签颜色也跟随情绪
+	sentiment_label.add_theme_color_override("font_color", bar_color)
