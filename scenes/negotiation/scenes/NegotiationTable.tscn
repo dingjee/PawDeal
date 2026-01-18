@@ -386,7 +386,7 @@ text = "✅ 接受"
 [node name="BtnRejectSoft" type="Button" parent="BottomLayer/ReactionButtons"]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
-text = "🤔 考虑"
+text = "❌ 拒绝"
 
 [node name="BtnRejectHard" type="Button" parent="BottomLayer/ReactionButtons"]
 custom_minimum_size = Vector2(100, 40)

@@ -510,7 +510,7 @@ func _update_ui_for_state(state: int) -> void:
 			reaction_buttons.visible = true
 			tactic_selector.visible = false
 			# 更新按钮文字以反映新的功能
-			btn_reject_hard.text = "修改提案"
+			# btn_reject_hard.text = "修改提案"
 		6: # GAME_END
 			action_buttons.visible = false
 			reaction_buttons.visible = false
