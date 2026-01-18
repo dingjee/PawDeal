@@ -51,6 +51,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="PsychMeters" type="VBoxContainer" parent="TopLayer/OpponentHUD"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
@@ -208,6 +209,53 @@ text = "拖放
 horizontal_alignment = 1
 vertical_alignment = 1
 mouse_filter = 2
+
+[node name="BenefitPanel" type="HBoxContainer" parent="MiddleLayer/OfferContainer/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 32
+
+[node name="AIBenefitBox" type="VBoxContainer" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="AILabel" type="Label" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox"]
+layout_mode = 2
+text = "AI方收益"
+horizontal_alignment = 1
+
+[node name="AIBar" type="ProgressBar" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox"]
+custom_minimum_size = Vector2(150, 20)
+layout_mode = 2
+max_value = 200.0
+value = 0.0
+show_percentage = false
+
+[node name="AIValue" type="Label" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="PlayerBenefitBox" type="VBoxContainer" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PlayerLabel" type="Label" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox"]
+layout_mode = 2
+text = "玩家收益"
+horizontal_alignment = 1
+
+[node name="PlayerBar" type="ProgressBar" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox"]
+custom_minimum_size = Vector2(150, 20)
+layout_mode = 2
+max_value = 200.0
+value = 0.0
+show_percentage = false
+
+[node name="PlayerValue" type="Label" parent="MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox"]
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
 
 [node name="TacticTag" type="Label" parent="MiddleLayer/OfferContainer/VBox"]
 layout_mode = 2

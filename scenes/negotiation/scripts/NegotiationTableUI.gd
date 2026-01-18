@@ -23,11 +23,18 @@ var manager: Node = null
 @onready var round_label: Label = $RoundLabel
 
 ## 对手区域
+## GAP-L 仪表盘（已隐藏，仅用于调试计算）
 @onready var greed_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/GreedMeter/Bar
 @onready var anchor_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/AnchorMeter/Bar
 @onready var power_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/PowerMeter/Bar
 @onready var patience_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/PatienceMeter/Bar
 @onready var feedback_label: Label = $TopLayer/OpponentHUD/FeedbackBubble/FeedbackLabel
+
+## 利益统计面板（双侧进度条）
+@onready var ai_benefit_bar: ProgressBar = $MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox/AIBar
+@onready var ai_benefit_label: Label = $MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox/AIValue
+@onready var player_benefit_bar: ProgressBar = $MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox/PlayerBar
+@onready var player_benefit_label: Label = $MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox/PlayerValue
 
 ## 提案区域
 @onready var tactic_tag: Label = $MiddleLayer/OfferContainer/VBox/TacticTag
@@ -75,6 +82,10 @@ var _tactic_presets: Array = []
 
 ## 最新的 AI 反提案（用于 UI 显示）
 var _last_counter_offer: Dictionary = {}
+
+## 上一次利益值（用于计算差值）
+var _last_ai_benefit: float = 0.0
+var _last_player_benefit: float = 0.0
 
 
 ## ===== 生命周期 =====
@@ -200,8 +211,8 @@ func _add_test_hand_cards() -> void:
 	
 	var test_cards: Array = [
 		{"name": "大豆采购", "g": 30.0, "opp": 15.0},
-		{"name": "关税减免", "g": 25.0, "opp": 20.0},
-		{"name": "技术合作", "g": 15.0, "opp": 10.0},
+		{"name": "关税减免", "g": 25.0, "opp": 50.0},
+		{"name": "技术合作", "g": 15.0, "opp": 20.0},
 		{"name": "能源协议", "g": 40.0, "opp": 35.0},
 	]
 	
@@ -316,6 +327,8 @@ func _handle_drop(data: Variant, is_remove: bool) -> void:
 	# 刷新 UI 显示
 	_update_table_display()
 	_update_hand_display()
+	# 更新利益统计
+	_update_benefit_display()
 
 
 ## 更新手牌显示状态
@@ -390,6 +403,9 @@ func _on_counter_offer_generated(counter_offer: Dictionary) -> void:
 	
 	# 更新提案区显示反提案内容
 	_update_counter_offer_display(counter_offer)
+	
+	# 预览反提案的利益变化
+	_preview_counter_offer_benefit(counter_offer)
 
 
 ## 回合结束处理
@@ -602,8 +618,15 @@ func _apply_card_style(card_ui: Control, border_color: Color, tooltip: String) -
 	card_ui.tooltip_text = tooltip
 
 
-## 更新心理仪表盘
+## 更新心理仪表盘（调试用，UI 已隐藏）
 func _update_psych_meters(breakdown: Dictionary) -> void:
+	# 输出调试日志
+	print("[DEBUG GAP-L] G_score=%.2f, A_gap=%.2f, P_score=%.2f" % [
+		breakdown.get("G_score", 0.0),
+		breakdown.get("gap_from_anchor", 0.0),
+		breakdown.get("P_score", 0.0)
+	])
+	
 	# G: 贪婪度 - 基于 G_score 相对于范围的百分比
 	var g_normalized: float = clampf(breakdown["G_score"] / 100.0, 0.0, 1.0) * 100.0
 	greed_bar.value = g_normalized
@@ -616,3 +639,100 @@ func _update_psych_meters(breakdown: Dictionary) -> void:
 	# P: 权力欲 - 基于 P_score
 	var p_normalized: float = clampf((breakdown["P_score"] + 50.0) / 100.0, 0.0, 1.0) * 100.0
 	power_bar.value = p_normalized
+
+
+## 更新利益统计显示（双侧进度条）
+## 计算当前桌面卡牌的双方收益总和，并显示与上次的差值
+func _update_benefit_display() -> void:
+	# 计算当前收益
+	var ai_total: float = 0.0
+	var player_total: float = 0.0
+	
+	for card: Resource in manager.table_cards:
+		ai_total += card.g_value
+		player_total += card.opp_value
+	
+	# 计算差值
+	var ai_delta: float = ai_total - _last_ai_benefit
+	var player_delta: float = player_total - _last_player_benefit
+	
+	# 更新进度条
+	ai_benefit_bar.value = ai_total
+	player_benefit_bar.value = player_total
+	
+	# 更新标签（带差值显示）
+	if abs(ai_delta) > 0.01:
+		var sign_str: String = "+" if ai_delta > 0 else ""
+		ai_benefit_label.text = "%.0f (%s%.0f)" % [ai_total, sign_str, ai_delta]
+		# 设置颜色：增加为绿色，减少为红色
+		ai_benefit_label.add_theme_color_override("font_color", Color.GREEN if ai_delta > 0 else Color.RED)
+	else:
+		ai_benefit_label.text = "%.0f" % ai_total
+		ai_benefit_label.remove_theme_color_override("font_color")
+	
+	if abs(player_delta) > 0.01:
+		var sign_str: String = "+" if player_delta > 0 else ""
+		player_benefit_label.text = "%.0f (%s%.0f)" % [player_total, sign_str, player_delta]
+		player_benefit_label.add_theme_color_override("font_color", Color.GREEN if player_delta > 0 else Color.RED)
+	else:
+		player_benefit_label.text = "%.0f" % player_total
+		player_benefit_label.remove_theme_color_override("font_color")
+	
+	# 保存当前值作为下次比较基准
+	_last_ai_benefit = ai_total
+	_last_player_benefit = player_total
+	
+	print("[Benefit] AI: %.0f, 玩家: %.0f" % [ai_total, player_total])
+
+
+## 预览反提案的利益变化（不更新基准值）
+## @param counter_offer: AI 反提案字典
+func _preview_counter_offer_benefit(counter_offer: Dictionary) -> void:
+	# 从当前桌面开始计算
+	var ai_total: float = 0.0
+	var player_total: float = 0.0
+	
+	for card: Resource in manager.table_cards:
+		ai_total += card.g_value
+		player_total += card.opp_value
+	
+	# 减去被移除的卡牌
+	for item: Dictionary in counter_offer.get("removed_cards", []):
+		var card: Resource = item.get("card")
+		if card:
+			ai_total -= card.g_value
+			player_total -= card.opp_value
+	
+	# 加上被添加的卡牌
+	for item: Dictionary in counter_offer.get("added_cards", []):
+		var card: Resource = item.get("card")
+		if card:
+			ai_total += card.g_value
+			player_total += card.opp_value
+	
+	# 计算与当前状态的差值
+	var ai_delta: float = ai_total - _last_ai_benefit
+	var player_delta: float = player_total - _last_player_benefit
+	
+	# 更新进度条
+	ai_benefit_bar.value = ai_total
+	player_benefit_bar.value = player_total
+	
+	# 更新标签（显示预期变化）
+	if abs(ai_delta) > 0.01:
+		var sign_str: String = "+" if ai_delta > 0 else ""
+		ai_benefit_label.text = "%.0f (%s%.0f)" % [ai_total, sign_str, ai_delta]
+		ai_benefit_label.add_theme_color_override("font_color", Color.GREEN if ai_delta > 0 else Color.RED)
+	else:
+		ai_benefit_label.text = "%.0f" % ai_total
+		ai_benefit_label.remove_theme_color_override("font_color")
+	
+	if abs(player_delta) > 0.01:
+		var sign_str: String = "+" if player_delta > 0 else ""
+		player_benefit_label.text = "%.0f (%s%.0f)" % [player_total, sign_str, player_delta]
+		player_benefit_label.add_theme_color_override("font_color", Color.GREEN if player_delta > 0 else Color.RED)
+	else:
+		player_benefit_label.text = "%.0f" % player_total
+		player_benefit_label.remove_theme_color_override("font_color")
+	
+	print("[Preview] AI: %.0f (%+.0f), 玩家: %.0f (%+.0f)" % [ai_total, ai_delta, player_total, player_delta])
