@@ -18,23 +18,24 @@ extends Control
 @export var manager_path: NodePath = ^"Manager"
 var manager: Node = null
 
-## UI 元素引用
-@onready var state_label: Label = $StateLabel
-@onready var round_label: Label = $RoundLabel
+## UI 元素引用 - 顶部状态栏
+@onready var state_label: Label = $TopStatusBar/StateLabel
+@onready var round_label: Label = $TopStatusBar/RoundLabel
+
+## 利益统计面板（顶部状态栏内）
+@onready var ai_benefit_bar: ProgressBar = $TopStatusBar/BenefitDisplay/AIBenefitBox/AIBar
+@onready var ai_benefit_label: Label = $TopStatusBar/BenefitDisplay/AIBenefitBox/AIValue
+@onready var player_benefit_bar: ProgressBar = $TopStatusBar/BenefitDisplay/PlayerBenefitBox/PlayerBar
+@onready var player_benefit_label: Label = $TopStatusBar/BenefitDisplay/PlayerBenefitBox/PlayerValue
 
 ## 对手区域
-## GAP-L 仪表盘（已隐藏，仅用于调试计算）
-@onready var greed_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/GreedMeter/Bar
-@onready var anchor_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/AnchorMeter/Bar
-@onready var power_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/PowerMeter/Bar
-@onready var patience_bar: ProgressBar = $TopLayer/OpponentHUD/PsychMeters/PatienceMeter/Bar
 @onready var feedback_label: Label = $TopLayer/OpponentHUD/FeedbackBubble/FeedbackLabel
 
-## 利益统计面板（双侧进度条）
-@onready var ai_benefit_bar: ProgressBar = $MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox/AIBar
-@onready var ai_benefit_label: Label = $MiddleLayer/OfferContainer/VBox/BenefitPanel/AIBenefitBox/AIValue
-@onready var player_benefit_bar: ProgressBar = $MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox/PlayerBar
-@onready var player_benefit_label: Label = $MiddleLayer/OfferContainer/VBox/BenefitPanel/PlayerBenefitBox/PlayerValue
+## GAP-L 仪表盘（已隐藏，仅用于调试计算）
+@onready var greed_bar: ProgressBar = $TopLayer/PsychMeters/GreedMeter/Bar
+@onready var anchor_bar: ProgressBar = $TopLayer/PsychMeters/AnchorMeter/Bar
+@onready var power_bar: ProgressBar = $TopLayer/PsychMeters/PowerMeter/Bar
+@onready var patience_bar: ProgressBar = $TopLayer/PsychMeters/PatienceMeter/Bar
 
 ## 提案区域
 @onready var tactic_tag: Label = $MiddleLayer/OfferContainer/VBox/TacticTag
@@ -410,7 +411,7 @@ func _on_counter_offer_generated(counter_offer: Dictionary) -> void:
 
 ## 回合结束处理
 func _on_round_ended(round_number: int) -> void:
-	round_label.text = "回合: %d / 10" % (round_number + 1)
+	round_label.text = "回合 %d/10" % (round_number + 1)
 	
 	# 更新耐心条
 	var patience_value: float = 10.0 - float(round_number)
@@ -475,7 +476,7 @@ func _on_hand_card_pressed(card: Resource) -> void:
 ## 新状态枚举: IDLE=0, PLAYER_TURN=1, AI_EVALUATE=2, AI_TURN=3, PLAYER_EVALUATE=4, PLAYER_REACTION=5, GAME_END=6
 func _update_ui_for_state(state: int) -> void:
 	var state_names: Array = ["空闲", "玩家回合", "AI评估中", "AI回合", "评估AI提案", "等待反应", "游戏结束"]
-	state_label.text = "状态: %s" % state_names[state]
+	state_label.text = state_names[state]
 	
 	match state:
 		0: # IDLE
@@ -517,11 +518,31 @@ func _update_ui_for_state(state: int) -> void:
 
 
 ## 更新战术按钮状态
+## 使用视觉高亮而非禁用，让玩家可以随时切换战术
 func _update_tactic_button_states() -> void:
 	var buttons: Array = [btn_simple, btn_substantiation, btn_threat, btn_relationship, btn_apologize]
+	
 	for i: int in range(buttons.size()):
 		var btn: Button = buttons[i]
-		btn.disabled = (i == _selected_tactic_index)
+		if i == _selected_tactic_index:
+			# 选中状态：高亮边框
+			var style: StyleBoxFlat = StyleBoxFlat.new()
+			style.bg_color = Color(0.2, 0.4, 0.6, 0.8)
+			style.border_width_bottom = 3
+			style.border_width_left = 3
+			style.border_width_right = 3
+			style.border_width_top = 3
+			style.border_color = Color(0.4, 0.7, 1.0)
+			style.corner_radius_top_left = 4
+			style.corner_radius_top_right = 4
+			style.corner_radius_bottom_left = 4
+			style.corner_radius_bottom_right = 4
+			btn.add_theme_stylebox_override("normal", style)
+			btn.add_theme_stylebox_override("hover", style)
+		else:
+			# 未选中状态：移除自定义样式
+			btn.remove_theme_stylebox_override("normal")
+			btn.remove_theme_stylebox_override("hover")
 
 
 ## 更新桌面显示
