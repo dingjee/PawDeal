@@ -71,7 +71,7 @@ var manager: Node = null
 
 ## ===== 内部状态 =====
 
-## 战术类引用
+## 战术类引用（保留但不再使用，战术已被动作卡吸收）
 var TacticClass: GDScript = null
 
 ## 反应类引用
@@ -80,10 +80,19 @@ var ReactionClass: GDScript = null
 ## 可拖拽卡牌场景
 var DraggableCardScene: PackedScene = preload("res://scenes/negotiation/scenes/DraggableCard.tscn")
 
-## 当前选中的战术索引
+## 议题卡类引用
+var IssueCardClass: GDScript = null
+
+## 动作卡类引用
+var ActionCardClass: GDScript = null
+
+## 提案合成器引用
+var SynthesizerClass: GDScript = null
+
+## 当前选中的战术索引（已废弃，保留兼容）
 var _selected_tactic_index: int = 0
 
-## 预设战术列表（与按钮顺序对应）
+## 预设战术列表（已废弃，保留兼容）
 var _tactic_presets: Array = []
 
 ## 最新的 AI 反提案（用于 UI 显示）
@@ -93,6 +102,17 @@ var _last_counter_offer: Dictionary = {}
 var _last_ai_benefit: float = 0.0
 var _last_player_benefit: float = 0.0
 
+## 议题卡列表（UI 节点引用）
+## 存储当前桌面上的议题卡 DraggableCard 节点
+var _issue_cards: Array[DraggableCard] = []
+
+## 合成卡列表（ProposalCardData 资源）
+## 存储当前已合成的提案卡数据
+var _proposals: Array[Resource] = []
+
+## 合成卡 UI 映射（ProposalCardData -> DraggableCard）
+var _proposal_ui_map: Dictionary = {}
+
 
 ## ===== 生命周期 =====
 
@@ -100,6 +120,11 @@ func _ready() -> void:
 	# 延迟加载类，避免循环引用
 	TacticClass = load("res://scenes/negotiation/resources/NegotiationTactic.gd")
 	ReactionClass = load("res://scenes/negotiation/resources/NegotiationReaction.gd")
+	
+	# 加载合成系统类
+	IssueCardClass = load("res://scenes/negotiation/resources/IssueCardData.gd")
+	ActionCardClass = load("res://scenes/negotiation/resources/ActionCardData.gd")
+	SynthesizerClass = load("res://scenes/negotiation/scripts/ProposalSynthesizer.gd")
 	
 	# 获取 Manager
 	manager = get_node(manager_path)
@@ -128,13 +153,16 @@ func _ready() -> void:
 	await get_tree().create_timer(0.5).timeout
 	manager.start_negotiation()
 	
-	# 添加测试用的初始手牌
+	# 添加测试用的初始手牌（动作卡）
 	_add_test_hand_cards()
+	
+	# 初始化核心议题（关税卡等）
+	_init_core_issues()
 	
 	# 初始化 AI 卡牌库（用于生成反提案）
 	_init_ai_deck()
 	
-	# 初始化预设战术（在谈判开始后设置，避免 IDLE 状态警告）
+	# 初始化预设战术（已废弃，保留兼容）
 	_init_tactic_presets()
 	
 	# 启用拖拽转发 (Drag Forwarding)
@@ -212,21 +240,76 @@ func _connect_buttons() -> void:
 	btn_walk_away.pressed.connect(_on_reaction_pressed.bind(3)) # WALK_AWAY
 
 
-## 添加测试用手牌
+## 添加测试用手牌（动作卡）
+## 动作卡携带 G/Opp 数值和立场
 func _add_test_hand_cards() -> void:
-	# 创建几张测试议题卡
-	var CardClass: GDScript = load("res://scenes/gap_l_mvp/resources/GapLCardData.gd")
-	
-	var test_cards: Array = [
-		{"name": "大豆采购", "g": 30.0, "opp": 15.0},
-		{"name": "关税减免", "g": 25.0, "opp": 50.0},
-		{"name": "技术合作", "g": 15.0, "opp": 20.0},
-		{"name": "能源协议", "g": 40.0, "opp": 35.0},
+	# 创建测试动作卡（替代原有的 GapLCardData）
+	var test_actions: Array = [
+		{"name": "采购协议", "g": 30.0, "opp": 15.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "采购"},
+		{"name": "关税减免", "g": 25.0, "opp": 50.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "减免"},
+		{"name": "技术封锁", "g": - 20.0, "opp": - 40.0, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "封锁"},
+		{"name": "市场开放", "g": 40.0, "opp": 35.0, "stance": ActionCardClass.Stance.NEUTRAL, "suffix": "开放"},
+		{"name": "威胁制裁", "g": 0.0, "opp": - 30.0, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "制裁"},
 	]
 	
-	for card_data: Dictionary in test_cards:
-		var card: Resource = CardClass.create(card_data["name"], card_data["g"], card_data["opp"])
-		_create_hand_card_ui(card)
+	for action_data: Dictionary in test_actions:
+		var action: Resource = ActionCardClass.create(
+			action_data["name"],
+			action_data["g"],
+			action_data["opp"],
+			action_data["stance"],
+			action_data["suffix"]
+		)
+		_create_hand_card_ui(action)
+	
+	print("[NegotiationTableUI] 手牌初始化完成，共 %d 张动作卡" % test_actions.size())
+
+
+## 初始化核心议题（固定在桌面上的议题卡）
+## 核心议题不可移除，代表谈判的主要话题
+func _init_core_issues() -> void:
+	# 创建核心议题：关税卡（游戏触发议题）
+	var tariff_issue: Resource = IssueCardClass.create(
+		"关税",
+		["trade", "economy"] as Array[String],
+		true, # 核心议题
+		"进出口关税谈判"
+	)
+	
+	# 创建其他可选议题
+	var other_issues: Array = [
+		{"name": "半导体", "tags": ["tech", "security"] as Array[String], "is_core": false, "desc": "高科技产业议题"},
+		{"name": "农产品", "tags": ["agriculture", "trade"] as Array[String], "is_core": false, "desc": "农业贸易议题"},
+	]
+	
+	# 添加核心议题到桌面
+	_create_issue_card_ui(tariff_issue)
+	
+	# 添加其他议题到桌面
+	for issue_data: Dictionary in other_issues:
+		var issue: Resource = IssueCardClass.create(
+			issue_data["name"],
+			issue_data["tags"],
+			issue_data["is_core"],
+			issue_data["desc"]
+		)
+		_create_issue_card_ui(issue)
+	
+	print("[NegotiationTableUI] 议题初始化完成，共 %d 个议题" % (1 + other_issues.size()))
+
+
+## 创建议题卡 UI 并添加到桌面
+## @param issue: IssueCardData 资源
+func _create_issue_card_ui(issue: Resource) -> void:
+	var card_ui: DraggableCard = DraggableCardScene.instantiate()
+	topic_layout.add_child(card_ui)
+	card_ui.set_as_issue(issue)
+	
+	# 连接合成请求信号
+	card_ui.request_synthesis.connect(_on_request_synthesis)
+	
+	# 记录到议题卡列表
+	_issue_cards.append(card_ui)
 
 
 ## 初始化 AI 卡牌库
@@ -251,11 +334,121 @@ func _init_ai_deck() -> void:
 	print("[NegotiationTableUI] AI 卡牌库已初始化，共 %d 张" % deck.size())
 
 
-## 创建手牌 UI 元素
+## 创建手牌 UI 元素（动作卡）
 func _create_hand_card_ui(card: Resource) -> void:
-	var card_ui = DraggableCardScene.instantiate()
+	var card_ui: DraggableCard = DraggableCardScene.instantiate()
 	hand_layout.add_child(card_ui)
 	card_ui.set_card_data(card)
+
+
+## ===== 合成系统回调 =====
+
+## 处理合成请求：当动作卡被放置到议题卡上时
+## @param issue_card: 议题卡 UI 节点
+## @param action_card: 动作卡 UI 节点
+func _on_request_synthesis(issue_card: DraggableCard, action_card: DraggableCard) -> void:
+	print("[Synthesis] 收到合成请求: %s + %s" % [
+		issue_card.card_data.issue_name if issue_card.card_data else "null",
+		action_card.card_data.action_name if action_card.card_data else "null"
+	])
+	
+	# 验证数据
+	if issue_card.card_data == null or action_card.card_data == null:
+		push_error("[Synthesis] 合成失败：卡牌数据为空")
+		return
+	
+	# 调用合成器
+	var proposal: Resource = SynthesizerClass.craft(issue_card.card_data, action_card.card_data)
+	if proposal == null:
+		push_error("[Synthesis] 合成失败：合成器返回空")
+		return
+	
+	# 创建合成卡 UI（替换议题卡位置）
+	var proposal_ui: DraggableCard = DraggableCardScene.instantiate()
+	var issue_index: int = issue_card.get_index()
+	topic_layout.add_child(proposal_ui)
+	topic_layout.move_child(proposal_ui, issue_index)
+	proposal_ui.set_as_proposal(proposal, issue_card)
+	
+	# 连接分离请求信号
+	proposal_ui.request_split.connect(_on_request_split)
+	
+	# 隐藏议题卡（视觉上被覆盖）
+	issue_card.visible = false
+	
+	# 从手牌中移除动作卡
+	action_card.queue_free()
+	
+	# 记录合成卡
+	_proposals.append(proposal)
+	_proposal_ui_map[proposal] = proposal_ui
+	
+	# 同步到 Manager（将合成卡数值添加到桌面）
+	# 使用 GapLCardData 格式兼容现有 Manager
+	var CardClass: GDScript = load("res://scenes/gap_l_mvp/resources/GapLCardData.gd")
+	var compat_card: Resource = CardClass.create(
+		proposal.display_name,
+		proposal.g_value,
+		proposal.opp_value
+	)
+	manager.add_card_to_table(compat_card)
+	
+	# 更新利益显示
+	_update_benefit_display()
+	
+	print("[Synthesis] 合成成功: %s" % proposal.display_name)
+
+
+## 处理分离请求：当右键点击合成卡时
+## @param proposal_card: 合成卡 UI 节点
+func _on_request_split(proposal_card: DraggableCard) -> void:
+	print("[Split] 收到分离请求: %s" % [
+		proposal_card.card_data.display_name if proposal_card.card_data else "null"
+	])
+	
+	var proposal: Resource = proposal_card.card_data
+	if proposal == null or not proposal.can_split():
+		push_error("[Split] 分离失败：合成卡数据无效")
+		return
+	
+	# 调用合成器分解
+	var result: Dictionary = SynthesizerClass.split(proposal)
+	if result.is_empty():
+		push_error("[Split] 分离失败：合成器返回空")
+		return
+	
+	# 恢复议题卡可见性
+	var issue_ui: DraggableCard = proposal_card.source_issue_ui
+	if issue_ui:
+		issue_ui.visible = true
+	
+	# 归还动作卡到手牌
+	var action_data: Resource = result.get("action")
+	if action_data:
+		_create_hand_card_ui(action_data)
+	
+	# 从 Manager 移除对应的卡牌
+	# 使用名称匹配找到之前添加的兼容卡
+	for table_card: Resource in manager.table_cards:
+		if table_card.card_name == proposal.display_name:
+			manager.remove_card_from_table(table_card)
+			break
+	
+	# 清理记录
+	_proposals.erase(proposal)
+	_proposal_ui_map.erase(proposal)
+	
+	# 销毁合成卡 UI
+	proposal_card.queue_free()
+	
+	# 更新利益显示
+	_update_benefit_display()
+	
+	print("[Split] 分离成功: %s -> %s + %s" % [
+		proposal.display_name,
+		result.get("issue").issue_name,
+		result.get("action").action_name
+	])
 
 ## ===== 拖拽系统回调 (Drag & Drop) =====
 ## 注意：Godot 4.x 的 set_drag_forwarding 回调签名为 (Vector2, Variant)
@@ -493,10 +686,10 @@ func _update_ui_for_state(state: int) -> void:
 		1: # PLAYER_TURN
 			action_buttons.visible = true
 			reaction_buttons.visible = false
-			tactic_selector.visible = true
+			tactic_selector.visible = false # 战术已被动作卡吸收，隐藏战术选择器
 			submit_btn.disabled = false
-			# 回到玩家回合时，恢复正常桌面显示
-			_update_table_display()
+			# 回到玩家回合时，不再重建桌面（议题卡和合成卡已经存在）
+			# _update_table_display()
 			_update_hand_display()
 		2: # AI_EVALUATE
 			action_buttons.visible = true
@@ -553,24 +746,16 @@ func _update_tactic_button_states() -> void:
 
 
 ## 更新桌面显示
+## 注意：在合成系统中，议题卡和合成卡由 _init_core_issues 和 _on_request_synthesis 管理
+## 此函数仅在初始化时清除占位符
 func _update_table_display() -> void:
-	# 清除现有占位符内容
+	# 清除场景中的占位符卡片（仅首次调用时）
 	for child: Node in topic_layout.get_children():
+		# 跳过 DraggableCard 节点（保留议题卡和合成卡）
+		if child is DraggableCard:
+			continue
+		# 清除占位符 Panel 和 Label
 		child.queue_free()
-	
-	# 为每张桌面卡牌创建 UI
-	for card: Resource in manager.table_cards:
-		var card_ui = DraggableCardScene.instantiate()
-		topic_layout.add_child(card_ui)
-		card_ui.set_card_data(card)
-	
-	# 如果桌面为空，显示提示
-	if manager.table_cards.is_empty():
-		var hint_label: Label = Label.new()
-		hint_label.text = "点击下方手牌添加议题"
-		hint_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		hint_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		topic_layout.add_child(hint_label)
 
 
 ## 更新反提案显示

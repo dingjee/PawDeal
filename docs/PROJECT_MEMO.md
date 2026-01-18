@@ -149,6 +149,64 @@ GAME_END        - 游戏结束
 | 2026-01-16 | 标签修复 | 改为中立命名（"AI方"/"玩家"） |
 | 2026-01-18 | 情绪系统 | 确认 Option A 布局 + NPC 预设 + Rage Quit 机制 |
 | 2026-01-18 | 情绪实现 | GapLAI 情绪透镜 + Manager 触发 + UI 情绪条；24/24 单元测试通过 |
+| 2026-01-18 | 在场合成系统 | 实现 Issue + Action = Proposal 的卡牌合成机制 |
+
+---
+
+## 6. 在场合成系统 (On-Table Synthesis)
+
+> **创建日期**: 2026-01-18 | **状态**: ✅ 核心完成
+
+### 核心概念
+
+**卡牌即立场，动作即合成**
+
+| 卡牌类型 | 位置 | 资源性质 | 作用 |
+|----------|------|----------|------|
+| **议题卡 (Issue)** | 桌面常驻 | 无限/固定 | 谈判的**对象**（半导体、关税、农产品） |
+| **动作卡 (Action)** | 手牌区 | 有限 (Deck) | 谈判的**手段**（制裁、采购、豁免） |
+| **合成卡 (Proposal)** | 桌面 | 运行时生成 | 议题 + 动作的**提案** |
+
+### 交互流程
+
+```
+玩家拖动 ActionCard → 覆盖 IssueCard
+       │
+       ▼
+ProposalSynthesizer.craft(issue, action) → ProposalCardData
+       │
+       ▼
+UI: 隐藏 IssueCard, 显示 ProposalCard (覆盖叠加视觉)
+       │
+       ▼
+右键点击 ProposalCard
+       │
+       ▼
+ProposalSynthesizer.split(proposal) → 恢复 IssueCard + 归还 ActionCard
+```
+
+### 设计决策
+
+| 项目 | 决策 |
+|------|------|
+| 议题卡布局 | 自由拖拽（关税卡初始存在且常驻为核心议题） |
+| 合成视觉 | 覆盖叠加（绿色边框 + 阴影效果） |
+| 敏感度 | 放在 AI 性格/interests 机制（后续迭代） |
+| 战术系统 | 被动作卡吸收（删除战术选择器 UI） |
+| 合成公式 | 分层计算（敏感度只影响 AI 心理感知，不改变数值） |
+
+### 相关文件
+
+```
+scenes/negotiation/resources/
+  ├── IssueCardData.gd      # 议题卡资源
+  ├── ActionCardData.gd     # 动作卡资源
+  └── ProposalCardData.gd   # 合成卡资源
+
+scenes/negotiation/scripts/
+  ├── ProposalSynthesizer.gd  # 纯函数合成器
+  └── DraggableCard.gd        # 三类卡牌 UI（支持 ISSUE/ACTION/PROPOSAL）
+```
 
 ---
 
@@ -172,3 +230,4 @@ scenes/negotiation/                     # 谈判系统主目录
 | Socio-emotional | S7 |
 | Unethical | S8 |
 | Process-related | S9 |
+
