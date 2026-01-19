@@ -4,10 +4,11 @@
 ## 合成卡是玩家的"提案"，由议题（What）和动作（How）组合而成。
 ## 例如："半导体" + "制裁" = "半导体制裁令"
 ##
-## 设计理念：
-## - 合成卡存储对源卡的引用，支持分解回退
-## - 数值直接取自动作卡（分层计算：敏感度在 AI 侧处理）
-## - 名称由议题名 + 动作后缀拼接
+## 设计理念（Phase 1 重构）：
+## - 合成卡存储对源卡的引用
+## - G/P 值通过 getter 实时计算（动态模式）
+## - 公式：G = base_volume × profit_mult - base_volume × my_dependency × cost_mult
+## - 公式：P = base_volume × opp_dependency_true × power_mult
 class_name ProposalCardData
 extends Resource
 
@@ -18,24 +19,18 @@ extends Resource
 ## 例如："半导体制裁令"
 @export var display_name: String = ""
 
-## G: 对 AI 方的价值（直接取自动作卡）
-@export var g_value: float = 0.0
-
-## Opp: 对玩家方的价值（直接取自动作卡）
-@export var opp_value: float = 0.0
-
 ## 立场倾向（继承自动作卡）
 @export var stance: int = 0 # ActionCardData.Stance
 
 
-## ===== 源引用（用于分解回退）=====
+## ===== 源引用（用于分解回退和实时计算）=====
 
 ## 源议题卡引用
-## 用于分解时恢复议题卡
+## 用于分解时恢复议题卡，以及实时计算 G/P 值
 var source_issue: Resource = null
 
 ## 源动作卡数据引用
-## 用于分解时归还动作卡到手牌
+## 用于分解时归还动作卡到手牌，以及实时计算 G/P 值
 var source_action: Resource = null
 
 
@@ -49,6 +44,44 @@ var gapl_modifiers: Array[Dictionary] = []
 
 ## 情绪影响值
 var sentiment_impact: float = 0.0
+
+
+## ===== 实时计算 G/P 值 (Phase 1: 动态模式) =====
+
+## 获取 Greed 值（实时计算）
+## 公式：raw_greed - self_cost
+## raw_greed = issue.base_volume × action.profit_mult
+## self_cost = issue.base_volume × issue.my_dependency × action.cost_mult
+## @return: 计算后的 G 值
+func get_g_value() -> float:
+	if source_issue == null or source_action == null:
+		return 0.0
+	
+	var base_volume: float = source_issue.base_volume
+	var my_dependency: float = source_issue.my_dependency
+	var profit_mult: float = source_action.profit_mult
+	var cost_mult: float = source_action.cost_mult
+	
+	# 计算原始利润
+	var raw_greed: float = base_volume * profit_mult
+	# 计算自损（杀敌自损）
+	var self_cost: float = base_volume * my_dependency * cost_mult
+	# 净利润
+	return raw_greed - self_cost
+
+
+## 获取 Power 值（实时计算）
+## 公式：issue.base_volume × issue.opp_dependency_true × action.power_mult
+## @return: 计算后的 P 值
+func get_p_value() -> float:
+	if source_issue == null or source_action == null:
+		return 0.0
+	
+	var base_volume: float = source_issue.base_volume
+	var opp_dependency: float = source_issue.opp_dependency_true
+	var power_mult: float = source_action.power_mult
+	
+	return base_volume * opp_dependency * power_mult
 
 
 ## ===== 工厂方法 =====
@@ -68,13 +101,9 @@ static func synthesize(issue: Resource, action: Resource) -> Resource:
 	
 	# 拼接名称：议题名 + 动作后缀
 	proposal.display_name = issue.issue_name + action.verb_suffix
-	
-	# 数值直接取自动作卡（分层计算：敏感度在 AI 评估时处理）
-	proposal.g_value = action.g_value
-	proposal.opp_value = action.opp_value
 	proposal.stance = action.stance
 	
-	# 存储源引用
+	# 存储源引用（用于实时计算和分解）
 	proposal.source_issue = issue
 	proposal.source_action = action
 	
@@ -108,3 +137,9 @@ func get_action_name() -> String:
 	if source_action:
 		return source_action.action_name
 	return ""
+
+
+## 获取用于日志的完整信息
+## @return: 格式化的提案信息字符串
+func get_debug_info() -> String:
+	return "%s [G=%.2f, P=%.2f]" % [display_name, get_g_value(), get_p_value()]

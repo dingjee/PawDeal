@@ -89,7 +89,13 @@ var max_patience_rounds: int = 10
 var fatigue_scale: float = 10.0
 
 
-## ===== 核心评估函数 =====
+## ===== Interest 系统 (Phase 3: 动态权重修正) =====
+
+## 当前生效的 Interest 卡片列表
+## 每张卡会乘法修正 G/P 维度的权重
+## 在 AI 初始化时注入，代表 AI 当前的关注点/心态
+var current_interests: Array = []
+
 
 ## 计算一组卡牌（谈判提案）的总效用
 ## @param cards: GapLCardData 数组，代表提案中的所有条款
@@ -188,6 +194,84 @@ func calculate_utility(cards: Array, context: Dictionary = {}) -> Dictionary:
 			"sentiment": current_sentiment, # 当前情绪值
 			"effective_batna": effective_batna, # 情绪修正后的 BATNA
 			"sentiment_emoji": get_sentiment_emoji(), # 情绪表情
+		},
+		"reason": reason
+	}
+
+
+## ===== 单提案评估函数 (Phase 3: 支持 ProposalCardData) =====
+
+## 评估单个 ProposalCardData 的效用
+## 这是 Phase 3 新增的接口，支持基于公式计算的 G/P 值
+## @param proposal: ProposalCardData 实例
+## @param context: 可选上下文（包含 round 等）
+## @return: 包含决策结果和详细分解的字典
+func evaluate_proposal(proposal: Resource, context: Dictionary = {}) -> Dictionary:
+	if proposal == null:
+		push_error("[GapLAI] evaluate_proposal 失败：proposal 为空")
+		return {"accepted": false, "total_score": 0.0, "reason": "无效提案"}
+	
+	# ===== 从 ProposalCardData 获取 G/P 值 =====
+	var g_raw: float = proposal.get_g_value()
+	var p_raw: float = proposal.get_p_value()
+	
+	# ===== 计算 L (时间成本) =====
+	var current_round: int = context.get("round", 1)
+	var round_ratio: float = clampf(float(current_round) / float(max_patience_rounds), 0.0, 1.0)
+	var time_pressure: float = round_ratio * round_ratio * fatigue_scale
+	var greed_direction: float = weight_greed - neutral_greed
+	var l_raw: float = greed_direction * time_pressure
+	
+	# ===== 计算 A (Anchor / 损失厌恶) =====
+	var gap: float = g_raw - current_anchor
+	var a_raw: float = 0.0
+	if gap >= 0.0:
+		a_raw = gap
+	else:
+		a_raw = gap * 2.5 # 损失厌恶系数
+	
+	# ===== 应用权重（包含 Interest 和情绪修正）=====
+	var eff_weights: Dictionary = _get_emotional_weights()
+	
+	var g_score: float = g_raw * eff_weights["weight_greed"]
+	var a_score: float = a_raw * eff_weights["weight_anchor"]
+	var p_score: float = p_raw * eff_weights["weight_power"]
+	var l_cost: float = l_raw * eff_weights["weight_laziness"]
+	var effective_batna: float = eff_weights["base_batna"]
+	
+	# ===== 计算总效用 =====
+	var total_score: float = g_score + a_score + p_score - l_cost
+	
+	# ===== 决策判定 =====
+	var accepted: bool = total_score >= effective_batna
+	var reason: String = _generate_reason(
+		total_score, g_score, a_score, p_score, l_cost,
+		p_raw, g_raw, greed_direction, current_round
+	)
+	
+	return {
+		"accepted": accepted,
+		"total_score": total_score,
+		"breakdown": {
+			"G_raw": g_raw,
+			"G_score": g_score,
+			"A_raw": a_raw,
+			"A_score": a_score,
+			"P_raw": p_raw,
+			"P_score": p_score,
+			"L_raw": l_raw,
+			"L_cost": l_cost,
+			"greed_direction": greed_direction,
+			"time_pressure": time_pressure,
+			"current_round": current_round,
+			"gap_from_anchor": gap,
+			# Interest 修正信息
+			"interest_g_mod": eff_weights.get("interest_g_mod", 1.0),
+			"interest_p_mod": eff_weights.get("interest_p_mod", 1.0),
+			# 情绪信息
+			"sentiment": current_sentiment,
+			"effective_batna": effective_batna,
+			"sentiment_emoji": get_sentiment_emoji(),
 		},
 		"reason": reason
 	}
@@ -618,8 +702,9 @@ func is_rage_quit() -> bool:
 	return current_sentiment <= -0.99 # 使用 -0.99 避免浮点精度问题
 
 
-## 获取情绪修正后的有效权重
+## 获取情绪和 Interest 修正后的有效权重
 ## 情绪作为"透镜"动态调整 GAP-L 权重
+## Interest 卡片乘法叠加修正
 ## @return: 包含修正后权重的字典
 func _get_emotional_weights() -> Dictionary:
 	var mod_weights: Dictionary = {
@@ -630,6 +715,23 @@ func _get_emotional_weights() -> Dictionary:
 		"base_batna": base_batna
 	}
 	
+	# ===== Interest 修正（乘法叠加）=====
+	var interest_g_mod: float = 1.0
+	var interest_p_mod: float = 1.0
+	
+	for interest: Resource in current_interests:
+		if interest != null:
+			interest_g_mod *= interest.g_weight_mod
+			interest_p_mod *= interest.p_weight_mod
+	
+	mod_weights["weight_greed"] *= interest_g_mod
+	mod_weights["weight_power"] *= interest_p_mod
+	
+	# 记录 Interest 修正值（供调试和测试断言）
+	mod_weights["interest_g_mod"] = interest_g_mod
+	mod_weights["interest_p_mod"] = interest_p_mod
+	
+	# ===== 情绪修正 =====
 	if current_sentiment < 0.0:
 		# ===== 愤怒状态：斗气模式 =====
 		# Power 权重随愤怒指数增加（最多增加 150%）

@@ -241,25 +241,27 @@ func _connect_buttons() -> void:
 
 
 ## 添加测试用手牌（动作卡）
-## 动作卡携带 G/Opp 数值和立场
+## 动作卡携带乘区参数和立场
 func _add_test_hand_cards() -> void:
-	# 创建测试动作卡（替代原有的 GapLCardData）
+	# 创建测试动作卡（使用新的 multiplier 系统）
+	# profit_mult: 利润乘数，power_mult: 威慑乘数，cost_mult: 自损乘数
 	var test_actions: Array = [
-		{"name": "采购协议", "g": 30.0, "opp": 15.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "采购"},
-		{"name": "关税减免", "g": 25.0, "opp": 50.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "减免"},
-		{"name": "技术封锁", "g": - 20.0, "opp": - 40.0, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "封锁"},
-		{"name": "市场开放", "g": 40.0, "opp": 35.0, "stance": ActionCardClass.Stance.NEUTRAL, "suffix": "开放"},
-		{"name": "威胁制裁", "g": 0.0, "opp": - 30.0, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "制裁"},
+		{"name": "采购协议", "profit": 1.5, "power": 0.0, "cost": 0.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "采购"},
+		{"name": "关税减免", "profit": 2.0, "power": 0.0, "cost": 0.0, "stance": ActionCardClass.Stance.COOPERATIVE, "suffix": "减免"},
+		{"name": "技术封锁", "profit": 0.5, "power": 2.0, "cost": 0.5, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "封锁"},
+		{"name": "市场开放", "profit": 1.8, "power": 0.0, "cost": 0.0, "stance": ActionCardClass.Stance.NEUTRAL, "suffix": "开放"},
+		{"name": "威胁制裁", "profit": 0.0, "power": 3.0, "cost": 1.0, "stance": ActionCardClass.Stance.AGGRESSIVE, "suffix": "制裁"},
 	]
 	
 	for action_data: Dictionary in test_actions:
-		var action: Resource = ActionCardClass.create(
+		var action: Resource = ActionCardClass.create_with_multipliers(
 			action_data["name"],
-			action_data["g"],
-			action_data["opp"],
-			action_data["stance"],
-			action_data["suffix"]
+			action_data["profit"],
+			action_data["power"],
+			action_data["cost"],
+			action_data["stance"]
 		)
+		action.verb_suffix = action_data["suffix"]
 		_create_hand_card_ui(action)
 	
 	print("[NegotiationTableUI] 手牌初始化完成，共 %d 张动作卡" % test_actions.size())
@@ -388,15 +390,17 @@ func _on_request_synthesis(issue_card: DraggableCard, action_card: DraggableCard
 	var CardClass: GDScript = load("res://scenes/gap_l_mvp/resources/GapLCardData.gd")
 	var compat_card: Resource = CardClass.create(
 		proposal.display_name,
-		proposal.g_value,
-		proposal.opp_value
+		proposal.get_g_value(), # 使用 getter 获取实时计算的 G 值
+		0.0 # P 值暂时不传递给旧系统
 	)
 	manager.add_card_to_table(compat_card)
 	
 	# 更新利益显示
 	_update_benefit_display()
 	
-	print("[Synthesis] 合成成功: %s" % proposal.display_name)
+	print("[Synthesis] 合成成功: %s [G=%.2f, P=%.2f]" % [
+		proposal.display_name, proposal.get_g_value(), proposal.get_p_value()
+	])
 
 
 ## 处理分离请求：当右键点击合成卡时

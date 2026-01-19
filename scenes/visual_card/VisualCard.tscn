@@ -14,3 +14,4 @@ position = Vector2(600, 400)
 [node name="FeatherGenerator" type="Node2D" parent="."]
 script = ExtResource("2_feather")
 feather_width = 30.0
+debug_draw = true

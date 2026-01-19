@@ -1,19 +1,19 @@
 ## ActionCardData.gd
 ## 动作卡资源类 - 代表谈判中的手段/策略
 ##
-## 动作卡携带具体数值（G/Opp）和立场倾向。
+## 动作卡携带乘区参数（profit_mult, power_mult, cost_mult）。
+## 与 IssueCardData 合成后，通过公式计算实际 G/P 值。
 ## 例如："制裁"、"采购"、"豁免"、"威胁" 等动作。
-## 玩家通过将动作卡覆盖在议题卡上来形成提案。
 ##
 ## 设计理念：
-## - 动作卡 = How（怎么做）
+## - 动作卡 = How（怎么做）+ 公式参数
+## - Issue (Data) + Action (Formula) = Proposal (Result)
 ## - 动作卡吸收了原战术系统的功能
-## - 打出动作卡本身就代表了立场，无需额外 UI 选择
 class_name ActionCardData
 extends Resource
 
 
-## ===== 立场枚举 =====
+## ===== 枚举定义 =====
 
 ## 动作卡的立场倾向
 ## 不同立场会影响 AI 的心理感知
@@ -24,20 +24,20 @@ enum Stance {
 	DECEPTIVE, ## 欺骗：虚假承诺、拖延
 }
 
+## 效果类型枚举
+## 用于区分不同的数值计算方式
+enum EffectType {
+	MULTIPLIER, ## 乘法效果：作用于 base_volume
+	FLAT, ## 固定值效果：直接加减
+	SPECIAL, ## 特殊效果：需要自定义逻辑
+}
+
 
 ## ===== 核心字段 =====
 
 ## 动作名称，用于显示和日志
 ## 例如："全面封锁"、"市场开放"、"技术转让"
 @export var action_name: String = ""
-
-## G: 对 AI 方的价值
-## 正数 = AI 获利，负数 = AI 受损
-@export var g_value: float = 0.0
-
-## Opp: 对玩家方的价值
-## 正数 = 玩家获利，负数 = 玩家受损
-@export var opp_value: float = 0.0
 
 ## 动作的立场倾向
 ## 影响 AI 的心理感知和情绪
@@ -52,6 +52,27 @@ enum Stance {
 
 ## 动作描述
 @export var description: String = ""
+
+
+## ===== 乘区参数 (Phase 1: TariffWin 数值机制) =====
+
+## 效果类型（默认为乘法效果）
+@export var effect_type: EffectType = EffectType.MULTIPLIER
+
+## 利润乘数：作用于 base_volume 计算 Greed
+## 公式：raw_greed = issue.base_volume × profit_mult
+## 默认 1.0 = 中性（不增不减）
+@export var profit_mult: float = 1.0
+
+## 威慑乘数：作用于 base_volume × opp_dependency 计算 Power
+## 公式：power = issue.base_volume × issue.opp_dependency_true × power_mult
+## 默认 0.0 = 无威慑效果
+@export var power_mult: float = 0.0
+
+## 自损乘数：作用于 base_volume × my_dependency 计算 Cost
+## 公式：self_cost = issue.base_volume × issue.my_dependency × cost_mult
+## 默认 0.0 = 无自损；正值 = 我方也受损（杀敌一千自损八百）
+@export var cost_mult: float = 0.0
 
 
 ## ===== GAP-L 修正器（吸收原战术系统）=====
@@ -76,47 +97,64 @@ enum Stance {
 const _SCRIPT_PATH: String = "res://scenes/negotiation/resources/ActionCardData.gd"
 
 
-## 快速创建动作卡的静态工厂方法
+## 快速创建动作卡的静态工厂方法（简化版）
 ## @param name: 动作名称
-## @param g: AI 方收益
-## @param opp: 玩家方收益
 ## @param action_stance: 立场
 ## @param suffix: 动词后缀
 ## @return: ActionCardData 实例
 static func create(
 	name: String,
-	g: float,
-	opp: float,
 	action_stance: Stance = Stance.NEUTRAL,
 	suffix: String = ""
 ) -> Resource:
 	var script: GDScript = load(_SCRIPT_PATH)
 	var action: Resource = script.new()
 	action.action_name = name
-	action.g_value = g
-	action.opp_value = opp
 	action.stance = action_stance
 	action.verb_suffix = suffix if suffix != "" else name
 	return action
 
 
-## 创建带 GAP-L 修正的动作卡（替代原战术）
+## 创建带乘区参数的动作卡（Phase 1 主力工厂方法）
 ## @param name: 动作名称
-## @param g: AI 方收益
-## @param opp: 玩家方收益
+## @param profit: 利润乘数 (default 1.0)
+## @param power: 威慑乘数 (default 0.0)
+## @param cost: 自损乘数 (default 0.0)
+## @param action_stance: 立场
+## @return: ActionCardData 实例
+static func create_with_multipliers(
+	name: String,
+	profit: float,
+	power: float,
+	cost: float,
+	action_stance: Stance = Stance.NEUTRAL
+) -> Resource:
+	var action: Resource = create(name, action_stance, name)
+	action.profit_mult = profit
+	action.power_mult = power
+	action.cost_mult = cost
+	return action
+
+
+## 创建带 GAP-L 修正的动作卡（战术效果）
+## @param name: 动作名称
+## @param profit: 利润乘数
+## @param power: 威慑乘数
+## @param cost: 自损乘数
 ## @param action_stance: 立场
 ## @param modifiers: GAP-L 修正器数组
 ## @param sentiment: 情绪影响
 ## @return: ActionCardData 实例
 static func create_with_modifiers(
 	name: String,
-	g: float,
-	opp: float,
+	profit: float,
+	power: float,
+	cost: float,
 	action_stance: Stance,
 	modifiers: Array[Dictionary],
 	sentiment: float = 0.0
 ) -> Resource:
-	var action: Resource = create(name, g, opp, action_stance, name)
+	var action: Resource = create_with_multipliers(name, profit, power, cost, action_stance)
 	action.has_gapl_modifiers = true
 	action.gapl_modifiers = modifiers
 	action.sentiment_impact = sentiment

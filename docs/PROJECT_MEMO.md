@@ -151,6 +151,11 @@ GAME_END        - 游戏结束
 | 2026-01-18 | 情绪实现 | GapLAI 情绪透镜 + Manager 触发 + UI 情绪条；24/24 单元测试通过 |
 | 2026-01-18 | 在场合成系统 | 实现 Issue + Action = Proposal 的卡牌合成机制 |
 | 2026-01-19 | VisualCard 羽化卡牌 | 创建独立视觉场景，Mesh 边缘羽化 + 动态噪点渐变 Shader；测试通过 |
+| 2026-01-19 | 数据层重构 Phase1 | IssueCardData 新增 base_volume/依赖度/迷雾字段；ActionCardData 改用 multiplier 系统；7/7 测试通过 |
+| 2026-01-19 | 数据层重构 Phase2 | ProposalSynthesizer 实现 GAP-L 数学公式（G=Vol×Profit-Cost, P=Vol×OppDep×Power）；动态计算模式；5/5 测试通过 |
+| 2026-01-19 | 数据层重构 Phase4 | IssueCardData 添加 get_display_dependency()/reveal_true_dependency() 迷雾方法；6/6 测试通过 |
+| 2026-01-19 | 数据层重构 Phase3 | 创建 InterestCardData；GapLAI 新增 current_interests 和 evaluate_proposal()；权重乘法叠加；4/4 测试通过 |
+
 
 ---
 
@@ -211,6 +216,51 @@ scenes/negotiation/scripts/
 
 ---
 
+## 7. TariffWin 数值系统 (Phase 1-4 重构)
+
+> **创建日期**: 2026-01-19 | **状态**: ✅ 核心完成
+
+### 核心公式
+
+```
+G (Greed) = base_volume × profit_mult - base_volume × my_dependency × cost_mult
+P (Power) = base_volume × opp_dependency_true × power_mult
+```
+
+### 数据结构变更
+
+| 资源类 | 新增字段 |
+|--------|----------|
+| **IssueCardData** | `base_volume`, `my_dependency`, `opp_dependency_true`, `opp_dependency_perceived`, `is_foggy` |
+| **ActionCardData** | `EffectType` 枚举, `profit_mult`, `power_mult`, `cost_mult` (替代旧 `g_value`/`opp_value`) |
+| **ProposalCardData** | `get_g_value()`, `get_p_value()` (动态计算 getter，无静态存储) |
+| **InterestCardData** | 新资源：`interest_name`, `g_weight_mod`, `p_weight_mod` |
+
+### 迷雾机制
+
+- `is_foggy = true`: UI 显示模糊范围（如 "0.3 - 0.9"）
+- `reveal_true_dependency()`: 揭示精确值，更新 `opp_dependency_perceived`
+- **上帝视角**: 内部计算始终使用 `opp_dependency_true`，不受迷雾影响
+
+### AI Interest 权重修正
+
+```gdscript
+# GapLAI._get_emotional_weights()
+Final_Wg = base_weight_greed × interest_1.g_mod × interest_2.g_mod × ...
+Final_Wp = base_weight_power × interest_1.p_mod × interest_2.p_mod × ...
+```
+
+### 测试覆盖
+
+| 测试文件 | 用例数 |
+|----------|--------|
+| `tests/gdunit/resources/test_card_data_upgrade.gd` | 7 |
+| `tests/gdunit/mechanics/test_synthesis_math.gd` | 5 |
+| `tests/gdunit/mechanics/test_fog_of_war.gd` | 6 |
+| `tests/gdunit/ai/test_ai_interests.gd` | 4 |
+
+---
+
 ## 附录
 
 ### A. 相关文件
@@ -219,6 +269,10 @@ scenes/negotiation/scripts/
 scenes/gap_l_mvp/scripts/GapLAI.gd     # GAP-L 核心 AI
 scenes/negotiation/                     # 谈判系统主目录
   ├── resources/                        # Resource 类
+  │   ├── IssueCardData.gd              # 议题卡（含数值容器+迷雾）
+  │   ├── ActionCardData.gd             # 动作卡（含乘区参数）
+  │   ├── ProposalCardData.gd           # 合成卡（动态计算）
+  │   └── InterestCardData.gd           # AI 兴趣卡（权重修正）
   ├── scripts/NegotiationManager.gd     # 状态机
   └── scenes/NegotiationTable.tscn      # 主界面
 ```
