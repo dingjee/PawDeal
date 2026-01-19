@@ -29,7 +29,8 @@ func _ready() -> void:
 	# 加载并实例化测试场景
 	_load_test_scene()
 	
-	# 等待一帧让场景初始化完成
+	# 等待多帧让场景初始化完成 (包括 queue_free 的清理)
+	await get_tree().process_frame
 	await get_tree().process_frame
 	await get_tree().process_frame
 	
@@ -68,6 +69,13 @@ func _load_test_scene() -> void:
 	_visual_card.position = get_viewport_rect().size / 2.0
 	add_child(_visual_card)
 	
+	# 重置 CardMesh 的局部位置以便截图居中显示
+	# 注意: 这会导致羽化网格位置不同步，仅用于测试截图
+	# 实际使用时不需要这个操作
+	var card_mesh := _visual_card.get_node_or_null("CardMesh")
+	if card_mesh:
+		card_mesh.position = Vector2.ZERO
+	
 	_log_info("✓ 场景加载成功: %s" % TARGET_SCENE_PATH)
 
 
@@ -90,9 +98,9 @@ func _test_scene_structure() -> void:
 	var card_mesh := _visual_card.get_node_or_null("CardMesh") as MeshInstance2D
 	_assert_true("CardMesh 节点存在", card_mesh != null)
 	
-	# 检查 FeatherGenerator 子节点
-	var feather_gen := _visual_card.get_node_or_null("FeatherGenerator")
-	_assert_true("FeatherGenerator 节点存在", feather_gen != null)
+	# 检查 CornerFeatherDealer 子节点 (新架构)
+	var dealer := _visual_card.get_node_or_null("CornerFeatherDealer")
+	_assert_true("CornerFeatherDealer 节点存在", dealer != null)
 
 
 ## 测试 Shader 材质
@@ -150,13 +158,13 @@ func _test_noise_texture() -> void:
 func _test_feather_mesh() -> void:
 	_log_info("--- 测试羽化网格 ---")
 	
-	var feather_gen := _visual_card.get_node_or_null("FeatherGenerator")
-	if feather_gen == null:
-		_log_error("FeatherGenerator 不存在")
+	var dealer := _visual_card.get_node_or_null("CornerFeatherDealer")
+	if dealer == null:
+		_log_error("CornerFeatherDealer 不存在")
 		return
 	
 	# 检查羽化 Mesh 是否生成
-	var feather_mesh := feather_gen.get_node_or_null("FeatherMesh") as MeshInstance2D
+	var feather_mesh := dealer.get_node_or_null("FeatherMesh") as MeshInstance2D
 	_assert_true("羽化 Mesh 已生成", feather_mesh != null)
 	
 	if feather_mesh:

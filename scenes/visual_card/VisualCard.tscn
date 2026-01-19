@@ -1,17 +1,19 @@
 [gd_scene load_steps=3 format=3 uid="uid://dnxoloe8m2fos"]
 
 [ext_resource type="Script" uid="uid://c4oirvbgt82mo" path="res://scenes/visual_card/scripts/visual_card_setup.gd" id="1_setup"]
-[ext_resource type="Script" uid="uid://bt1xj6q6lip0k" path="res://scenes/visual_card/scripts/mesh_feather_generator.gd" id="2_feather"]
+[ext_resource type="Script" path="res://scenes/visual_card/scripts/corner_feather_dealer.gd" id="2_dealer"]
 
 [node name="VisualCard" type="Node2D"]
 script = ExtResource("1_setup")
 card_mesh = NodePath("CardMesh")
-feather_generator = NodePath("FeatherGenerator")
+corner_feather_dealer = NodePath("CornerFeatherDealer")
 
 [node name="CardMesh" type="MeshInstance2D" parent="."]
-position = Vector2(600, 400)
 
-[node name="FeatherGenerator" type="Node2D" parent="."]
-script = ExtResource("2_feather")
+[node name="CornerFeatherDealer" type="Node2D" parent="."]
+script = ExtResource("2_dealer")
+shape_type = 0
+rect_size = Vector2(200, 300)
+corner_radius = 20.0
+corner_segments = 4
 feather_width = 30.0
-debug_draw = true
