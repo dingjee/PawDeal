@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://dajrup0iiw11s"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_corner_feather.gd" id="1_test"]
+
+[node name="TestCornerFeather" type="Node"]
+script = ExtResource("1_test")
+auto_exit = true
+snapshot_delay_frames = 10

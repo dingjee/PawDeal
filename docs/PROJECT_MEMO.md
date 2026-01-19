@@ -152,10 +152,11 @@ GAME_END        - 游戏结束
 | 2026-01-18 | 在场合成系统 | 实现 Issue + Action = Proposal 的卡牌合成机制 |
 | 2026-01-19 | VisualCard 羽化卡牌 | 创建独立视觉场景，Mesh 边缘羽化 + 动态噪点渐变 Shader；测试通过 |
 | 2026-01-19 | 数据层重构 Phase1 | IssueCardData 新增 base_volume/依赖度/迷雾字段；ActionCardData 改用 multiplier 系统；7/7 测试通过 |
+| 2026-01-19 | Mesh Feathering Architecture | **Ground-Truth Clipping Strategy**: Replaced metadata approach with a robust geometry pipeline. 1) Enforce clockwise winding. 2) Generate a guaranteed non-overlapping "valid outer polygon" using `Geometry2D.offset_polygon` (dynamically detecting correct offset direction). 3) Ray-cast from inner vertices along normals to find precise intersection points on this valid boundary. This correctly handles all concave/convex scenarios without manual classification logic. Ref: `CornerFeatherDealer`. |
 | 2026-01-19 | 数据层重构 Phase2 | ProposalSynthesizer 实现 GAP-L 数学公式（G=Vol×Profit-Cost, P=Vol×OppDep×Power）；动态计算模式；5/5 测试通过 |
 | 2026-01-19 | 数据层重构 Phase4 | IssueCardData 添加 get_display_dependency()/reveal_true_dependency() 迷雾方法；6/6 测试通过 |
 | 2026-01-19 | 数据层重构 Phase3 | 创建 InterestCardData；GapLAI 新增 current_interests 和 evaluate_proposal()；权重乘法叠加；4/4 测试通过 |
-
+| 2026-01-19 | Mesh Feathering V2 | **A2 Bevel Join 方案**：废弃不稳定的 `Geometry2D.offset_polygon`，改用叉积判断凹凸角。凹角使用边法线形成 Bevel（两个外扩点），凸角使用平均法线 + Miter 校正。无外部依赖，100% 稳定。Ref: `CornerFeatherDealer._update_feather_mesh`. |
 
 ---
 

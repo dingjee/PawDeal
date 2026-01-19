@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=4 uid="uid://dnxoloe8m2fos"]
+[gd_scene load_steps=22 format=4 uid="uid://dnxoloe8m2fos"]
 
 [ext_resource type="Script" uid="uid://di66pk7e1q1lu" path="res://scenes/visual_card/scripts/corner_feather_dealer.gd" id="1_dealer"]
 [ext_resource type="Script" uid="uid://bl34rd0ypnrf8" path="res://scenes/visual_card/scripts/fps_label.gd" id="2_fps"]
@@ -6,7 +6,7 @@
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_spiiw"]
 noise_type = 0
-frequency = 0.5
+frequency = 0.382
 fractal_octaves = 4
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_6e5o0"]
@@ -17,49 +17,184 @@ seamless = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_mgqph"]
 shader = ExtResource("3_spiiw")
-shader_parameter/base_color = Color(0, 0, 0.5, 1)
+shader_parameter/base_color = Color(0.6891749, 0.6487951, 0.64686066, 1)
 shader_parameter/linear_enabled = true
-shader_parameter/linear_start_color = Color(1, 0.5, 0, 1)
-shader_parameter/linear_end_color = Color(1, 1, 1, 0)
-shader_parameter/linear_angle = 45.0
+shader_parameter/linear_start_color = Color(1, 1, 0, 0.38431373)
+shader_parameter/linear_end_color = Color(1, 1, 0, 0)
+shader_parameter/linear_angle = 270.0
 shader_parameter/linear_scale = 1.0
 shader_parameter/linear_offset = 0.0
-shader_parameter/radial_enabled = true
-shader_parameter/radial_center_color = Color(1, 1, 1, 1)
+shader_parameter/radial_enabled = false
+shader_parameter/radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
 shader_parameter/radial_edge_color = Color(1, 1, 1, 0)
-shader_parameter/radial_center = Vector2(0.5, 0.5)
-shader_parameter/radial_radius = 0.5
+shader_parameter/radial_center = Vector2(0.5, 0)
+shader_parameter/radial_radius = 1.258
 shader_parameter/noise_enabled = true
 shader_parameter/noise_tex = SubResource("NoiseTexture2D_6e5o0")
 shader_parameter/noise_scale = 100.0
 shader_parameter/noise_strength = 0.8
 shader_parameter/edge_hardness = 2.0
-shader_parameter/noise_speed = 0.04
+shader_parameter/noise_speed = 0.001
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_8d28h"]
 _surfaces = [{
-"aabb": AABB(-158.16808, -63.224525, 0, 428.2647, 309.97046, 1e-05),
-"attribute_data": PackedByteArray("/////zfqAj98COs+/////+GEyj03mP4+/////yKCuz2aJgk//////6cyvD0XTBM//////0aLzD1fGB0//////3OD6z3i7CU//////wOTCz62Oi0//////2dYJj6rizI//////6xS6D6ELV4//////6GE8z6MqGA//////5o8/z5Yu2E//////4OHBT8JXGE//////61HCz8Ojl8//////wCqED/2YVw//////xF9FT/h9Fc//////yKVUT/e6RQ//////7zWUz9sIRI//////3TeVT8nEg8//////xmnVz/dwws//////x8sWT/9Pgg//////6ZpWj+DjAQ//////4JcWz/dtQA//////6YGaD/A94U+/////7yPaD9Y91w+/////7eCZT8SojA+/////yFbXz+/8g0+/////ywSVz93y/Q9/////033TT9OJfI9/////yx7RT8hLwo+/////2JYET9525s+/////4eaDD+EVaI+/////8WABz8Fn6Y+/////5YxAj+nl6g+/////wSq+T6NMKg+//////Mm7z6/bKU+/////z8p5T4YYaA+//////EgpD440G0+/////56+kz47yF8+/////9d/gj5J3F0+/////6RqYz7oMWg+/////8xNRT5R/30+/////xn1LD5pzY4+/////+c7HD6mTaI+"),
+"aabb": AABB(-0.02298665, -0.1085535, 0, 1281.3251, 682.5395, 1e-05),
+"attribute_data": PackedByteArray("/////0nx/z57u/8+/////wisSjsbdX8//////+IXfz8AAIA//////wAAgD8AAAAA/////wAAAADSs+w3"),
 "format": 34359742489,
-"index_count": 126,
-"index_data": PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUAAAAFAAYAAAAGAAcAAAAHAAgAAAAIAAkAAAAJAAoAAAAKAAsAAAALAAwAAAAMAA0AAAANAA4AAAAOAA8AAAAPABAAAAAQABEAAAARABIAAAASABMAAAATABQAAAAUABUAAAAVABYAAAAWABcAAAAXABgAAAAYABkAAAAZABoAAAAaABsAAAAbABwAAAAcAB0AAAAdAB4AAAAeAB8AAAAfACAAAAAgACEAAAAhACIAAAAiACMAAAAjACQAAAAkACUAAAAlACYAAAAmACcAAAAnACgAAAAoACkAAAApACoAAAAqAAEA"),
+"index_count": 12,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAEA"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 43,
-"vertex_data": PackedByteArray("KLx3Qo1FlkIAAAAAVFMaw+pKtUIAAAAABysew1+L1EIAAAAA1/0dw7C59EIAAAAAoM4Zw4jmCUMAAAAAGuERw0znF0MAAAAAkLUGw4R8I0MAAAAAkAHywsDqK0MAAAAApML9QSMccUMAAAAAxLssQjALdUMAAAAAH7tcQvW+dkMAAAAAYpOGQtIndkMAAAAAGCGeQjRLc0MAAAAAeS60Ql5DbkMAAAAAEvHHQn8+Z0MAAAAAtAlfQwba+UIAAAAAlqhjQ2kG8UIAAAAA69BnQyhS50IAAAAAF3hrQwjW3EIAAAAAxpRuQ8is0UIAAAAACh9xQ+TyxUIAAAAAZRBzQ0jGuUIAAAAAAICGQ/r/n8AAAAAAXgyHQ174vMEAAAAApeyDQxrKJMIAAAAAoT57QyLLW8IAAAAAGkdqQzHMesIAAAAAsKFXQ+rlfMIAAAAAXkFGQ0LDYcIAAAAAtvi2QgS0RUEAAAAA+oyjQnbvi0EAAAAA16iOQj4hp0EAAAAAudNxQkais0EAAAAAEOhFQkIUsUEAAAAA8tkaQnSKn0EAAAAAH9zjQUQSf0EAAAAAW24YwnKJh8EAAAAAjIlbwvQJtMEAAAAA1hWRwjoiusEAAAAA0XizwkJbmcEAAAAAUk7SwgxqKMEAAAAAUjzrwtBSAEAAAAAAElz8wo29i0EAAAAA")
+"vertex_count": 5,
+"vertex_data": PackedByteArray("uR8gRPZmqkMAAAAAkCF8QAA/KkQAAAAAcpifRJSbKkQAAAAAqymgRExR3r0AAAAAgE68vODftr0AAAAA")
 }]
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_kj0hc"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_6e5o0"]
+noise_type = 0
+frequency = 0.382
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_mgqph"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_6e5o0")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0vxyq"]
+shader = ExtResource("3_spiiw")
+shader_parameter/base_color = Color(0.6891749, 0.6487951, 0.64686066, 1)
+shader_parameter/linear_enabled = true
+shader_parameter/linear_start_color = Color(1, 1, 0, 0.38431373)
+shader_parameter/linear_end_color = Color(1, 1, 0, 0)
+shader_parameter/linear_angle = 270.0
+shader_parameter/linear_scale = 1.0
+shader_parameter/linear_offset = 0.0
+shader_parameter/radial_enabled = false
+shader_parameter/radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+shader_parameter/radial_edge_color = Color(1, 1, 1, 0)
+shader_parameter/radial_center = Vector2(0.5, 0)
+shader_parameter/radial_radius = 1.258
+shader_parameter/noise_enabled = true
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_mgqph")
+shader_parameter/noise_scale = 100.0
+shader_parameter/noise_strength = 0.8
+shader_parameter/edge_hardness = 2.0
+shader_parameter/noise_speed = 0.001
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_kj0hc"]
+noise_type = 0
+frequency = 0.618
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_qh6oa"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_kj0hc")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6qaf8"]
+shader = ExtResource("3_spiiw")
+shader_parameter/base_color = Color(1, 0.5, 0, 1)
+shader_parameter/linear_enabled = true
+shader_parameter/linear_start_color = Color(1, 0.33333334, 0, 0)
+shader_parameter/linear_end_color = Color(1, 0.33333334, 0, 1)
+shader_parameter/linear_angle = 270.0
+shader_parameter/linear_scale = 3.615
+shader_parameter/linear_offset = 0.0
+shader_parameter/radial_enabled = true
+shader_parameter/radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+shader_parameter/radial_edge_color = Color(1, 1, 1, 0)
+shader_parameter/radial_center = Vector2(0.5, 0)
+shader_parameter/radial_radius = 1.258
+shader_parameter/noise_enabled = true
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_qh6oa")
+shader_parameter/noise_scale = 100.0
+shader_parameter/noise_strength = 0.8
+shader_parameter/edge_hardness = 2.0
+shader_parameter/noise_speed = 0.01
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0vxyq"]
 _surfaces = [{
-"aabb": AABB(-205.85059, -110.51603, 0, 523.4684, 405.21097, 1e-05),
-"attribute_data": PackedByteArray("/////+GEyj03mP4+/////yKCuz2aJgk/////AKHvPDwKd+w+////AHrAHjrerAU//////6cyvD0XTBM/////AKyZnDp5bhc//////0aLzD1fGB0/////ANhreDz2kyg//////3OD6z3i7CU/////AJl/Kj3bBzg//////wOTCz62Oi0/////AE6coT0Q0EQ//////2dYJj6rizI/////AK209D1SRk0//////6xS6D6ELV4/////AOcF1z40T3o//////6GE8z6MqGA/////ALKR6D7jFn4//////5o8/z5Yu2E/////AKcT/T7G938//////4OHBT8JXGE/////AO/hCD/+UH8//////61HCz8Ojl8/////ADjyEj+GKHw//////wCqED/2YVw/////AExeHD9bm3Y//////xF9FT/h9Fc/////AA30Iz/0xW8//////yKVUT/e6RQ/////AN5XYT8lUSs//////7zWUz9sIRI/////AInaZD+t8iY//////3TeVT8nEg8/////AAloaD/1lyE//////xmnVz/dwws/////AC2Haz/yzhs//////x8sWT/9Pgg/////APYvbj9rphU//////6ZpWj+DjAQ/////AKJbcD8WLg8//////4JcWz/dtQA/////AHbccT/XMAk//////6YGaD/A94U+////AFArfz8mjI8+/////7yPaD9Y91w+////ACXEfz+E6Es+/////7eCZT8SojA+////AN6XeT97aeQ9/////yFbXz+/8g0+////AN4jbT9HGjA9/////ywSVz93y/Q9////AGNgXD+W8o47/////033TT9OJfI9////ACz0ST/ovuQ6/////yx7RT8hLwo+////AG3ROj9m7fI8/////2JYET9525s+////APyBBT+kN08+/////4eaDD+EVaI+////AOZ2Az+oLVU+/////8WABz8Fn6Y+////AHYwAj9pUlc+/////5YxAj+nl6g+////AKrcAD+5Tlg+/////wSq+T6NMKg+////AAgL/z4sG1g+//////Mm7z6/bKU+////AEZq/D5FuVY+/////z8p5T4YYaA+////AM8X+D6q/1E+//////EgpD440G0+////AB/ttT6jnPs9/////56+kz47yF8+////AHo2nD4CZ9E9/////9d/gj5J3F0+////ADoRfD4zrco9/////6RqYz7oMWg+////AGdMQT7h2O49/////8xNRT5R/30+////AO6ZDD7nkx0+/////xn1LD5pzY4+////AGv9wz0H5FQ+/////+c7HD6mTaI+////ADeJjj25tog+"),
+"aabb": AABB(1.2478142, 0.98501587, 0, 1280.7645, 463.1979, 1e-05),
+"attribute_data": PackedByteArray("/////4kEAD/N0/8+/////0OwRzzm3Go//////+DrjTwG5XM//////xiE+TwsrHc//////5kzeD+Dunc//////zmQez9m9HM//////z/hfD9z7Wo//////+K3eT8kR6I9/////75LeD/VOzw9/////6AJdT/SVwQ9/////3l9MD1rNgs9/////7fe+Dy1I0M9/////1Viyzy6pKU9"),
 "format": 34359742489,
-"index_count": 252,
-"index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABAAGAAUABgAHAAUABgAIAAcACAAJAAcACAAKAAkACgALAAkACgAMAAsADAANAAsADAAOAA0ADgAPAA0ADgAQAA8AEAARAA8AEAASABEAEgATABEAEgAUABMAFAAVABMAFAAWABUAFgAXABUAFgAYABcAGAAZABcAGAAaABkAGgAbABkAGgAcABsAHAAdABsAHAAeAB0AHgAfAB0AHgAgAB8AIAAhAB8AIAAiACEAIgAjACEAIgAkACMAJAAlACMAJAAmACUAJgAnACUAJgAoACcAKAApACcAKAAqACkAKgArACkAKgAsACsALAAtACsALAAuAC0ALgAvAC0ALgAwAC8AMAAxAC8AMAAyADEAMgAzADEAMgA0ADMANAA1ADMANAA2ADUANgA3ADUANgA4ADcAOAA5ADcAOAA6ADkAOgA7ADkAOgA8ADsAPAA9ADsAPAA+AD0APgA/AD0APgBAAD8AQABBAD8AQABCAEEAQgBDAEEAQgBEAEMARABFAEMARABGAEUARgBHAEUARgBIAEcASABJAEcASABKAEkASgBLAEkASgBMAEsATABNAEsATABOAE0ATgBPAE0ATgBQAE8AUABRAE8AUABSAFEAUgBTAFEAUgAAAFMAAAACAFMA"),
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUAAAAFAAYAAAAGAAcAAAAHAAgAAAAIAAkAAAAJAAoAAAAKAAsAAAALAAwAAAAMAAEA"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 84,
-"vertex_data": PackedByteArray("VFMaw+pKtUIAAAAABysew1+L1EIAAAAAVR9Iw9aKmEIAAAAAwNlNw3KFyUIAAAAA1/0dw7C59EIAAAAArYpNw0DrAEMAAAAAoM4Zw4jmCUMAAAAADThGwzIcHEMAAAAAGuERw0znF0MAAAAAYlg4w4qdNEMAAAAAkLUGw4R8I0MAAAAAMMwkw63iSEMAAAAAkAHywsDqK0MAAAAAtIYPw/pNVkMAAAAApML9QSMccUMAAAAAlhdgQV7cjkMAAAAAxLssQjALdUMAAAAA5cb/QafbkUMAAAAAH7tcQvW+dkMAAAAAVuJTQvRYk0MAAAAAYpOGQtIndkMAAAAAVk+UQrbUkkMAAAAAGCGeQjRLc0MAAAAAU4e9QqtTkEMAAAAAeS60Ql5DbkMAAAAAwh7kQs/si0MAAAAAEvHHQn8+Z0MAAAAA65cBQ7CBhkMAAAAAtAlfQwba+UIAAAAAelB/QyZ0IEMAAAAAlqhjQ2kG8UIAAAAAb0CDQ3OGGUMAAAAA69BnQyhS50IAAAAAuOOGQ70IEUMAAAAAF3hrQwjW3EIAAAAAABaKQx7cB0MAAAAAxpRuQ8is0UIAAAAAGc+MQw0w/EIAAAAACh9xQ+TyxUIAAAAAFAiPQ8Gq50IAAAAAZRBzQ0jGuUIAAAAAIJKQQ9er1EIAAAAAAICGQ/r/n8AAAAAAljKeQwIiJkAAAAAAXgyHQ174vMEAAAAAFc+eQ2ES88EAAAAApeyDQxrKJMIAAAAA8nyYQ9Pkg8IAAAAAoT57QyLLW8IAAAAAlbyLQ2aKu8IAAAAAGkdqQzHMesIAAAAAmiR1QzPo2sIAAAAAsKFXQ+rlfMIAAAAAOGpPQzUI3cIAAAAAXkFGQ0LDYcIAAAAAF2swQyBfxsIAAAAAtvi2QgS0RUEAAAAAxHyGQpiT6MEAAAAA+oyjQnbvi0EAAAAAkjx8QqCr1cEAAAAA16iOQj4hp0EAAAAAgcpxQi7fzsEAAAAAudNxQkais0EAAAAAAetmQuy+y8EAAAAAEOhFQkIUsUEAAAAAF/BbQmxizMEAAAAA8tkaQnSKn0EAAAAAkCxRQuDE0MEAAAAAH9zjQUQSf0EAAAAAtHg/QlDB38EAAAAAW24YwnKJh8EAAAAAJhKfwW1kdcIAAAAAjIlbwvQJtMEAAAAAZto4wipui8IAAAAA1hWRwjoiusEAAAAAEDuawskYjsIAAAAA0XizwkJbmcEAAAAAR2jWwniDf8IAAAAAUk7SwgxqKMEAAAAA9C4GwwMCQ8IAAAAAUjzrwtBSAEAAAAAANP8bwyKV1sEAAAAAElz8wo29i0EAAAAANK4pw9imNMAAAAAA")
+"vertex_count": 13,
+"vertex_data": PackedByteArray("JG4gRL9qaEMAAAAAYLifP+Ol20MAAAAAdLP/QCNi5EMAAAAAddzJQYwJ6EMAAAAAtECdRGoX6EMAAAAAXWifRAFx5EMAAAAAZUCgROW120MAAAAAmDmeRPzIwUEAAAAALlCdRCS/90AAAAAAgzmbRAAqfD8AAAAAQkAnQjBj6D8AAAAAcgjJQUo7CUEAAAAAY7iOQZ1LyEEAAAAA")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0voqr"]
+_surfaces = [{
+"aabb": AABB(-14.5371, -14.721569, 0, 1312.3323, 494.5848, 1e-05),
+"attribute_data": PackedByteArray("/////0OwRzzm3Go//////+DrjTwG5XM/////AAHNKznuNmw/////ALpcDDzApXk//////xiE+TwsrHc/////ANSh5Tw/x38//////5kzeD+Dunc/////AHjSeD+y1X8//////zmQez9m9HM/////AOXNfT/PtXk//////z/hfD9z7Wo/////ACn1fz8iSWw//////+K3eT8kR6I9////AP3BfD+9VJM9/////75LeD/VOzw9////AFV3ej9fTbo8/////6AJdT/SVwQ9////AOWhdT9mUxs6/////3l9MD1rNgs9////ANvrJj2ILBU7/////7fe+Dy1I0M9////APdmszyAKcg8/////1Viyzy6pKU9////AKpEVDxFqJY9"),
+"format": 34359742489,
+"index_count": 72,
+"index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABAAGAAUABgAHAAUABgAIAAcACAAJAAcACAAKAAkACgALAAkACgAMAAsADAANAAsADAAOAA0ADgAPAA0ADgAQAA8AEAARAA8AEAASABEAEgATABEAEgAUABMAFAAVABMAFAAWABUAFgAXABUAFgAAABcAAAACABcA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("YLifP+Ol20MAAAAAdLP/QCNi5EMAAAAA9pdowZD03EMAAAAASF1gwIjy6UMAAAAAddzJQYwJ6EMAAAAAwl6wQYbg70MAAAAAtECdRGoX6EMAAAAAiqadRH/u70MAAAAAXWifRAFx5EMAAAAAFtigRBAC6kMAAAAAZUCgROW120MAAAAAcjmiRCsG3UMAAAAAmDmeRPzIwUEAAAAAXCygRFLfpEEAAAAALlCdRCS/90AAAAAAULSeRIw0cMAAAAAAgzmbRAAqfD8AAAAAHpubRIyLa8EAAAAAQkAnQjBj6D8AAAAA2/saQnY0XsEAAAAAcgjJQUo7CUEAAAAAd/NfQciVOsAAAAAAY7iOQZ1LyEEAAAAAYF4QQH5Oq0EAAAAA")
+}]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_u3tdm"]
+noise_type = 0
+frequency = 0.5
+fractal_octaves = 4
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_p5r5k"]
+width = 256
+height = 256
+noise = SubResource("FastNoiseLite_u3tdm")
+seamless = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ge2l5"]
+shader = ExtResource("3_spiiw")
+shader_parameter/base_color = Color(0, 0, 0.5, 1)
+shader_parameter/linear_enabled = false
+shader_parameter/linear_start_color = Color(1, 0.5, 0, 1)
+shader_parameter/linear_end_color = Color(1, 1, 1, 0)
+shader_parameter/linear_angle = 45.0
+shader_parameter/linear_scale = 1.0
+shader_parameter/linear_offset = 0.0
+shader_parameter/radial_enabled = false
+shader_parameter/radial_center_color = Color(1, 1, 1, 1)
+shader_parameter/radial_edge_color = Color(1, 1, 1, 0)
+shader_parameter/radial_center = Vector2(0.5, 0.5)
+shader_parameter/radial_radius = 0.5
+shader_parameter/noise_enabled = true
+shader_parameter/noise_tex = SubResource("NoiseTexture2D_p5r5k")
+shader_parameter/noise_scale = 100.0
+shader_parameter/noise_strength = 0.8
+shader_parameter/edge_hardness = 2.0
+shader_parameter/noise_speed = 0.04
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_spiiw"]
+_surfaces = [{
+"aabb": AABB(-182.94363, 116.23123, 0, 509.1837, 221.92892, 1e-05),
+"attribute_data": PackedByteArray("/////zCfAT+1Ggw//////8QYMD4jlyM//////3lLKz4vsSw//////wEUMz4cdTU//////3snRT75TTs//////9gi/j5GHjo//////5RXAj8AcDs//////7+1BT8ODzs//////zDWCD8RBTk//////5AFUD+Scio///////vNUz+BLyQ//////yItVT9VwRs//////07IUz+LVRM///////K8QT80qJk+/////6vCPD+uOYs+/////+ETNj//H4k+/////5dRMD+uLpQ+/////7hmCj8hTCE//////9CRBT/layY//////1iO/z5ywyY//////4ty9T4fOSI//////+SVpD51E6Y+/////3zgmD58epw+/////4Tfiz7Gpp8+/////1Z7gj7DZa4+"),
+"format": 34359742489,
+"index_count": 72,
+"index_data": PackedByteArray("AAABAAIAAAACAAMAAAADAAQAAAAEAAUAAAAFAAYAAAAGAAcAAAAHAAgAAAAIAAkAAAAJAAoAAAAKAAsAAAALAAwAAAAMAA0AAAANAA4AAAAOAA8AAAAPABAAAAAQABEAAAARABIAAAASABMAAAATABQAAAAUABUAAAAVABYAAAAWABcAAAAXABgAAAAYAAEA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 25,
+"vertex_data": PackedByteArray("4f2YQhvLeUMAAAAA+1ozw+LRkkMAAAAAkvE2w+FQm0MAAAAApyAxw3t/o0MAAAAAxZ4jw7z0qEMAAAAArrmJQj/Zp0MAAAAAK0ydQoAUqUMAAAAANm6xQgG6qEMAAAAAPx/EQsHSpkMAAAAAomqbQ4E4mUMAAAAA7hGhQx1gk0MAAAAAuh6jQ46Bi0MAAAAAcwmhQzmlg0MAAAAA1BGGQ8WpA0MAAAAA2EJ9QzJi7EIAAAAASklpQ2R26EIAAAAAoxJYQwQb/UIAAAAAoXnNQvCtkEMAAAAAaZewQmp2lUMAAAAAKviNQiPIlUMAAAAAeYJfQimLkUMAAAAA/PCBwnVBD0MAAAAAOvCkwvxLBkMAAAAAhc7LwjhCCUMAAAAAnODnwgAGF0MAAAAA")
+}]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_6e5o0"]
+_surfaces = [{
+"aabb": AABB(-315.63797, -15.286072, 0, 774.2225, 482.5636, 1e-05),
+"attribute_data": PackedByteArray("/////8QYMD4jlyM//////3lLKz4vsSw/////AD+7Qzw5WA4/////AGMHybt2cDE//////wEUMz4cdTU/////AIVkBz3+oV4//////3snRT75TTs/////ADZOCT6ZDIA//////9gi/j5GHjo/////AAXt8z4Bw34//////5RXAj8AcDs/////APEK/T6cTIA//////7+1BT8ODzs/////AACIDz+Sr34//////zDWCD8RBTk/////AC/QEz+65Hs//////5AFUD+Scio/////AHdbZD/EZ2s///////vNUz+BLyQ/////AKZoej8D50Y//////yItVT9VwRs/////AAu6gD8emxs//////07IUz+LVRM/////ANJ2fD/Z7Po+//////K8QT80qJk+////AG6uZT/wxBE+/////6vCPD+uOYs+////AOoETz/awWU8/////+ETNj//H4k+////AGQvLD+1J/G7/////5dRMD+uLpQ+////AHFrEj8tz7Y9/////7hmCj8hTCE/////AFfc1z7Pvt4+/////9CRBT/layY/////APvq7z5qO8U+/////1iO/z5ywyY/////AGE7Cj/4EsM+/////4ty9T4fOSI/////AIa/Fj+Zj9k+/////+SVpD51E6Y+////AF2P2z6gWOQ9/////3zgmD58epw+////ADhNpz6EAeQ8/////4Tfiz7Gpp8+////ANRHRz6/FHY9/////1Z7gj7DZa4+////AJ1s6z3hmD0+"),
+"format": 34359742489,
+"index_count": 144,
+"index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABAAGAAUABgAHAAUABgAIAAcACAAJAAcACAAKAAkACgALAAkACgAMAAsADAANAAsADAAOAA0ADgAPAA0ADgAQAA8AEAARAA8AEAASABEAEgATABEAEgAUABMAFAAVABMAFAAWABUAFgAXABUAFgAYABcAGAAZABcAGAAaABkAGgAbABkAGgAcABsAHAAdABsAHAAeAB0AHgAfAB0AHgAgAB8AIAAhAB8AIAAiACEAIgAjACEAIgAkACMAJAAlACMAJAAmACUAJgAnACUAJgAoACcAKAApACcAKAAqACkAKgArACkAKgAsACsALAAtACsALAAuAC0ALgAvAC0ALgAAAC8AAAACAC8A"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 48,
+"vertex_data": PackedByteArray("+1ozw+LRkkMAAAAAkvE2w+FQm0MAAAAAtOaWw835fUMAAAAAqdGdw0m/n0MAAAAApyAxw3t/o0MAAAAAR9OOw+zuyUMAAAAAxZ4jw7z0qEMAAAAAlldQwwQs6UMAAAAArrmJQj/Zp0MAAAAA5GlWQpns50MAAAAAK0ydQoAUqUMAAAAAC3WGQoaj6UMAAAAANm6xQgG6qEMAAAAAZyTsQnXa50MAAAAAPx/EQsHSpkMAAAAAst4CQy8/5UMAAAAAomqbQ4E4mUMAAAAA2s65Qxvb1UMAAAAA7hGhQx1gk0MAAAAAlMPaQzPIs0MAAAAAuh6jQ46Bi0MAAAAA0UrlQ+Jdi0MAAAAAcwmhQzmlg0MAAAAA8dXdQ2Z1XkMAAAAA1BGGQ8WpA0MAAAAAcMm7QyQQYUIAAAAA2EJ9QzJi7EIAAAAAEuuZQ/AhosAAAAAASklpQ2R26EIAAAAAsLdLQ8CTdMEAAAAAoxJYQwQb/UIAAAAAzmj9Qmgj90EAAAAAoXnNQvCtkEMAAAAAmI86QWsnREMAAAAAaZewQmp2lUMAAAAAQnQ+QqhWLEMAAAAAKviNQiPIlUMAAAAAiXbMQvlSKkMAAAAAeYJfQimLkUMAAAAAcqQLQ4dQP0MAAAAA/PCBwnVBD0MAAAAAaIKJQWgTJkIAAAAAOvCkwvxLBkMAAAAAUaVzwoBDxD8AAAAAhc7LwjhCCUMAAAAAAggiwzCOh0EAAAAAnODnwgAGF0MAAAAAuPtew2FxmUIAAAAA")
 }]
 
 [sub_resource type="LabelSettings" id="LabelSettings_fps"]
@@ -70,25 +205,86 @@ outline_color = Color(0, 0, 0, 1)
 
 [node name="VisualCard" type="Node2D"]
 
-[node name="CardPolygon" type="Polygon2D" parent="."]
-position = Vector2(355, 326)
+[node name="BackgroundPolygon" type="Polygon2D" parent="."]
 color = Color(0, 0, 0, 0)
-polygon = PackedVector2Array(-176, 147, 69, 258, 238, 112, 300, -122, 61, 32, -101, -48)
+polygon = PackedVector2Array(3.9395485, 680.9844, 1276.7639, 682.4309, 1281.3021, -0.1085535, -0.02298665, -0.089294195)
 
-[node name="CornerFeatherDealer" type="Node2D" parent="CardPolygon"]
+[node name="CornerFeatherDealer" type="Node2D" parent="BackgroundPolygon"]
 script = ExtResource("1_dealer")
-corner_radius = 64.0
-feather_width = 48.0
-noise_frequency = 0.5
+corner_radius = 0.0
+corner_segments = 2
+feather_width = 0.0
+base_color = Color(0.6891749, 0.6487951, 0.64686066, 1)
+linear_start_color = Color(1, 1, 0, 0.38431373)
+linear_end_color = Color(1, 1, 0, 0)
+linear_angle = 270.0
+radial_enabled = false
+radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+radial_center = Vector2(0.5, 0)
+radial_radius = 1.258
+noise_speed = 0.001
+noise_frequency = 0.382
 
-[node name="ShapeMesh" type="MeshInstance2D" parent="CardPolygon/CornerFeatherDealer"]
+[node name="ShapeMesh" type="MeshInstance2D" parent="BackgroundPolygon/CornerFeatherDealer"]
 material = SubResource("ShaderMaterial_mgqph")
 mesh = SubResource("ArrayMesh_8d28h")
 
+[node name="FeatherMesh" type="MeshInstance2D" parent="BackgroundPolygon/CornerFeatherDealer"]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_0vxyq")
+
+[node name="DeskPolygon" type="Polygon2D" parent="."]
+position = Vector2(0, 256)
+color = Color(0, 0, 0, 0)
+polygon = PackedVector2Array(1.9967213, 462.5686, 1281.2695, 462.70374, 1266.5555, -0.57258725, 17.004965, 0.18996121)
+
+[node name="CornerFeatherDealer" type="Node2D" parent="DeskPolygon"]
+script = ExtResource("1_dealer")
+corner_radius = 24.0
+corner_segments = 2
+feather_width = 16.0
+base_color = Color(1, 0.5, 0, 1)
+linear_start_color = Color(1, 0.33333334, 0, 0)
+linear_end_color = Color(1, 0.33333334, 0, 1)
+linear_angle = 270.0
+linear_scale = 3.615
+radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+radial_center = Vector2(0.5, 0)
+radial_radius = 1.258
+noise_speed = 0.01
+noise_frequency = 0.618
+
+[node name="ShapeMesh" type="MeshInstance2D" parent="DeskPolygon/CornerFeatherDealer"]
+material = SubResource("ShaderMaterial_6qaf8")
+mesh = SubResource("ArrayMesh_0vxyq")
+
+[node name="FeatherMesh" type="MeshInstance2D" parent="DeskPolygon/CornerFeatherDealer"]
+show_behind_parent = true
+material = SubResource("ShaderMaterial_6qaf8")
+mesh = SubResource("ArrayMesh_0voqr")
+
+[node name="CardPolygon" type="Polygon2D" parent="."]
+position = Vector2(518, 44)
+color = Color(0, 0, 0, 0)
+polygon = PackedVector2Array(-189, 322, 91, 442, 340, 291, 243, 120, 80, 309, -92, 137)
+
+[node name="CornerFeatherDealer" type="Node2D" parent="CardPolygon"]
+script = ExtResource("1_dealer")
+corner_radius = 32.0
+corner_segments = 3
+feather_width = 128.0
+linear_enabled = false
+radial_enabled = false
+noise_frequency = 0.5
+
+[node name="ShapeMesh" type="MeshInstance2D" parent="CardPolygon/CornerFeatherDealer"]
+material = SubResource("ShaderMaterial_ge2l5")
+mesh = SubResource("ArrayMesh_spiiw")
+
 [node name="FeatherMesh" type="MeshInstance2D" parent="CardPolygon/CornerFeatherDealer"]
 show_behind_parent = true
-material = SubResource("ShaderMaterial_mgqph")
-mesh = SubResource("ArrayMesh_kj0hc")
+material = SubResource("ShaderMaterial_ge2l5")
+mesh = SubResource("ArrayMesh_6e5o0")
 
 [node name="FPSLabel" type="Label" parent="."]
 offset_right = 150.0
