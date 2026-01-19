@@ -150,6 +150,7 @@ GAME_END        - 游戏结束
 | 2026-01-18 | 情绪系统 | 确认 Option A 布局 + NPC 预设 + Rage Quit 机制 |
 | 2026-01-18 | 情绪实现 | GapLAI 情绪透镜 + Manager 触发 + UI 情绪条；24/24 单元测试通过 |
 | 2026-01-18 | 在场合成系统 | 实现 Issue + Action = Proposal 的卡牌合成机制 |
+| 2026-01-19 | VisualCard 羽化卡牌 | 创建独立视觉场景，Mesh 边缘羽化 + 动态噪点渐变 Shader；测试通过 |
 
 ---
 
