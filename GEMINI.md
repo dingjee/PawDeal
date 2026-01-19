@@ -26,7 +26,8 @@
     * Mac: `/Applications/Godot.app/Contents/MacOS/Godot`
 * **Wrapper**: `.\tests\run_test.{bat|sh} <scene_path> [--gui]`
     * Default: `--headless` (Logic). Use `--gui` for UI Snapshots.
-* **Maintain**: Keep only last 10 logs/snapshots in `tests/`.
+* **Maintain**: Keep only last **5** logs/snapshots in `tests/`.
+* **Cleanup**: Remove obsolete test files when corresponding production code/system is deleted.
 
 ## 4. STANDARDS
 * **Style**: **Tabs** only. **Static Typing** mandatory (e.g., `var hp: int`).

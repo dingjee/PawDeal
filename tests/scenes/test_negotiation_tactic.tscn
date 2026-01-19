@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://c52d84mf6qc8"]
-
-[ext_resource type="Script" path="res://tests/scripts/test_negotiation_tactic.gd" id="1_test"]
-
-[node name="TestNegotiationTactic" type="Node"]
-script = ExtResource("1_test")
