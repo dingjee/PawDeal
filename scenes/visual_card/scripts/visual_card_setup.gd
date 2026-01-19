@@ -1,176 +1,213 @@
 # res://scenes/visual_card/scripts/visual_card_setup.gd
+@tool
 ## VisualCard 设置脚本
 ## 负责材质创建和 Shader 参数配置
-## 
-## 使用方法：
-##   1. 将此脚本挂载到 VisualCard 根节点 (Node2D)
-##   2. 设置 card_mesh 和 corner_feather_dealer 引用
-##   3. 运行场景，材质将自动应用
 
 extends Node2D
 
-## 卡牌主体 Mesh 节点路径
-@export var card_mesh: NodePath
-
-## 圆角羽化处理器节点路径
-@export var corner_feather_dealer: NodePath
+## CornerFeatherDealer 节点路径
+@export var corner_dealer: NodePath = NodePath("CardPolygon/CornerFeatherDealer")
 
 ## ========================================
-## Shader 参数配置
+## Shader 参数
 ## ========================================
 @export_group("Base Style")
-## 基础底色 (深蓝)
-@export var base_color: Color = Color(0.0, 0.0, 0.5, 1.0)
+@export var base_color: Color = Color(0.0, 0.0, 0.5, 1.0):
+	set(value):
+		base_color = value
+		_update_material()
 
 @export_group("Linear Gradient")
-## 是否启用线性渐变
-@export var linear_enabled: bool = true
-## 起始颜色 (橙色)
-@export var linear_start_color: Color = Color(1.0, 0.5, 0.0, 1.0)
-## 结束颜色 (透明)
-@export var linear_end_color: Color = Color(1.0, 1.0, 1.0, 0.0)
-## 渐变角度 (度)
-@export_range(0.0, 360.0) var linear_angle: float = 45.0
-## 渐变缩放
-@export_range(0.1, 5.0) var linear_scale: float = 1.0
+@export var linear_enabled: bool = true:
+	set(value):
+		linear_enabled = value
+		_update_material()
+@export var linear_start_color: Color = Color(1.0, 0.5, 0.0, 1.0):
+	set(value):
+		linear_start_color = value
+		_update_material()
+@export var linear_end_color: Color = Color(1.0, 1.0, 1.0, 0.0):
+	set(value):
+		linear_end_color = value
+		_update_material()
+@export_range(0.0, 360.0) var linear_angle: float = 45.0:
+	set(value):
+		linear_angle = value
+		_update_material()
+@export_range(0.1, 5.0) var linear_scale: float = 1.0:
+	set(value):
+		linear_scale = value
+		_update_material()
 
 @export_group("Radial Gradient")
-## 是否启用径向渐变
-@export var radial_enabled: bool = true
-## 中心颜色 (白色)
-@export var radial_center_color: Color = Color(1.0, 1.0, 1.0, 1.0)
-## 边缘颜色 (透明)
-@export var radial_edge_color: Color = Color(1.0, 1.0, 1.0, 0.0)
-## 渐变中心 (UV 坐标)
-@export var radial_center: Vector2 = Vector2(0.5, 0.5)
-## 渐变半径
-@export_range(0.1, 2.0) var radial_radius: float = 0.5
+@export var radial_enabled: bool = true:
+	set(value):
+		radial_enabled = value
+		_update_material()
+@export var radial_center_color: Color = Color(1.0, 1.0, 1.0, 1.0):
+	set(value):
+		radial_center_color = value
+		_update_material()
+@export var radial_edge_color: Color = Color(1.0, 1.0, 1.0, 0.0):
+	set(value):
+		radial_edge_color = value
+		_update_material()
+@export var radial_center: Vector2 = Vector2(0.5, 0.5):
+	set(value):
+		radial_center = value
+		_update_material()
+@export_range(0.1, 2.0) var radial_radius: float = 0.5:
+	set(value):
+		radial_radius = value
+		_update_material()
 
 @export_group("Noise System")
-## 是否启用噪点效果
-@export var noise_enabled: bool = true
-## 噪点分辨率缩放
-@export_range(10.0, 500.0) var noise_scale: float = 100.0
-## 噪点强度
-@export_range(0.0, 1.0) var noise_strength: float = 0.8
-## 边缘硬度
-@export_range(0.5, 5.0) var edge_hardness: float = 2.0
-## 噪点动画速度 (0 = 静止)
-@export_range(0.0, 5.0) var noise_speed: float = 0.04
+@export var noise_enabled: bool = true:
+	set(value):
+		noise_enabled = value
+		_update_material()
+@export_range(10.0, 500.0) var noise_scale: float = 100.0:
+	set(value):
+		noise_scale = value
+		_update_material()
+@export_range(0.0, 1.0) var noise_strength: float = 0.8:
+	set(value):
+		noise_strength = value
+		_update_material()
+@export_range(0.5, 5.0) var edge_hardness: float = 2.0:
+	set(value):
+		edge_hardness = value
+		_update_material()
+@export_range(0.0, 5.0) var noise_speed: float = 0.04:
+	set(value):
+		noise_speed = value
+		_update_material()
 
-@export_group("FastNoiseLite Config")
-## 噪点频率 (越小越稀疏)
-@export var noise_frequency: float = 0.05
-## 是否启用无缝平铺
-@export var noise_seamless: bool = true
-## 噪点纹理尺寸
-@export var noise_texture_size: Vector2i = Vector2i(256, 256)
+@export_group("FastNoiseLite")
+@export var noise_frequency: float = 0.05:
+	set(value):
+		noise_frequency = value
+		_recreate_noise()
+@export var noise_seamless: bool = true:
+	set(value):
+		noise_seamless = value
+		_recreate_noise()
+@export var noise_texture_size: Vector2i = Vector2i(256, 256):
+	set(value):
+		noise_texture_size = value
+		_recreate_noise()
 
-## 运行时获取的节点引用
-var _card_mesh_node: MeshInstance2D = null
 var _dealer_node: Node2D = null
-
-## 共享的 ShaderMaterial 实例
 var _shared_material: ShaderMaterial = null
+var _noise_texture: NoiseTexture2D = null
+var _is_ready: bool = false
 
 
 func _ready() -> void:
-	# 获取节点引用
-	if card_mesh:
-		_card_mesh_node = get_node(card_mesh) as MeshInstance2D
-	if corner_feather_dealer:
-		_dealer_node = get_node(corner_feather_dealer) as Node2D
+	_is_ready = true
 	
-	# 创建 ShaderMaterial 和噪点纹理
-	_shared_material = _create_shader_material()
+	# 获取 dealer 节点
+	if corner_dealer:
+		_dealer_node = get_node_or_null(corner_dealer)
 	
-	# 配置 CornerFeatherDealer
-	if _dealer_node and _card_mesh_node:
-		_dealer_node.target_mesh = _card_mesh_node
-		_dealer_node.feather_material = _shared_material
-		# 触发生成
-		if _dealer_node.has_method("generate"):
-			_dealer_node.generate()
+	# 如果 dealer 已有材质，使用它；否则创建新材质
+	if _dealer_node and _dealer_node.feather_material:
+		_shared_material = _dealer_node.feather_material
+		_update_material()
+	else:
+		_shared_material = _create_shader_material()
+		if _dealer_node:
+			_dealer_node.feather_material = _shared_material
 	
-	# 应用材质到卡牌主体
-	if _card_mesh_node:
-		_card_mesh_node.material = _shared_material
-	
-	print("[VisualCardSetup] ✓ 视觉效果初始化完成！")
+	if not Engine.is_editor_hint():
+		print("[VisualCardSetup] ✓ 初始化完成！")
 
 
-## 创建 ShaderMaterial 并配置所有参数
-## @return 配置完成的 ShaderMaterial
+func _update_material() -> void:
+	if not _is_ready or not _shared_material:
+		return
+	
+	_shared_material.set_shader_parameter("base_color", base_color)
+	_shared_material.set_shader_parameter("linear_enabled", linear_enabled)
+	_shared_material.set_shader_parameter("linear_start_color", linear_start_color)
+	_shared_material.set_shader_parameter("linear_end_color", linear_end_color)
+	_shared_material.set_shader_parameter("linear_angle", linear_angle)
+	_shared_material.set_shader_parameter("linear_scale", linear_scale)
+	_shared_material.set_shader_parameter("radial_enabled", radial_enabled)
+	_shared_material.set_shader_parameter("radial_center_color", radial_center_color)
+	_shared_material.set_shader_parameter("radial_edge_color", radial_edge_color)
+	_shared_material.set_shader_parameter("radial_center", radial_center)
+	_shared_material.set_shader_parameter("radial_radius", radial_radius)
+	_shared_material.set_shader_parameter("noise_enabled", noise_enabled)
+	_shared_material.set_shader_parameter("noise_scale", noise_scale)
+	_shared_material.set_shader_parameter("noise_strength", noise_strength)
+	_shared_material.set_shader_parameter("edge_hardness", edge_hardness)
+	_shared_material.set_shader_parameter("noise_speed", noise_speed)
+
+
+func _recreate_noise() -> void:
+	if not _is_ready or not _shared_material:
+		return
+	
+	_noise_texture = _create_noise_texture()
+	_shared_material.set_shader_parameter("noise_tex", _noise_texture)
+
+
 func _create_shader_material() -> ShaderMaterial:
-	var material := ShaderMaterial.new()
+	var mat := ShaderMaterial.new()
 	
-	# 加载 Shader 代码
 	var shader := load("res://shaders/complex_gradient_feather.gdshader") as Shader
-	if shader == null:
+	if not shader:
 		push_error("[VisualCardSetup] 无法加载 Shader！")
-		return material
+		return mat
 	
-	material.shader = shader
+	mat.shader = shader
+	_noise_texture = _create_noise_texture()
 	
-	# --- 创建 NoiseTexture2D ---
-	var noise_texture := _create_noise_texture()
+	mat.set_shader_parameter("base_color", base_color)
+	mat.set_shader_parameter("linear_enabled", linear_enabled)
+	mat.set_shader_parameter("linear_start_color", linear_start_color)
+	mat.set_shader_parameter("linear_end_color", linear_end_color)
+	mat.set_shader_parameter("linear_angle", linear_angle)
+	mat.set_shader_parameter("linear_scale", linear_scale)
+	mat.set_shader_parameter("linear_offset", 0.0)
+	mat.set_shader_parameter("radial_enabled", radial_enabled)
+	mat.set_shader_parameter("radial_center_color", radial_center_color)
+	mat.set_shader_parameter("radial_edge_color", radial_edge_color)
+	mat.set_shader_parameter("radial_center", radial_center)
+	mat.set_shader_parameter("radial_radius", radial_radius)
+	mat.set_shader_parameter("noise_enabled", noise_enabled)
+	mat.set_shader_parameter("noise_tex", _noise_texture)
+	mat.set_shader_parameter("noise_scale", noise_scale)
+	mat.set_shader_parameter("noise_strength", noise_strength)
+	mat.set_shader_parameter("edge_hardness", edge_hardness)
+	mat.set_shader_parameter("noise_speed", noise_speed)
 	
-	# --- 设置 Shader 参数 ---
-	# Base Style
-	material.set_shader_parameter("base_color", base_color)
+	if not Engine.is_editor_hint():
+		print("[VisualCardSetup] ShaderMaterial 创建完成")
 	
-	# Linear Gradient
-	material.set_shader_parameter("linear_enabled", linear_enabled)
-	material.set_shader_parameter("linear_start_color", linear_start_color)
-	material.set_shader_parameter("linear_end_color", linear_end_color)
-	material.set_shader_parameter("linear_angle", linear_angle)
-	material.set_shader_parameter("linear_scale", linear_scale)
-	material.set_shader_parameter("linear_offset", 0.0)
-	
-	# Radial Gradient
-	material.set_shader_parameter("radial_enabled", radial_enabled)
-	material.set_shader_parameter("radial_center_color", radial_center_color)
-	material.set_shader_parameter("radial_edge_color", radial_edge_color)
-	material.set_shader_parameter("radial_center", radial_center)
-	material.set_shader_parameter("radial_radius", radial_radius)
-	
-	# Noise System
-	material.set_shader_parameter("noise_enabled", noise_enabled)
-	material.set_shader_parameter("noise_tex", noise_texture)
-	material.set_shader_parameter("noise_scale", noise_scale)
-	material.set_shader_parameter("noise_strength", noise_strength)
-	material.set_shader_parameter("edge_hardness", edge_hardness)
-	material.set_shader_parameter("noise_speed", noise_speed)
-	
-	print("[VisualCardSetup] ShaderMaterial 创建完成")
-	return material
+	return mat
 
 
-## 创建 NoiseTexture2D + FastNoiseLite
-## @return 配置完成的 NoiseTexture2D
 func _create_noise_texture() -> NoiseTexture2D:
-	# 创建 FastNoiseLite 噪声生成器
 	var noise := FastNoiseLite.new()
 	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
 	noise.frequency = noise_frequency
 	noise.fractal_type = FastNoiseLite.FRACTAL_FBM
 	noise.fractal_octaves = 4
 	
-	# 创建 NoiseTexture2D
-	var noise_tex := NoiseTexture2D.new()
-	noise_tex.noise = noise
-	noise_tex.width = noise_texture_size.x
-	noise_tex.height = noise_texture_size.y
-	noise_tex.seamless = noise_seamless
-	noise_tex.seamless_blend_skirt = 0.1
+	var tex := NoiseTexture2D.new()
+	tex.noise = noise
+	tex.width = noise_texture_size.x
+	tex.height = noise_texture_size.y
+	tex.seamless = noise_seamless
+	tex.seamless_blend_skirt = 0.1
 	
-	print("[VisualCardSetup] NoiseTexture2D 创建完成: %dx%d, freq=%.3f, seamless=%s" % [
-		noise_texture_size.x, noise_texture_size.y, noise_frequency, noise_seamless
-	])
+	if not Engine.is_editor_hint():
+		print("[VisualCardSetup] NoiseTexture2D: %dx%d" % [noise_texture_size.x, noise_texture_size.y])
 	
-	return noise_tex
+	return tex
 
 
-## 获取共享材质实例 (用于外部访问)
 func get_shared_material() -> ShaderMaterial:
 	return _shared_material

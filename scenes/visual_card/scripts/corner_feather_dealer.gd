@@ -1,172 +1,328 @@
 # res://scenes/visual_card/scripts/corner_feather_dealer.gd
+@tool
 ## 圆角羽化处理器 (Corner Feather Dealer)
-## 整合多边形圆角生成与羽化边缘生成的统一组件
+## 从父级 Polygon2D 获取顶点，生成带圆角的 ArrayMesh、羽化边缘和 Shader 效果
 ## 
-## 功能：
-##   1. 支持多种形状：矩形、星形、自定义多边形
-##   2. 对任意多边形顶点进行圆角化处理
-##   3. 自动生成 ArrayMesh 并设置到目标节点
-##   4. 自动生成羽化边缘效果
-##
-## 使用方法：
-##   1. 添加为 MeshInstance2D 的兄弟节点
-##   2. 设置 target_mesh 引用
-##   3. 配置形状和羽化参数
-##   4. 运行场景，自动生成效果
+## 所有配置集成在此脚本中，无需额外的 Setup 脚本
 
 class_name CornerFeatherDealer
 extends Node2D
-
-## 形状类型枚举
-enum ShapeType {
-	RECT, ## 矩形
-	STAR, ## 星形
-	CUSTOM ## 自定义多边形
-}
-
-## ========================================
-## 基础配置
-## ========================================
-@export_group("Target")
-## 目标 MeshInstance2D 节点
-@export var target_mesh: MeshInstance2D
-
-## ========================================
-## 形状配置
-## ========================================
-@export_group("Shape")
-## 形状类型
-@export var shape_type: ShapeType = ShapeType.RECT
-
-## 矩形尺寸 (shape_type == RECT 时使用)
-@export var rect_size: Vector2 = Vector2(200, 300)
-
-## ========================================
-## 星形参数 (shape_type == STAR 时使用)
-## ========================================
-@export_group("Star Shape")
-## 星形顶点数
-@export_range(3, 20) var star_points: int = 5
-## 星形外半径
-@export var star_outer_radius: float = 100.0
-## 星形内半径
-@export var star_inner_radius: float = 40.0
-
-## ========================================
-## 自定义多边形 (shape_type == CUSTOM 时使用)
-## ========================================
-@export_group("Custom Polygon")
-## 自定义顶点数组 (逆时针顺序)
-@export var custom_vertices: PackedVector2Array
 
 ## ========================================
 ## 圆角配置
 ## ========================================
 @export_group("Corner")
-## 圆角半径 (像素)
-@export_range(0.0, 100.0) var corner_radius: float = 20.0
-## 每个圆角的分段数 (越高越平滑)
-@export_range(1, 16) var corner_segments: int = 4
+@export_range(0.0, 100.0) var corner_radius: float = 20.0:
+	set(value):
+		corner_radius = value
+		_request_update()
+
+@export_range(1, 16) var corner_segments: int = 6:
+	set(value):
+		corner_segments = value
+		_request_update()
 
 ## ========================================
 ## 羽化配置
 ## ========================================
 @export_group("Feather")
-## 羽化宽度 (像素)
-@export_range(0.0, 200.0) var feather_width: float = 30.0
-## 羽化材质 (ShaderMaterial)
-@export var feather_material: ShaderMaterial
-## 是否反转法线方向
-@export var invert_normal: bool = false
+@export_range(0.0, 200.0) var feather_width: float = 30.0:
+	set(value):
+		feather_width = value
+		_request_update()
+
+@export var invert_normal: bool = false:
+	set(value):
+		invert_normal = value
+		_request_update()
+
+## ========================================
+## Shader - 基础样式
+## ========================================
+@export_group("Shader - Base")
+@export var base_color: Color = Color(0.0, 0.0, 0.5, 1.0):
+	set(value):
+		base_color = value
+		_update_shader_params()
+
+## ========================================
+## Shader - 线性渐变
+## ========================================
+@export_group("Shader - Linear Gradient")
+@export var linear_enabled: bool = true:
+	set(value):
+		linear_enabled = value
+		_update_shader_params()
+@export var linear_start_color: Color = Color(1.0, 0.5, 0.0, 1.0):
+	set(value):
+		linear_start_color = value
+		_update_shader_params()
+@export var linear_end_color: Color = Color(1.0, 1.0, 1.0, 0.0):
+	set(value):
+		linear_end_color = value
+		_update_shader_params()
+@export_range(0.0, 360.0) var linear_angle: float = 45.0:
+	set(value):
+		linear_angle = value
+		_update_shader_params()
+@export_range(0.1, 5.0) var linear_scale: float = 1.0:
+	set(value):
+		linear_scale = value
+		_update_shader_params()
+
+## ========================================
+## Shader - 径向渐变
+## ========================================
+@export_group("Shader - Radial Gradient")
+@export var radial_enabled: bool = true:
+	set(value):
+		radial_enabled = value
+		_update_shader_params()
+@export var radial_center_color: Color = Color(1.0, 1.0, 1.0, 1.0):
+	set(value):
+		radial_center_color = value
+		_update_shader_params()
+@export var radial_edge_color: Color = Color(1.0, 1.0, 1.0, 0.0):
+	set(value):
+		radial_edge_color = value
+		_update_shader_params()
+@export var radial_center: Vector2 = Vector2(0.5, 0.5):
+	set(value):
+		radial_center = value
+		_update_shader_params()
+@export_range(0.1, 2.0) var radial_radius: float = 0.5:
+	set(value):
+		radial_radius = value
+		_update_shader_params()
+
+## ========================================
+## Shader - 噪点系统
+## ========================================
+@export_group("Shader - Noise")
+@export var noise_enabled: bool = true:
+	set(value):
+		noise_enabled = value
+		_update_shader_params()
+@export_range(10.0, 500.0) var noise_scale: float = 100.0:
+	set(value):
+		noise_scale = value
+		_update_shader_params()
+@export_range(0.0, 1.0) var noise_strength: float = 0.8:
+	set(value):
+		noise_strength = value
+		_update_shader_params()
+@export_range(0.5, 5.0) var edge_hardness: float = 2.0:
+	set(value):
+		edge_hardness = value
+		_update_shader_params()
+@export_range(0.0, 5.0) var noise_speed: float = 0.04:
+	set(value):
+		noise_speed = value
+		_update_shader_params()
+@export var noise_frequency: float = 0.05:
+	set(value):
+		noise_frequency = value
+		_recreate_noise_texture()
+@export var noise_seamless: bool = true:
+	set(value):
+		noise_seamless = value
+		_recreate_noise_texture()
+@export var noise_texture_size: Vector2i = Vector2i(256, 256):
+	set(value):
+		noise_texture_size = value
+		_recreate_noise_texture()
 
 ## ========================================
 ## 调试
 ## ========================================
 @export_group("Debug")
-## 调试绘制开关
-@export var debug_draw: bool = false
+@export var debug_draw: bool = false:
+	set(value):
+		debug_draw = value
+		queue_redraw()
 
-## 生成的羽化网格节点
+## 内部状态
+var _source_polygon: Polygon2D = null
+var _shape_mesh_instance: MeshInstance2D = null
 var _feather_mesh_instance: MeshInstance2D = null
-
-## 调试数据
+var _shader_material: ShaderMaterial = null
+var _noise_texture: NoiseTexture2D = null
+var _processed_vertices: PackedVector2Array = PackedVector2Array()
+var _cached_polygon: PackedVector2Array = PackedVector2Array()
+var _debug_corner_centers: Array = []
 var _debug_boundary_edges: Array = []
 var _debug_outer_edges: Array = []
+var _needs_update: bool = false
+var _is_initialized: bool = false
 
 
 func _ready() -> void:
-	if target_mesh:
-		generate()
+	_source_polygon = get_parent() as Polygon2D
+	if not _source_polygon:
+		push_warning("[CornerFeatherDealer] 父节点不是 Polygon2D")
+		return
+	
+	# 创建 ShaderMaterial
+	_shader_material = _create_shader_material()
+	
+	_is_initialized = true
+	_do_generate()
 
 
-## 主入口：生成形状和羽化效果
+func _process(_delta: float) -> void:
+	if _needs_update and _is_initialized:
+		_needs_update = false
+		_do_generate()
+	
+	# 编辑器中检测 Polygon 变化
+	if Engine.is_editor_hint() and _source_polygon:
+		if _source_polygon.polygon != _cached_polygon:
+			_cached_polygon = _source_polygon.polygon.duplicate()
+			_do_generate()
+
+
+func _request_update() -> void:
+	if _is_initialized:
+		_needs_update = true
+
+
+func _update_shader_params() -> void:
+	if not _shader_material:
+		return
+	
+	_shader_material.set_shader_parameter("base_color", base_color)
+	_shader_material.set_shader_parameter("linear_enabled", linear_enabled)
+	_shader_material.set_shader_parameter("linear_start_color", linear_start_color)
+	_shader_material.set_shader_parameter("linear_end_color", linear_end_color)
+	_shader_material.set_shader_parameter("linear_angle", linear_angle)
+	_shader_material.set_shader_parameter("linear_scale", linear_scale)
+	_shader_material.set_shader_parameter("radial_enabled", radial_enabled)
+	_shader_material.set_shader_parameter("radial_center_color", radial_center_color)
+	_shader_material.set_shader_parameter("radial_edge_color", radial_edge_color)
+	_shader_material.set_shader_parameter("radial_center", radial_center)
+	_shader_material.set_shader_parameter("radial_radius", radial_radius)
+	_shader_material.set_shader_parameter("noise_enabled", noise_enabled)
+	_shader_material.set_shader_parameter("noise_scale", noise_scale)
+	_shader_material.set_shader_parameter("noise_strength", noise_strength)
+	_shader_material.set_shader_parameter("edge_hardness", edge_hardness)
+	_shader_material.set_shader_parameter("noise_speed", noise_speed)
+
+
+func _recreate_noise_texture() -> void:
+	if not _shader_material:
+		return
+	
+	_noise_texture = _create_noise_texture()
+	_shader_material.set_shader_parameter("noise_tex", _noise_texture)
+
+
+func _create_shader_material() -> ShaderMaterial:
+	var mat := ShaderMaterial.new()
+	
+	var shader := load("res://shaders/complex_gradient_feather.gdshader") as Shader
+	if not shader:
+		push_error("[CornerFeatherDealer] 无法加载 Shader！")
+		return mat
+	
+	mat.shader = shader
+	_noise_texture = _create_noise_texture()
+	
+	mat.set_shader_parameter("base_color", base_color)
+	mat.set_shader_parameter("linear_enabled", linear_enabled)
+	mat.set_shader_parameter("linear_start_color", linear_start_color)
+	mat.set_shader_parameter("linear_end_color", linear_end_color)
+	mat.set_shader_parameter("linear_angle", linear_angle)
+	mat.set_shader_parameter("linear_scale", linear_scale)
+	mat.set_shader_parameter("linear_offset", 0.0)
+	mat.set_shader_parameter("radial_enabled", radial_enabled)
+	mat.set_shader_parameter("radial_center_color", radial_center_color)
+	mat.set_shader_parameter("radial_edge_color", radial_edge_color)
+	mat.set_shader_parameter("radial_center", radial_center)
+	mat.set_shader_parameter("radial_radius", radial_radius)
+	mat.set_shader_parameter("noise_enabled", noise_enabled)
+	mat.set_shader_parameter("noise_tex", _noise_texture)
+	mat.set_shader_parameter("noise_scale", noise_scale)
+	mat.set_shader_parameter("noise_strength", noise_strength)
+	mat.set_shader_parameter("edge_hardness", edge_hardness)
+	mat.set_shader_parameter("noise_speed", noise_speed)
+	
+	return mat
+
+
+func _create_noise_texture() -> NoiseTexture2D:
+	var noise := FastNoiseLite.new()
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	noise.frequency = noise_frequency
+	noise.fractal_type = FastNoiseLite.FRACTAL_FBM
+	noise.fractal_octaves = 4
+	
+	var tex := NoiseTexture2D.new()
+	tex.noise = noise
+	tex.width = noise_texture_size.x
+	tex.height = noise_texture_size.y
+	tex.seamless = noise_seamless
+	tex.seamless_blend_skirt = 0.1
+	
+	return tex
+
+
+## 公开的生成方法
 func generate() -> void:
-	if not target_mesh:
-		push_error("[CornerFeatherDealer] target_mesh 未设置！")
+	_do_generate()
+
+
+## 内部生成逻辑
+func _do_generate() -> void:
+	if not _source_polygon:
+		_source_polygon = get_parent() as Polygon2D
+		if not _source_polygon:
+			return
+	
+	var source_vertices := _source_polygon.polygon
+	if source_vertices.is_empty():
 		return
 	
-	# 步骤 1: 获取基础形状顶点
-	var base_vertices := _get_shape_vertices()
-	if base_vertices.is_empty():
-		push_error("[CornerFeatherDealer] 无法获取形状顶点！")
-		return
+	# 确保材质存在
+	if not _shader_material:
+		_shader_material = _create_shader_material()
 	
-	# 步骤 2: 对顶点进行圆角化处理
-	var rounded_vertices := _apply_corner_rounding(base_vertices)
+	# 清理调试数据
+	_debug_corner_centers.clear()
+	_debug_boundary_edges.clear()
+	_debug_outer_edges.clear()
 	
-	# 步骤 3: 生成 ArrayMesh 并设置到目标节点
-	var mesh := _create_polygon_mesh(rounded_vertices)
-	target_mesh.mesh = mesh
+	# 圆角化
+	_processed_vertices = _apply_corner_rounding(source_vertices)
 	
-	# 步骤 4: 生成羽化边缘
-	_generate_feather(rounded_vertices)
+	# 计算统一的 UV 包围盒 (包含羽化区域)
+	var unified_aabb := Rect2(_processed_vertices[0], Vector2.ZERO)
+	for v in _processed_vertices:
+		unified_aabb = unified_aabb.expand(v)
+	unified_aabb = unified_aabb.grow(feather_width)
 	
-	print("[CornerFeatherDealer] ✓ 生成完成！顶点数: %d" % rounded_vertices.size())
+	if unified_aabb.size.x < 0.001:
+		unified_aabb.size.x = 1.0
+	if unified_aabb.size.y < 0.001:
+		unified_aabb.size.y = 1.0
+	
+	# 创建/更新 Mesh (使用统一的 UV 包围盒)
+	_update_shape_mesh(_processed_vertices, unified_aabb)
+	_update_feather_mesh(_processed_vertices, unified_aabb)
+	
+	# 运行时隐藏父级 Polygon2D
+	if not Engine.is_editor_hint():
+		_source_polygon.color = Color(0, 0, 0, 0)
 	
 	if debug_draw:
 		queue_redraw()
-
-
-## 获取基础形状顶点 (未圆角化)
-func _get_shape_vertices() -> PackedVector2Array:
-	match shape_type:
-		ShapeType.RECT:
-			return _get_rect_vertices()
-		ShapeType.STAR:
-			return _get_star_vertices()
-		ShapeType.CUSTOM:
-			return custom_vertices
-	return PackedVector2Array()
-
-
-## 获取矩形顶点 (逆时针，从左下开始)
-func _get_rect_vertices() -> PackedVector2Array:
-	var half_w := rect_size.x / 2.0
-	var half_h := rect_size.y / 2.0
-	return PackedVector2Array([
-		Vector2(-half_w, half_h), # 左下
-		Vector2(half_w, half_h), # 右下
-		Vector2(half_w, -half_h), # 右上
-		Vector2(-half_w, -half_h), # 左上
-	])
-
-
-## 获取星形顶点 (逆时针)
-func _get_star_vertices() -> PackedVector2Array:
-	var verts := PackedVector2Array()
-	var angle_step := TAU / (star_points * 2)
 	
-	for i in range(star_points * 2):
-		var angle := -PI / 2.0 + i * angle_step # 从顶部开始
-		var radius := star_outer_radius if i % 2 == 0 else star_inner_radius
-		verts.append(Vector2(cos(angle), sin(angle)) * radius)
-	
-	return verts
+	if not Engine.is_editor_hint():
+		print("[CornerFeatherDealer] ✓ 生成完成！原始: %d, 圆角化: %d" % [
+			source_vertices.size(), _processed_vertices.size()
+		])
 
 
-## 对多边形顶点进行圆角化处理
-## @param vertices 原始顶点数组
-## @return 圆角化后的顶点数组
+## 圆角化
 func _apply_corner_rounding(vertices: PackedVector2Array) -> PackedVector2Array:
 	if corner_radius < 0.1 or corner_segments < 1:
 		return vertices
@@ -174,99 +330,101 @@ func _apply_corner_rounding(vertices: PackedVector2Array) -> PackedVector2Array:
 	var result := PackedVector2Array()
 	var n := vertices.size()
 	
+	if n < 3:
+		return vertices
+	
 	for i in range(n):
 		var prev := vertices[(i - 1 + n) % n]
 		var curr := vertices[i]
 		var next := vertices[(i + 1) % n]
 		
-		# 计算两条边的方向
-		var dir_in := (curr - prev).normalized()
-		var dir_out := (next - curr).normalized()
+		var v1 := (prev - curr).normalized()
+		var v2 := (next - curr).normalized()
 		
-		# 计算角度
-		var angle := dir_in.angle_to(dir_out)
+		var dot_val := clampf(v1.dot(v2), -1.0, 1.0)
+		var angle := acos(dot_val)
 		
-		# 如果角度太小（接近 180°），跳过圆角
-		if absf(angle) < 0.1:
+		if angle < 0.05 or angle > PI - 0.05:
 			result.append(curr)
 			continue
 		
-		# 计算圆角需要的内缩距离
-		# tan(angle/2) = radius / offset_distance
-		var half_angle := absf(angle) / 2.0
+		var len1 := (prev - curr).length()
+		var len2 := (next - curr).length()
+		var max_offset := minf(len1, len2) / 2.0
+		
+		var half_angle := angle / 2.0
 		var tan_half := tan(half_angle)
+		
 		if tan_half < 0.001:
 			result.append(curr)
 			continue
 		
-		# 限制圆角半径，确保不超过边长的一半
-		var edge_in_len := (curr - prev).length()
-		var edge_out_len := (next - curr).length()
-		var max_radius := minf(edge_in_len, edge_out_len) / 2.0
+		var max_radius := max_offset * tan_half
 		var actual_radius := minf(corner_radius, max_radius)
 		
-		var offset_distance := actual_radius / tan_half
+		if actual_radius < 0.1:
+			result.append(curr)
+			continue
 		
-		# 计算圆角起点和终点
-		var p_start := curr - dir_in * offset_distance
-		var p_end := curr + dir_out * offset_distance
+		var offset := actual_radius / tan_half
+		var p1 := curr + v1 * offset
+		var p2 := curr + v2 * offset
 		
-		# 计算圆心
-		# 圆心在角平分线上，距离顶点 = offset_distance / cos(half_angle)
-		var bisector := (-dir_in + dir_out).normalized()
-		# 判断凸凹：如果叉积 > 0，则是凸角（逆时针），否则是凹角
-		var cross := dir_in.x * dir_out.y - dir_in.y * dir_out.x
-		if cross < 0:
-			bisector = - bisector
+		var bisector := (v1 + v2).normalized()
+		var center_dist := actual_radius / sin(half_angle)
+		var center := curr + bisector * center_dist
 		
-		var center_distance := actual_radius / sin(half_angle)
-		var center := curr + bisector * center_distance
+		_debug_corner_centers.append(center)
 		
-		# 生成圆弧顶点
-		var start_angle := (p_start - center).angle()
-		var end_angle := (p_end - center).angle()
+		var start_angle := (p1 - center).angle()
+		var end_angle := (p2 - center).angle()
+		var arc_angle := end_angle - start_angle
 		
-		# 确保角度方向正确
-		var angle_diff := end_angle - start_angle
-		if cross > 0: # 凸角，顺时针绕
-			if angle_diff > 0:
-				angle_diff -= TAU
-		else: # 凹角，逆时针绕
-			if angle_diff < 0:
-				angle_diff += TAU
+		while arc_angle > PI:
+			arc_angle -= TAU
+		while arc_angle < -PI:
+			arc_angle += TAU
 		
-		var arc_step := angle_diff / corner_segments
 		for j in range(corner_segments + 1):
-			var arc_angle := start_angle + j * arc_step
-			var arc_point := center + Vector2(cos(arc_angle), sin(arc_angle)) * actual_radius
-			result.append(arc_point)
+			var t := float(j) / float(corner_segments)
+			var a := start_angle + arc_angle * t
+			result.append(center + Vector2(cos(a), sin(a)) * actual_radius)
 	
 	return result
 
 
-## 创建多边形 ArrayMesh (使用扇形三角剖分)
-func _create_polygon_mesh(vertices: PackedVector2Array) -> ArrayMesh:
+## 更新形状 Mesh
+func _update_shape_mesh(vertices: PackedVector2Array, uv_aabb: Rect2) -> void:
+	if vertices.is_empty():
+		return
+	
+	if not _shape_mesh_instance or not is_instance_valid(_shape_mesh_instance):
+		_shape_mesh_instance = get_node_or_null("ShapeMesh") as MeshInstance2D
+		if not _shape_mesh_instance:
+			_shape_mesh_instance = MeshInstance2D.new()
+			_shape_mesh_instance.name = "ShapeMesh"
+			add_child(_shape_mesh_instance)
+			if Engine.is_editor_hint():
+				_shape_mesh_instance.owner = get_tree().edited_scene_root
+	
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	
-	# 计算包围盒用于 UV
-	var aabb := Rect2(vertices[0], Vector2.ZERO)
-	for v in vertices:
-		aabb = aabb.expand(v)
-	
-	# 扇形三角剖分：中心点连接所有边界顶点
+	# 计算几何中心 (用于扇形三角剖分)
 	var center := Vector2.ZERO
-	var center_uv := Vector2(0.5, 0.5)
+	for v in vertices:
+		center += v
+	center /= vertices.size()
+	
+	# 使用统一的 UV aabb
+	var center_uv := (center - uv_aabb.position) / uv_aabb.size
 	
 	for i in range(vertices.size()):
 		var v0 := vertices[i]
 		var v1 := vertices[(i + 1) % vertices.size()]
+		var uv0 := (v0 - uv_aabb.position) / uv_aabb.size
+		var uv1 := (v1 - uv_aabb.position) / uv_aabb.size
 		
-		# 计算 UV
-		var uv0 := (v0 - aabb.position) / aabb.size
-		var uv1 := (v1 - aabb.position) / aabb.size
-		
-		# 三角形: center -> v0 -> v1
 		st.set_uv(center_uv)
 		st.set_color(Color.WHITE)
 		st.add_vertex(Vector3(center.x, center.y, 0))
@@ -280,40 +438,31 @@ func _create_polygon_mesh(vertices: PackedVector2Array) -> ArrayMesh:
 		st.add_vertex(Vector3(v1.x, v1.y, 0))
 	
 	st.index()
-	return st.commit()
+	_shape_mesh_instance.mesh = st.commit()
+	_shape_mesh_instance.material = _shader_material
 
 
-## 生成羽化边缘
-func _generate_feather(vertices: PackedVector2Array) -> void:
-	_debug_boundary_edges.clear()
-	_debug_outer_edges.clear()
-	
-	if feather_width < 0.1:
+## 更新羽化 Mesh
+func _update_feather_mesh(vertices: PackedVector2Array, uv_aabb: Rect2) -> void:
+	if feather_width < 0.1 or vertices.is_empty():
+		if _feather_mesh_instance:
+			_feather_mesh_instance.mesh = null
 		return
 	
-	# 清理旧的羽化网格
-	if _feather_mesh_instance:
-		_feather_mesh_instance.queue_free()
-		_feather_mesh_instance = null
+	if not _feather_mesh_instance or not is_instance_valid(_feather_mesh_instance):
+		_feather_mesh_instance = get_node_or_null("FeatherMesh") as MeshInstance2D
+		if not _feather_mesh_instance:
+			_feather_mesh_instance = MeshInstance2D.new()
+			_feather_mesh_instance.name = "FeatherMesh"
+			_feather_mesh_instance.show_behind_parent = true
+			add_child(_feather_mesh_instance)
+			if Engine.is_editor_hint():
+				_feather_mesh_instance.owner = get_tree().edited_scene_root
 	
-	var existing := get_node_or_null("FeatherMesh")
-	if existing:
-		existing.queue_free()
-	
-	# 计算每个顶点的外向法线
 	var normals := _calculate_vertex_normals(vertices)
 	
-	# 计算包围盒用于 UV (包含羽化区域)
-	var aabb := Rect2(vertices[0], Vector2.ZERO)
-	for v in vertices:
-		aabb = aabb.expand(v)
-	aabb = aabb.grow(feather_width)
-	
-	# 生成羽化三角形带
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	
-	var target_xform := target_mesh.transform if target_mesh else Transform2D.IDENTITY
 	
 	for i in range(vertices.size()):
 		var v0 := vertices[i]
@@ -321,21 +470,17 @@ func _generate_feather(vertices: PackedVector2Array) -> void:
 		var n0 := normals[i]
 		var n1 := normals[(i + 1) % vertices.size()]
 		
-		# 外圈顶点
 		var v0_out := v0 + n0 * feather_width
 		var v1_out := v1 + n1 * feather_width
 		
-		# 保存调试数据
-		_debug_boundary_edges.append([target_xform * v0, target_xform * v1])
-		_debug_outer_edges.append([target_xform * v0_out, target_xform * v1_out])
+		_debug_boundary_edges.append([v0, v1])
+		_debug_outer_edges.append([v0_out, v1_out])
 		
-		# 计算 UV
-		var uv_v0 := (v0 - aabb.position) / aabb.size
-		var uv_v1 := (v1 - aabb.position) / aabb.size
-		var uv_v0_out := (v0_out - aabb.position) / aabb.size
-		var uv_v1_out := (v1_out - aabb.position) / aabb.size
+		var uv_v0 := (v0 - uv_aabb.position) / uv_aabb.size
+		var uv_v1 := (v1 - uv_aabb.position) / uv_aabb.size
+		var uv_v0_out := (v0_out - uv_aabb.position) / uv_aabb.size
+		var uv_v1_out := (v1_out - uv_aabb.position) / uv_aabb.size
 		
-		# 三角形 1: v0 -> v1 -> v0_out
 		st.set_uv(uv_v0)
 		st.set_color(Color.WHITE)
 		st.add_vertex(Vector3(v0.x, v0.y, 0))
@@ -345,39 +490,27 @@ func _generate_feather(vertices: PackedVector2Array) -> void:
 		st.add_vertex(Vector3(v1.x, v1.y, 0))
 		
 		st.set_uv(uv_v0_out)
-		st.set_color(Color(1, 1, 1, 0)) # 外圈透明
+		st.set_color(Color(1, 1, 1, 0))
 		st.add_vertex(Vector3(v0_out.x, v0_out.y, 0))
 		
-		# 三角形 2: v1 -> v1_out -> v0_out
 		st.set_uv(uv_v1)
 		st.set_color(Color.WHITE)
 		st.add_vertex(Vector3(v1.x, v1.y, 0))
 		
 		st.set_uv(uv_v1_out)
-		st.set_color(Color(1, 1, 1, 0)) # 外圈透明
+		st.set_color(Color(1, 1, 1, 0))
 		st.add_vertex(Vector3(v1_out.x, v1_out.y, 0))
 		
 		st.set_uv(uv_v0_out)
-		st.set_color(Color(1, 1, 1, 0)) # 外圈透明
+		st.set_color(Color(1, 1, 1, 0))
 		st.add_vertex(Vector3(v0_out.x, v0_out.y, 0))
 	
 	st.index()
-	var feather_mesh := st.commit()
-	
-	# 创建羽化网格节点
-	_feather_mesh_instance = MeshInstance2D.new()
-	_feather_mesh_instance.name = "FeatherMesh"
-	_feather_mesh_instance.mesh = feather_mesh
+	_feather_mesh_instance.mesh = st.commit()
 	_feather_mesh_instance.show_behind_parent = true
-	_feather_mesh_instance.transform = target_mesh.transform if target_mesh else Transform2D.IDENTITY
-	
-	if feather_material:
-		_feather_mesh_instance.material = feather_material
-	
-	add_child(_feather_mesh_instance)
+	_feather_mesh_instance.material = _shader_material
 
 
-## 计算每个顶点的外向法线
 func _calculate_vertex_normals(vertices: PackedVector2Array) -> Array[Vector2]:
 	var normals: Array[Vector2] = []
 	var n := vertices.size()
@@ -387,40 +520,53 @@ func _calculate_vertex_normals(vertices: PackedVector2Array) -> Array[Vector2]:
 		var curr := vertices[i]
 		var next := vertices[(i + 1) % n]
 		
-		# 计算两条边的方向
 		var dir_in := (curr - prev).normalized()
 		var dir_out := (next - curr).normalized()
 		
-		# 两条边的法线 (逆时针旋转 90°)
 		var normal_in := Vector2(-dir_in.y, dir_in.x)
 		var normal_out := Vector2(-dir_out.y, dir_out.x)
 		
-		# 平均法线
-		var avg_normal := (normal_in + normal_out).normalized()
+		var avg := (normal_in + normal_out).normalized()
+		if avg.length_squared() < 0.001:
+			avg = normal_in
 		
 		if invert_normal:
-			avg_normal = - avg_normal
+			avg = - avg
 		
-		normals.append(avg_normal)
+		normals.append(avg)
 	
 	return normals
 
 
-## 调试绘制
+func get_processed_vertices() -> PackedVector2Array:
+	return _processed_vertices
+
+
+func get_shape_mesh() -> MeshInstance2D:
+	return _shape_mesh_instance
+
+
+func get_shader_material() -> ShaderMaterial:
+	return _shader_material
+
+
 func _draw() -> void:
 	if not debug_draw:
 		return
 	
-	# 绘制边界边 (黄色)
 	for edge in _debug_boundary_edges:
 		draw_line(edge[0], edge[1], Color.YELLOW, 2.0)
 	
-	# 绘制外圈边 (青色)
 	for edge in _debug_outer_edges:
 		draw_line(edge[0], edge[1], Color.CYAN, 2.0)
 	
-	# 绘制连接线 (半透明白色)
-	for i in range(_debug_boundary_edges.size()):
+	for i in range(mini(_debug_boundary_edges.size(), _debug_outer_edges.size())):
 		var inner: Vector2 = _debug_boundary_edges[i][0]
 		var outer: Vector2 = _debug_outer_edges[i][0]
-		draw_line(inner, outer, Color(1, 1, 1, 0.5), 1.0)
+		draw_line(inner, outer, Color(1, 1, 1, 0.3), 1.0)
+	
+	for center in _debug_corner_centers:
+		draw_circle(center, 4.0, Color.RED)
+	
+	for v in _processed_vertices:
+		draw_circle(v, 2.0, Color.GREEN)
