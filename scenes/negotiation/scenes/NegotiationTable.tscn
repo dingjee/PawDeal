@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cj8wq2hv6pmrt"]
+[gd_scene format=3 uid="uid://cj8wq2hv6pmrt"]
 
 [ext_resource type="Script" uid="uid://cjy30n76c7aat" path="res://scenes/negotiation/scripts/NegotiationManager.gd" id="1_manager"]
 [ext_resource type="Script" uid="uid://r8vlo3dgycia" path="res://scenes/negotiation/scripts/NegotiationTableUI.gd" id="2_ui"]
 
-[node name="NegotiationTable" type="Control"]
+[node name="NegotiationTable" type="Control" unique_id=1150543142]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,10 +12,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("2_ui")
 
-[node name="Manager" type="Node" parent="."]
+[node name="Manager" type="Node" parent="." unique_id=840574622]
 script = ExtResource("1_manager")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=130915459]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +24,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.08, 0.09, 0.12, 1)
 
-[node name="TopStatusBar" type="HBoxContainer" parent="."]
+[node name="TopStatusBar" type="HBoxContainer" parent="." unique_id=945754995]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -33,90 +33,90 @@ offset_bottom = 48.0
 grow_horizontal = 2
 theme_override_constants/separation = 16
 
-[node name="LeftSpacer" type="Control" parent="TopStatusBar"]
+[node name="LeftSpacer" type="Control" parent="TopStatusBar" unique_id=375647599]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RoundLabel" type="Label" parent="TopStatusBar"]
+[node name="RoundLabel" type="Label" parent="TopStatusBar" unique_id=1768639465]
 layout_mode = 2
 text = "回合 1/10"
 
-[node name="BenefitDisplay" type="HBoxContainer" parent="TopStatusBar"]
+[node name="BenefitDisplay" type="HBoxContainer" parent="TopStatusBar" unique_id=1420257944]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="AIBenefitBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay"]
+[node name="AIBenefitBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay" unique_id=2061003883]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="AILabel" type="Label" parent="TopStatusBar/BenefitDisplay/AIBenefitBox"]
+[node name="AILabel" type="Label" parent="TopStatusBar/BenefitDisplay/AIBenefitBox" unique_id=181420445]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
 text = "AI方:"
 
-[node name="AIBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/AIBenefitBox"]
+[node name="AIBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/AIBenefitBox" unique_id=1754056525]
 custom_minimum_size = Vector2(100, 16)
 layout_mode = 2
 max_value = 200.0
 show_percentage = false
 
-[node name="AIValue" type="Label" parent="TopStatusBar/BenefitDisplay/AIBenefitBox"]
+[node name="AIValue" type="Label" parent="TopStatusBar/BenefitDisplay/AIBenefitBox" unique_id=753125821]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
 text = "0"
 
-[node name="AISentimentBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay"]
+[node name="AISentimentBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay" unique_id=15098789]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="SentimentEmoji" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+[node name="SentimentEmoji" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox" unique_id=1432170510]
 layout_mode = 2
 text = "😐"
 
-[node name="SentimentBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+[node name="SentimentBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/AISentimentBox" unique_id=127022355]
 custom_minimum_size = Vector2(60, 16)
 layout_mode = 2
 min_value = -100.0
 show_percentage = false
 
-[node name="SentimentValue" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox"]
+[node name="SentimentValue" type="Label" parent="TopStatusBar/BenefitDisplay/AISentimentBox" unique_id=243489489]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "0%"
 
-[node name="BalanceIcon" type="Label" parent="TopStatusBar/BenefitDisplay"]
+[node name="BalanceIcon" type="Label" parent="TopStatusBar/BenefitDisplay" unique_id=884160620]
 layout_mode = 2
 text = "⚖️"
 
-[node name="PlayerBenefitBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay"]
+[node name="PlayerBenefitBox" type="HBoxContainer" parent="TopStatusBar/BenefitDisplay" unique_id=1499873387]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="PlayerLabel" type="Label" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox"]
+[node name="PlayerLabel" type="Label" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox" unique_id=1855425372]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.8, 0.4, 1)
 text = "玩家:"
 
-[node name="PlayerBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox"]
+[node name="PlayerBar" type="ProgressBar" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox" unique_id=817757765]
 custom_minimum_size = Vector2(100, 16)
 layout_mode = 2
 max_value = 200.0
 show_percentage = false
 
-[node name="PlayerValue" type="Label" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox"]
+[node name="PlayerValue" type="Label" parent="TopStatusBar/BenefitDisplay/PlayerBenefitBox" unique_id=929378992]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.8, 0.4, 1)
 text = "0"
 
-[node name="StateLabel" type="Label" parent="TopStatusBar"]
+[node name="StateLabel" type="Label" parent="TopStatusBar" unique_id=422724987]
 layout_mode = 2
 text = "玩家回合"
 
-[node name="RightSpacer" type="Control" parent="TopStatusBar"]
+[node name="RightSpacer" type="Control" parent="TopStatusBar" unique_id=948421031]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="TopLayer" type="HBoxContainer" parent="."]
+[node name="TopLayer" type="HBoxContainer" parent="." unique_id=1253799775]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -127,16 +127,16 @@ offset_bottom = 140.0
 grow_horizontal = 2
 theme_override_constants/separation = 24
 
-[node name="OpponentHUD" type="HBoxContainer" parent="TopLayer"]
+[node name="OpponentHUD" type="HBoxContainer" parent="TopLayer" unique_id=15569314]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
 
-[node name="AvatarFrame" type="Panel" parent="TopLayer/OpponentHUD"]
+[node name="AvatarFrame" type="Panel" parent="TopLayer/OpponentHUD" unique_id=939727718]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
-[node name="Avatar" type="TextureRect" parent="TopLayer/OpponentHUD/AvatarFrame"]
+[node name="Avatar" type="TextureRect" parent="TopLayer/OpponentHUD/AvatarFrame" unique_id=252168890]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -146,77 +146,77 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="FeedbackBubble" type="PanelContainer" parent="TopLayer/OpponentHUD"]
+[node name="FeedbackBubble" type="PanelContainer" parent="TopLayer/OpponentHUD" unique_id=1402739944]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="FeedbackLabel" type="Label" parent="TopLayer/OpponentHUD/FeedbackBubble"]
+[node name="FeedbackLabel" type="Label" parent="TopLayer/OpponentHUD/FeedbackBubble" unique_id=15136539]
 layout_mode = 2
 text = "让我考虑一下..."
 horizontal_alignment = 1
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="PsychMeters" type="VBoxContainer" parent="TopLayer"]
+[node name="PsychMeters" type="VBoxContainer" parent="TopLayer" unique_id=1795079654]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="GreedMeter" type="HBoxContainer" parent="TopLayer/PsychMeters"]
+[node name="GreedMeter" type="HBoxContainer" parent="TopLayer/PsychMeters" unique_id=1647322136]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TopLayer/PsychMeters/GreedMeter"]
+[node name="Label" type="Label" parent="TopLayer/PsychMeters/GreedMeter" unique_id=76048017]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "贪婪度 G"
 
-[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/GreedMeter"]
+[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/GreedMeter" unique_id=1948424643]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 50.0
 show_percentage = false
 
-[node name="AnchorMeter" type="HBoxContainer" parent="TopLayer/PsychMeters"]
+[node name="AnchorMeter" type="HBoxContainer" parent="TopLayer/PsychMeters" unique_id=379686405]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TopLayer/PsychMeters/AnchorMeter"]
+[node name="Label" type="Label" parent="TopLayer/PsychMeters/AnchorMeter" unique_id=2071953985]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "锚定值 A"
 
-[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/AnchorMeter"]
+[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/AnchorMeter" unique_id=1236186893]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 30.0
 show_percentage = false
 
-[node name="PowerMeter" type="HBoxContainer" parent="TopLayer/PsychMeters"]
+[node name="PowerMeter" type="HBoxContainer" parent="TopLayer/PsychMeters" unique_id=1982022594]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TopLayer/PsychMeters/PowerMeter"]
+[node name="Label" type="Label" parent="TopLayer/PsychMeters/PowerMeter" unique_id=2101379837]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "权力欲 P"
 
-[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/PowerMeter"]
+[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/PowerMeter" unique_id=1934003057]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 value = 70.0
 show_percentage = false
 
-[node name="PatienceMeter" type="HBoxContainer" parent="TopLayer/PsychMeters"]
+[node name="PatienceMeter" type="HBoxContainer" parent="TopLayer/PsychMeters" unique_id=1579305987]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="TopLayer/PsychMeters/PatienceMeter"]
+[node name="Label" type="Label" parent="TopLayer/PsychMeters/PatienceMeter" unique_id=823215519]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "耐心值 L"
 
-[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/PatienceMeter"]
+[node name="Bar" type="ProgressBar" parent="TopLayer/PsychMeters/PatienceMeter" unique_id=111774340]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -224,7 +224,7 @@ max_value = 10.0
 value = 10.0
 show_percentage = false
 
-[node name="MiddleLayer" type="CenterContainer" parent="."]
+[node name="MiddleLayer" type="CenterContainer" parent="." unique_id=860069540]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -234,31 +234,31 @@ offset_bottom = -280.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="OfferContainer" type="PanelContainer" parent="MiddleLayer"]
+[node name="OfferContainer" type="PanelContainer" parent="MiddleLayer" unique_id=446614146]
 custom_minimum_size = Vector2(600, 200)
 layout_mode = 2
 
-[node name="VBox" type="VBoxContainer" parent="MiddleLayer/OfferContainer"]
+[node name="VBox" type="VBoxContainer" parent="MiddleLayer/OfferContainer" unique_id=44356690]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="MiddleLayer/OfferContainer/VBox"]
+[node name="Title" type="Label" parent="MiddleLayer/OfferContainer/VBox" unique_id=710055022]
 layout_mode = 2
 text = "当前提案"
 horizontal_alignment = 1
 
-[node name="TopicLayout" type="HBoxContainer" parent="MiddleLayer/OfferContainer/VBox"]
+[node name="TopicLayout" type="HBoxContainer" parent="MiddleLayer/OfferContainer/VBox" unique_id=329238664]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="PlaceholderCard1" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+[node name="PlaceholderCard1" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout" unique_id=484077779]
 custom_minimum_size = Vector2(100, 120)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard1"]
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard1" unique_id=377792147]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -270,12 +270,12 @@ text = "拖放
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlaceholderCard2" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+[node name="PlaceholderCard2" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout" unique_id=2098688355]
 custom_minimum_size = Vector2(100, 120)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard2"]
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard2" unique_id=776039519]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -287,12 +287,12 @@ text = "拖放
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlaceholderCard3" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout"]
+[node name="PlaceholderCard3" type="Panel" parent="MiddleLayer/OfferContainer/VBox/TopicLayout" unique_id=246238242]
 custom_minimum_size = Vector2(100, 120)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard3"]
+[node name="Label" type="Label" parent="MiddleLayer/OfferContainer/VBox/TopicLayout/PlaceholderCard3" unique_id=1855190874]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -304,13 +304,13 @@ text = "拖放
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TacticTag" type="Label" parent="MiddleLayer/OfferContainer/VBox"]
+[node name="TacticTag" type="Label" parent="MiddleLayer/OfferContainer/VBox" unique_id=2000046115]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "附加姿态: [直接提交]"
 horizontal_alignment = 1
 
-[node name="BottomLayer" type="VBoxContainer" parent="."]
+[node name="BottomLayer" type="VBoxContainer" parent="." unique_id=514162390]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0
@@ -321,29 +321,29 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_constants/separation = 8
 
-[node name="HandArea" type="CenterContainer" parent="BottomLayer"]
+[node name="HandArea" type="CenterContainer" parent="BottomLayer" unique_id=771274804]
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
-[node name="HandLayout" type="HBoxContainer" parent="BottomLayer/HandArea"]
+[node name="HandLayout" type="HBoxContainer" parent="BottomLayer/HandArea" unique_id=526753906]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TacticSelector" type="HBoxContainer" parent="BottomLayer"]
+[node name="TacticSelector" type="HBoxContainer" parent="BottomLayer" unique_id=90078168]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 8
 
-[node name="BtnSimple" type="Button" parent="BottomLayer/TacticSelector"]
+[node name="BtnSimple" type="Button" parent="BottomLayer/TacticSelector" unique_id=613041573]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 tooltip_text = "不附加任何沟通姿态，直接提交提案。"
 text = "🗣️ 直接
 无修正"
 
-[node name="BtnSubstantiation" type="Button" parent="BottomLayer/TacticSelector"]
+[node name="BtnSubstantiation" type="Button" parent="BottomLayer/TacticSelector" unique_id=2048922337]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 tooltip_text = "用事实和逻辑论证提案的合理性。
@@ -351,7 +351,7 @@ tooltip_text = "用事实和逻辑论证提案的合理性。
 text = "📊 理性
 预期↓20%"
 
-[node name="BtnThreat" type="Button" parent="BottomLayer/TacticSelector"]
+[node name="BtnThreat" type="Button" parent="BottomLayer/TacticSelector" unique_id=1297339452]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 tooltip_text = "警告对方不合作的后果。
@@ -360,7 +360,7 @@ tooltip_text = "警告对方不合作的后果。
 text = "⚡ 威胁
 底线↓15"
 
-[node name="BtnRelationship" type="Button" parent="BottomLayer/TacticSelector"]
+[node name="BtnRelationship" type="Button" parent="BottomLayer/TacticSelector" unique_id=1006208995]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 tooltip_text = "强调双方的关系和长期合作。
@@ -368,7 +368,7 @@ tooltip_text = "强调双方的关系和长期合作。
 text = "💝 感情
 竞争=0"
 
-[node name="BtnApologize" type="Button" parent="BottomLayer/TacticSelector"]
+[node name="BtnApologize" type="Button" parent="BottomLayer/TacticSelector" unique_id=2139908349]
 custom_minimum_size = Vector2(100, 60)
 layout_mode = 2
 tooltip_text = "为之前的行为道歉，表达诚意。
@@ -376,38 +376,38 @@ tooltip_text = "为之前的行为道歉，表达诚意。
 text = "🙏 道歉
 焦虑↓50%"
 
-[node name="ActionButtons" type="HBoxContainer" parent="BottomLayer"]
+[node name="ActionButtons" type="HBoxContainer" parent="BottomLayer" unique_id=1778130708]
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 24
 
-[node name="SubmitBtn" type="Button" parent="BottomLayer/ActionButtons"]
+[node name="SubmitBtn" type="Button" parent="BottomLayer/ActionButtons" unique_id=1986364411]
 custom_minimum_size = Vector2(160, 48)
 layout_mode = 2
 text = "🚀 提交提案"
 
-[node name="ReactionButtons" type="HBoxContainer" parent="BottomLayer"]
+[node name="ReactionButtons" type="HBoxContainer" parent="BottomLayer" unique_id=667485071]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_constants/separation = 12
 
-[node name="BtnAccept" type="Button" parent="BottomLayer/ReactionButtons"]
+[node name="BtnAccept" type="Button" parent="BottomLayer/ReactionButtons" unique_id=2066019631]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "✅ 接受"
 
-[node name="BtnRejectSoft" type="Button" parent="BottomLayer/ReactionButtons"]
+[node name="BtnRejectSoft" type="Button" parent="BottomLayer/ReactionButtons" unique_id=220837225]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "❌ 拒绝"
 
-[node name="BtnRejectHard" type="Button" parent="BottomLayer/ReactionButtons"]
+[node name="BtnRejectHard" type="Button" parent="BottomLayer/ReactionButtons" unique_id=749954074]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "✏️ 修改"
 
-[node name="BtnWalkAway" type="Button" parent="BottomLayer/ReactionButtons"]
+[node name="BtnWalkAway" type="Button" parent="BottomLayer/ReactionButtons" unique_id=325072656]
 custom_minimum_size = Vector2(100, 40)
 layout_mode = 2
 text = "🚪 离开"
