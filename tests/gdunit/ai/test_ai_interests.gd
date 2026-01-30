@@ -1,7 +1,12 @@
 ## test_ai_interests.gd
-## Phase 3 测试：验证 AI Interest 系统对权重的动态修正
+## [DEPRECATED] Phase 3 测试：验证 AI Interest 系统对权重的动态修正
 ##
-## 测试内容：
+## ⚠️ 警告：此测试依赖已废弃的 GAP-L 模型参数（weight_greed, weight_power 等）
+## 这些参数已在 2026-01-30 的 PR 模型重构中被移除。
+## 
+## 新的 PR 模型测试请参考：tests/scripts/test_pr_model_simple.gd
+##
+## 测试内容（已过时）：
 ## - GapLAI 无 Interest 时的基础评估
 ## - 贪婪 Interest 增加 G 维度权重
 ## - 软弱 Interest 降低 P 维度权重
@@ -9,16 +14,12 @@
 extends GdUnitTestSuite
 
 
-## 辅助函数：创建测试用的 GapLAI
-func _create_ai(w_g: float = 1.0, w_p: float = 1.0) -> RefCounted:
+## 辅助函数：创建测试用的 GapLAI (PR 模型版本)
+func _create_ai(sf: float = 0.0, batna: float = 0.0) -> RefCounted:
 	var GapLAIClass: GDScript = load("res://scenes/gap_l_mvp/scripts/GapLAI.gd")
 	var ai: RefCounted = GapLAIClass.new()
-	ai.weight_greed = w_g
-	ai.weight_power = w_p
-	ai.weight_anchor = 0.0 # 简化测试，忽略 A 维度
-	ai.weight_laziness = 0.0 # 简化测试，忽略 L 维度
-	ai.base_batna = 0.0 # 任何正分都接受
-	ai.current_anchor = 0.0
+	ai.strategy_factor = sf
+	ai.base_batna = batna
 	return ai
 
 

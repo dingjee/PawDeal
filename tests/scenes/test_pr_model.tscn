@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://dqy7c4kvvmtri"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_pr_model_simple.gd" id="1_pr_test"]
+
+[node name="TestPRModel" type="Node"]
+script = ExtResource("1_pr_test")

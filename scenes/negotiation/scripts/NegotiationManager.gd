@@ -421,19 +421,21 @@ func _on_ai_sentiment_changed(new_value: float, reason: String) -> void:
 
 ## 根据提案质量和战术更新 AI 情绪
 ## 在 _evaluate_player_proposal 中调用
+## 适配 PR 模型：使用 v_self 替代旧的 G_raw/G_score
 func _update_ai_sentiment_from_proposal() -> void:
 	var breakdown: Dictionary = _last_result.get("breakdown", {})
-	var g_raw: float = breakdown.get("G_raw", 0.0)
-	var g_score: float = breakdown.get("G_score", 0.0)
+	# PR 模型核心字段
+	var v_self: float = breakdown.get("v_self", 0.0)
+	var relationship_utility: float = breakdown.get("relationship_utility", 0.0)
 	
 	# ===== 1. 根据提案质量更新情绪 =====
-	if g_raw < 0:
+	if v_self < 0:
 		# 侮辱性提案：AI 会亏损
 		ai.update_sentiment(-0.15, "侮辱性报价")
-	elif g_score > 30.0:
+	elif v_self > 30.0:
 		# 非常慷慨的提案
 		ai.update_sentiment(0.10, "慷慨的提案")
-	elif g_score > 0:
+	elif v_self > 0:
 		# 一般慷慨
 		ai.update_sentiment(0.05, "可接受的提案")
 	
@@ -441,11 +443,11 @@ func _update_ai_sentiment_from_proposal() -> void:
 	var tactic_type: int = current_tactic.act_type if current_tactic else 0
 	
 	match tactic_type:
-		8: # THREAT (威胁)
+		7: # THREAT (威胁) - ActType 枚举值已更新
 			ai.update_sentiment(-0.30, "被威胁")
-		9: # APOLOGIZE (道歉)
+		6: # APOLOGIZE (道歉)
 			ai.update_sentiment(0.15, "对方道歉")
-		6: # RELATIONSHIP (拉关系)
+		5: # RELATIONSHIP (拉关系)
 			ai.update_sentiment(0.15, "拉关系")
 	
 	# ===== 3. 回合自然衰减 =====

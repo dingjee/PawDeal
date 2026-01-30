@@ -14,42 +14,52 @@
 
 ---
 
-## 1. GAP-L 谈判系统
+## 1. PR 谈判系统 (Profit-Relationship Model)
 
-> **创建日期**: 2026-01-14 | **状态**: ✅ Phase 1 核心完成
+> **创建日期**: 2026-01-14 | **重构日期**: 2026-01-30 | **状态**: ✅ 核心完成
 
 ### 核心公式
 
 ```
-Total = (G × W_g) + (A × W_a) + (P × W_p) - L_cost
+final_utility = v_self + (v_opp × strategy_factor)
+accepted = final_utility >= effective_batna
 ```
 
-| 维度 | 含义 | 玩家影响方式 |
-|------|------|--------------|
-| **G** (Greed) | 绝对收益 | 高价值议题卡 |
-| **A** (Anchor) | 心理预期偏差 | Substantiation 降低 AI 预期 |
-| **P** (Power) | 相对优势 | Relationship 卡屏蔽 P 维度 |
-| **L** (Laziness) | 时间成本 | Press 卡加速 AI 焦虑 |
+### 核心参数
 
-### 当前实施方案
+| 参数 | 类型 | 含义 |
+|------|------|------|
+| `strategy_factor` | float (-1.0 ~ 1.0) | 策略转化率：定义 AI 性格 |
+| `base_batna` | float | 底线值 (Best Alternative To Negotiated Agreement) |
 
-**Tactic 应用**: State Snapshot + Rollback（函数式设计，无副作用）
+### strategy_factor 语义
 
-**AI 反提案**: Rule-Based Counter-Offer
-- 移除导致 G_raw < 0 的玩家卡牌
-- 从 AI Deck 添加高 G 值卡牌
+| 值 | 性格类型 | 行为描述 |
+|----|----------|----------|
+| **正数** (如 +0.8) | 合作型 | 愿意"战略性亏损"换取长期关系 |
+| **负数** (如 -0.5) | 嫉妒型 | 对手赚钱会让我不爽（零和博弈） |
+| **零** (0.0) | 冷漠型 | 完全不关心对手，只看自己赚多少 |
 
-### Tactic → GAP-L 映射表
+### 情绪修正 (Sentiment)
+
+情绪通过**加法修正** strategy_factor：
+```
+effective_sf = strategy_factor + (current_sentiment × emotional_volatility)
+```
+
+- 愤怒状态 → SF 降低 → 变嫉妒
+- 愉悦状态 → SF 增加 → 变合作
+
+### Tactic → PR 模型映射表
 
 | Tactic | 分类 | 中文 | 修正效果 |
 |--------|------|------|----------|
-| `SUBSTANTIATION` | Persuasive | 理性论证 | anchor×0.8, power×0.5 |
-| `STRESSING_POWER` | Persuasive | 展示实力 | power×0.3, batna-=5 |
-| `THREAT` | Unethical | 威胁 | batna-=15, power×2.5 |
-| `LYING` | Unethical | 欺骗 | anchor-=10 (识破：power×3) |
-| `POSITIVE_EMOTION` | Socio-emotional | 正面情绪 | anchor×0.9, power×0.7 |
-| `RELATIONSHIP` | Socio-emotional | 拉关系 | power=0, greed×0.9 |
-| `APOLOGIZE` | Socio-emotional | 道歉 | laziness×0.5 |
+| `SUBSTANTIATION` | Persuasive | 理性论证 | batna -= 5 |
+| `STRESSING_POWER` | Persuasive | 展示实力 | batna -= 8 |
+| `THREAT` | Unethical | 威胁 | sf -= 0.5, batna -= 15 |
+| `RELATIONSHIP` | Socio-emotional | 拉关系 | sf += 0.5 |
+| `POSITIVE_EMOTION` | Socio-emotional | 正面情绪 | sf += 0.2, batna -= 3 |
+| `APOLOGIZE` | Socio-emotional | 道歉 | sf += 0.3 |
 
 ---
 
@@ -157,6 +167,7 @@ GAME_END        - 游戏结束
 | 2026-01-19 | 数据层重构 Phase4 | IssueCardData 添加 get_display_dependency()/reveal_true_dependency() 迷雾方法；6/6 测试通过 |
 | 2026-01-19 | 数据层重构 Phase3 | 创建 InterestCardData；GapLAI 新增 current_interests 和 evaluate_proposal()；权重乘法叠加；4/4 测试通过 |
 | 2026-01-19 | Mesh Feathering V2 | **A2 Bevel Join 方案**：废弃不稳定的 `Geometry2D.offset_polygon`，改用叉积判断凹凸角。凹角使用边法线形成 Bevel（两个外扩点），凸角使用平均法线 + Miter 校正。无外部依赖，100% 稳定。Ref: `CornerFeatherDealer._update_feather_mesh`. |
+| 2026-01-30 | **PR 模型重构** | **废弃 GAP-L 四维度模型**，改用 PR (Profit-Relationship) 统一价值坐标系。核心公式：`final_utility = v_self + (v_opp × strategy_factor)`。`strategy_factor` 正数=合作型（愿意战略性亏损），负数=嫉妒型（零和博弈），零=冷漠理性型。情绪通过加法修正 strategy_factor。移除 weight_greed/anchor/power/laziness，新增 strategy_factor + base_batna 两个核心参数。战术映射更新：威胁降低 SF，拉关系增加 SF，理性论证降低 BATNA。|
 
 ---
 

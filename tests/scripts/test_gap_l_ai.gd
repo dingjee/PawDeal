@@ -1,8 +1,18 @@
 ## test_gap_l_ai.gd
-## GAP-L 效用模型的测试脚本（重构版 - L 维度时间成本）
-## 验证模型在不同情况下的决策行为，特别是 L 维度的连续公式
+## [DEPRECATED] GAP-L 效用模型的测试脚本（重构版 - L 维度时间成本）
 ##
-## 测试场景：
+## ⚠️ 警告：此测试依赖已废弃的 GAP-L 模型参数：
+## - weight_greed, weight_anchor, weight_power, weight_laziness
+## - neutral_greed, fatigue_scale, max_patience_rounds
+## 这些参数已在 2026-01-30 的 PR 模型重构中被移除。
+##
+## 新的 PR 模型使用两个核心参数：
+## - strategy_factor: 策略转化率（正=合作，负=嫉妒，零=理性）
+## - base_batna: 底线值
+##
+## 新的测试请参考：tests/scripts/test_pr_model_simple.gd
+##
+## 测试场景（已过时）：
 ## 1. 基础场景：简单高效的贸易采购 - 验证 G、P 维度正常工作
 ## 2. 基础场景：对手获利更多 - 验证 P 维度拒绝逻辑
 ## 3. 高贪婪型 AI：第 1 轮通过，第 10 轮拒绝（涨价心理）

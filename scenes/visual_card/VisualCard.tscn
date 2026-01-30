@@ -102,7 +102,7 @@ shader_parameter/linear_angle = 270.0
 shader_parameter/linear_scale = 3.615
 shader_parameter/linear_offset = 0.0
 shader_parameter/radial_enabled = true
-shader_parameter/radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+shader_parameter/radial_center_color = Color(1, 0.68333334, 0, 0.84705883)
 shader_parameter/radial_edge_color = Color(1, 1, 1, 0)
 shader_parameter/radial_center = Vector2(0.5, 0)
 shader_parameter/radial_radius = 1.258
@@ -128,15 +128,15 @@ _surfaces = [{
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_0voqr"]
 _surfaces = [{
-"aabb": AABB(-14.5371, -14.721569, 0, 1312.3323, 494.5848, 1e-05),
-"attribute_data": PackedByteArray("/////0OwRzzm3Go//////+DrjTwG5XM/////AAHNKznuNmw/////ALpcDDzApXk//////xiE+TwsrHc/////ANSh5Tw/x38//////5kzeD+Dunc/////AHjSeD+y1X8//////zmQez9m9HM/////AOXNfT/PtXk//////z/hfD9z7Wo/////ACn1fz8iSWw//////+K3eT8kR6I9////AP3BfD+9VJM9/////75LeD/VOzw9////AFV3ej9fTbo8/////6AJdT/SVwQ9////AOWhdT9mUxs6/////3l9MD1rNgs9////ANvrJj2ILBU7/////7fe+Dy1I0M9////APdmszyAKcg8/////1Viyzy6pKU9////AKpEVDxFqJY9"),
+"aabb": AABB(-14.871962, -15.017139, 0, 1313.0012, 495.20035, 1e-05),
+"attribute_data": PackedByteArray("/////0OwRzzm3Go//////+DrjTwG5XM/////AMBXv7hGPmw/////AHkDADyAJHo//////xiE+TwsrHc/////AOE55Tyg8X8//////5kzeD+Dunc/////ALbVeD8FAIA//////zmQez9m9HM/////ADv/fT+INHo//////z/hfD9z7Wo/////AOsCgD9+UGw//////+K3eT8kR6I9////ABPQfD9/D5M9/////75LeD/VOzw9////ADKjej8lSqs8/////6AJdT/SVwQ9////AMKkdT/pCpK2/////3l9MD1rNgs9////AOq9Jj1vZdw6/////7fe+Dy1I0M9////AL3urTxqMbk8/////1Viyzy6pKU9////AHvDUDwkY5Y9"),
 "format": 34359742489,
 "index_count": 72,
 "index_data": PackedByteArray("AAABAAIAAQADAAIAAQAEAAMABAAFAAMABAAGAAUABgAHAAUABgAIAAcACAAJAAcACAAKAAkACgALAAkACgAMAAsADAANAAsADAAOAA0ADgAPAA0ADgAQAA8AEAARAA8AEAASABEAEgATABEAEgAUABMAFAAVABMAFAAWABUAFgAXABUAFgAAABcAAAACABcA"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
 "vertex_count": 24,
-"vertex_data": PackedByteArray("YLifP+Ol20MAAAAAdLP/QCNi5EMAAAAA9pdowZD03EMAAAAASF1gwIjy6UMAAAAAddzJQYwJ6EMAAAAAwl6wQYbg70MAAAAAtECdRGoX6EMAAAAAiqadRH/u70MAAAAAXWifRAFx5EMAAAAAFtigRBAC6kMAAAAAZUCgROW120MAAAAAcjmiRCsG3UMAAAAAmDmeRPzIwUEAAAAAXCygRFLfpEEAAAAALlCdRCS/90AAAAAAULSeRIw0cMAAAAAAgzmbRAAqfD8AAAAAHpubRIyLa8EAAAAAQkAnQjBj6D8AAAAA2/saQnY0XsEAAAAAcgjJQUo7CUEAAAAAd/NfQciVOsAAAAAAY7iOQZ1LyEEAAAAAYF4QQH5Oq0EAAAAA")
+"vertex_data": PackedByteArray("YLifP+Ol20MAAAAAdLP/QCNi5EMAAAAAjvNtwar73EMAAAAAEtiPwB9t6kMAAAAAddzJQYwJ6EMAAAAAftmvQYMJ8EMAAAAAtECdRGoX6EMAAAAAnqidRHMX8EMAAAAAXWifRAFx5EMAAAAAtvegRKF86kMAAAAAZUCgROW120MAAAAAI0SiREkN3UMAAAAAmDmeRPzIwUEAAAAAYzWgRGJZpEEAAAAALlCdRCS/90AAAAAAbtCeRHwklcAAAAAAgzmbRAAqfD8AAAAA9JybRDRGcMEAAAAAQkAnQjBj6D8AAAAA9cAaQsLqYsEAAAAAcgjJQUo7CUEAAAAAS+1RQRx/dMAAAAAAY7iOQZ1LyEEAAAAASMv8P8bIqkEAAAAA")
 }]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_u3tdm"]
@@ -171,7 +171,7 @@ shader_parameter/noise_strength = 0.8
 shader_parameter/edge_hardness = 2.0
 shader_parameter/noise_speed = 0.04
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_spiiw"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_cvbkr"]
 _surfaces = [{
 "aabb": AABB(-182.94363, 116.23123, 0, 509.1837, 221.92892, 1e-05),
 "attribute_data": PackedByteArray("/////zCfAT+1Ggw//////8QYMD4jlyM//////3lLKz4vsSw//////wEUMz4cdTU//////3snRT75TTs//////9gi/j5GHjo//////5RXAj8AcDs//////7+1BT8ODzs//////zDWCD8RBTk//////5AFUD+Scio///////vNUz+BLyQ//////yItVT9VwRs//////07IUz+LVRM///////K8QT80qJk+/////6vCPD+uOYs+/////+ETNj//H4k+/////5dRMD+uLpQ+/////7hmCj8hTCE//////9CRBT/layY//////1iO/z5ywyY//////4ty9T4fOSI//////+SVpD51E6Y+/////3zgmD58epw+/////4Tfiz7Gpp8+/////1Z7gj7DZa4+"),
@@ -184,7 +184,7 @@ _surfaces = [{
 "vertex_data": PackedByteArray("4f2YQhvLeUMAAAAA+1ozw+LRkkMAAAAAkvE2w+FQm0MAAAAApyAxw3t/o0MAAAAAxZ4jw7z0qEMAAAAArrmJQj/Zp0MAAAAAK0ydQoAUqUMAAAAANm6xQgG6qEMAAAAAPx/EQsHSpkMAAAAAomqbQ4E4mUMAAAAA7hGhQx1gk0MAAAAAuh6jQ46Bi0MAAAAAcwmhQzmlg0MAAAAA1BGGQ8WpA0MAAAAA2EJ9QzJi7EIAAAAASklpQ2R26EIAAAAAoxJYQwQb/UIAAAAAoXnNQvCtkEMAAAAAaZewQmp2lUMAAAAAKviNQiPIlUMAAAAAeYJfQimLkUMAAAAA/PCBwnVBD0MAAAAAOvCkwvxLBkMAAAAAhc7LwjhCCUMAAAAAnODnwgAGF0MAAAAA")
 }]
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_6e5o0"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_is021"]
 _surfaces = [{
 "aabb": AABB(-315.63797, -15.286072, 0, 774.2225, 482.5636, 1e-05),
 "attribute_data": PackedByteArray("/////8QYMD4jlyM//////3lLKz4vsSw/////AD+7Qzw5WA4/////AGMHybt2cDE//////wEUMz4cdTU/////AIVkBz3+oV4//////3snRT75TTs/////ADZOCT6ZDIA//////9gi/j5GHjo/////AAXt8z4Bw34//////5RXAj8AcDs/////APEK/T6cTIA//////7+1BT8ODzs/////AACIDz+Sr34//////zDWCD8RBTk/////AC/QEz+65Hs//////5AFUD+Scio/////AHdbZD/EZ2s///////vNUz+BLyQ/////AKZoej8D50Y//////yItVT9VwRs/////AAu6gD8emxs//////07IUz+LVRM/////ANJ2fD/Z7Po+//////K8QT80qJk+////AG6uZT/wxBE+/////6vCPD+uOYs+////AOoETz/awWU8/////+ETNj//H4k+////AGQvLD+1J/G7/////5dRMD+uLpQ+////AHFrEj8tz7Y9/////7hmCj8hTCE/////AFfc1z7Pvt4+/////9CRBT/layY/////APvq7z5qO8U+/////1iO/z5ywyY/////AGE7Cj/4EsM+/////4ty9T4fOSI/////AIa/Fj+Zj9k+/////+SVpD51E6Y+////AF2P2z6gWOQ9/////3zgmD58epw+////ADhNpz6EAeQ8/////4Tfiz7Gpp8+////ANRHRz6/FHY9/////1Z7gj7DZa4+////AJ1s6z3hmD0+"),
@@ -248,7 +248,7 @@ linear_start_color = Color(1, 0.33333334, 0, 0)
 linear_end_color = Color(1, 0.33333334, 0, 1)
 linear_angle = 270.0
 linear_scale = 3.615
-radial_center_color = Color(1, 0.68333334, 0, 0.7058824)
+radial_center_color = Color(1, 0.68333334, 0, 0.84705883)
 radial_center = Vector2(0.5, 0)
 radial_radius = 1.258
 noise_speed = 0.01
@@ -279,12 +279,12 @@ noise_frequency = 0.5
 
 [node name="ShapeMesh" type="MeshInstance2D" parent="CardPolygon/CornerFeatherDealer"]
 material = SubResource("ShaderMaterial_ge2l5")
-mesh = SubResource("ArrayMesh_spiiw")
+mesh = SubResource("ArrayMesh_cvbkr")
 
 [node name="FeatherMesh" type="MeshInstance2D" parent="CardPolygon/CornerFeatherDealer"]
 show_behind_parent = true
 material = SubResource("ShaderMaterial_ge2l5")
-mesh = SubResource("ArrayMesh_6e5o0")
+mesh = SubResource("ArrayMesh_is021")
 
 [node name="FPSLabel" type="Label" parent="."]
 offset_right = 150.0

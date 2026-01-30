@@ -185,25 +185,23 @@ func _ready() -> void:
 
 ## ===== 初始化方法 =====
 
-## 初始化预设战术
+## 初始化预设战术（使用 PR 模型参数）
 func _init_tactic_presets() -> void:
-	# 创建各种预设战术
+	# 创建各种预设战术（PR 模型：strategy_factor, base_batna）
 	_tactic_presets = [
 		_create_tactic("tactic_simple", "直接提交", 0, []),
 		_create_tactic("tactic_substantiation", "理性分析", 1, [
-			{"target": "weight_anchor", "op": "multiply", "val": 0.8},
-			{"target": "weight_power", "op": "multiply", "val": 0.5}
+			{"target": "base_batna", "op": "add", "val": - 5.0} # 降低底线
 		]),
 		_create_tactic("tactic_threat", "威胁施压", 7, [
-			{"target": "base_batna", "op": "add", "val": - 15.0},
-			{"target": "weight_power", "op": "multiply", "val": 2.5}
+			{"target": "strategy_factor", "op": "add", "val": - 0.5}, # 让 AI 变嫉妒
+			{"target": "base_batna", "op": "add", "val": - 15.0} # 大幅降低底线
 		]),
 		_create_tactic("tactic_relationship", "打感情牌", 5, [
-			{"target": "weight_power", "op": "set", "val": 0.0},
-			{"target": "weight_greed", "op": "multiply", "val": 0.9}
+			{"target": "strategy_factor", "op": "add", "val": 0.5} # 让 AI 变合作
 		]),
 		_create_tactic("tactic_apologize", "道歉示弱", 6, [
-			{"target": "weight_laziness", "op": "multiply", "val": 0.5}
+			{"target": "strategy_factor", "op": "add", "val": 0.3} # 提升合作意愿
 		]),
 	]
 	# 设置默认战术
@@ -836,25 +834,29 @@ func _apply_card_style(card_ui: Control, border_color: Color, tooltip: String) -
 
 
 ## 更新心理仪表盘（调试用，UI 已隐藏）
+## 适配 PR 模型：使用 v_self 和 relationship_utility
 func _update_psych_meters(breakdown: Dictionary) -> void:
-	# 输出调试日志
-	print("[DEBUG GAP-L] G_score=%.2f, A_gap=%.2f, P_score=%.2f" % [
-		breakdown.get("G_score", 0.0),
-		breakdown.get("gap_from_anchor", 0.0),
-		breakdown.get("P_score", 0.0)
+	# 输出调试日志（PR 模型字段）
+	var v_self: float = breakdown.get("v_self", 0.0)
+	var v_opp: float = breakdown.get("v_opp", 0.0)
+	var rel_util: float = breakdown.get("relationship_utility", 0.0)
+	var sf: float = breakdown.get("strategy_factor", 0.0)
+	
+	print("[DEBUG PR] v_self=%.2f, v_opp=%.2f, rel_util=%.2f, sf=%.2f" % [
+		v_self, v_opp, rel_util, sf
 	])
 	
-	# G: 贪婪度 - 基于 G_score 相对于范围的百分比
-	var g_normalized: float = clampf(breakdown["G_score"] / 100.0, 0.0, 1.0) * 100.0
+	# 映射到调试仪表盘（Greed -> v_self, Power -> rel_util）
+	# Greed bar: 显示我方收益
+	var g_normalized: float = clampf(v_self / 100.0, 0.0, 1.0) * 100.0
 	greed_bar.value = g_normalized
 	
-	# A: 锚定值 - 基于与锚点的差距
-	var gap: float = breakdown.get("gap_from_anchor", 0.0)
-	var a_normalized: float = clampf((gap + 50.0) / 100.0, 0.0, 1.0) * 100.0
-	anchor_bar.value = a_normalized
+	# Anchor bar: 显示 strategy_factor（-1~1 映射到 0~100）
+	var sf_normalized: float = (sf + 1.0) / 2.0 * 100.0
+	anchor_bar.value = sf_normalized
 	
-	# P: 权力欲 - 基于 P_score
-	var p_normalized: float = clampf((breakdown["P_score"] + 50.0) / 100.0, 0.0, 1.0) * 100.0
+	# Power bar: 显示关系效用（可能为负）
+	var p_normalized: float = clampf((rel_util + 50.0) / 100.0, 0.0, 1.0) * 100.0
 	power_bar.value = p_normalized
 
 
