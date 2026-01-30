@@ -1,8 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bst3j8grnhxwy"]
-
-[ext_resource type="Script" path="res://tests/scripts/test_sentiment_system.gd" id="1_test"]
-
-[node name="TestSentimentSystem" type="Node"]
-script = ExtResource("1_test")
-auto_exit = true
-snapshot_delay_frames = 3
