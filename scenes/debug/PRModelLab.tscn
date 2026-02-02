@@ -1,0 +1,259 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7prmodellabscn"]
+
+[ext_resource type="Script" path="res://scenes/debug/PRModelLab.gd" id="1_script"]
+
+[node name="PRModelLab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer"]
+custom_minimum_size = Vector2(280, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "🧠 AI 脑图 (The Brain)"
+horizontal_alignment = 1
+
+[node name="StrategyFactorGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SFLabel" type="Label" parent="HSplitContainer/LeftPanel/StrategyFactorGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+text = "性格倾向 (Strategy Factor)"
+
+[node name="SFSlider" type="HSlider" parent="HSplitContainer/LeftPanel/StrategyFactorGroup"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+min_value = -1.0
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="SFValueLabel" type="Label" parent="HSplitContainer/LeftPanel/StrategyFactorGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "0.50: 合作型 🤝"
+horizontal_alignment = 1
+
+[node name="BATNAGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BATNALabel" type="Label" parent="HSplitContainer/LeftPanel/BATNAGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
+text = "心理底线 (BATNA)"
+
+[node name="BATNASlider" type="HSlider" parent="HSplitContainer/LeftPanel/BATNAGroup"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+min_value = -50.0
+max_value = 200.0
+step = 5.0
+value = 0.0
+
+[node name="BATNAValueLabel" type="Label" parent="HSplitContainer/LeftPanel/BATNAGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "底线: 0.0"
+horizontal_alignment = 1
+
+[node name="SentimentGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SentimentLabel" type="Label" parent="HSplitContainer/LeftPanel/SentimentGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 1, 0.8, 1)
+text = "情绪状态 (Sentiment)"
+
+[node name="SentimentSlider" type="HSlider" parent="HSplitContainer/LeftPanel/SentimentGroup"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+min_value = -1.0
+max_value = 1.0
+step = 0.05
+value = 0.0
+
+[node name="SentimentValueLabel" type="Label" parent="HSplitContainer/LeftPanel/SentimentGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "😐 0.00 (中立)"
+horizontal_alignment = 1
+
+[node name="VolatilityGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="VolatilityLabel" type="Label" parent="HSplitContainer/LeftPanel/VolatilityGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 1, 1)
+text = "情绪敏感度 (Volatility)"
+
+[node name="VolatilitySlider" type="HSlider" parent="HSplitContainer/LeftPanel/VolatilityGroup"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.05
+value = 0.5
+
+[node name="VolatilityValueLabel" type="Label" parent="HSplitContainer/LeftPanel/VolatilityGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "敏感度: 0.50"
+horizontal_alignment = 1
+
+[node name="CenterPanel" type="VBoxContainer" parent="HSplitContainer"]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/CenterPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+text = "📝 提案构造器 (The Offer)"
+horizontal_alignment = 1
+
+[node name="SliderContainer" type="HBoxContainer" parent="HSplitContainer/CenterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="ProfitGroup" type="VBoxContainer" parent="HSplitContainer/CenterPanel/SliderContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PLabel" type="Label" parent="HSplitContainer/CenterPanel/SliderContainer/ProfitGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+text = "我方收益 (P)"
+horizontal_alignment = 1
+
+[node name="PSlider" type="VSlider" parent="HSplitContainer/CenterPanel/SliderContainer/ProfitGroup"]
+custom_minimum_size = Vector2(40, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+min_value = -200.0
+max_value = 200.0
+step = 5.0
+value = 50.0
+
+[node name="PValueLabel" type="Label" parent="HSplitContainer/CenterPanel/SliderContainer/ProfitGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "P: 50.0"
+horizontal_alignment = 1
+
+[node name="RelationshipGroup" type="VBoxContainer" parent="HSplitContainer/CenterPanel/SliderContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="RLabel" type="Label" parent="HSplitContainer/CenterPanel/SliderContainer/RelationshipGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "对方收益 (R)"
+horizontal_alignment = 1
+
+[node name="RSlider" type="VSlider" parent="HSplitContainer/CenterPanel/SliderContainer/RelationshipGroup"]
+custom_minimum_size = Vector2(40, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+min_value = -200.0
+max_value = 200.0
+step = 5.0
+value = 30.0
+
+[node name="RValueLabel" type="Label" parent="HSplitContainer/CenterPanel/SliderContainer/RelationshipGroup"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 18
+text = "R: 30.0"
+horizontal_alignment = 1
+
+[node name="FormulaDisplay" type="RichTextLabel" parent="HSplitContainer/CenterPanel"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[center][b]═══ PR 效用公式 ═══[/b][/center]
+
+等待计算..."
+scroll_active = false
+
+[node name="SubmitButton" type="Button" parent="HSplitContainer/CenterPanel"]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.1, 0.1, 0.15, 1)
+theme_override_colors/font_hover_color = Color(0.1, 0.1, 0.15, 1)
+theme_override_font_sizes/font_size = 18
+text = "🤝 提交提案"
+
+[node name="RightPanel" type="VBoxContainer" parent="HSplitContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/RightPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.5, 1)
+theme_override_font_sizes/font_size = 20
+text = "📜 历史观测台 (The Log)"
+horizontal_alignment = 1
+
+[node name="HistoryLog" type="RichTextLabel" parent="HSplitContainer/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray][i]等待首次提交...[/i][/color]"
+scroll_active = true
+
+[node name="ScreenFlash" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 1, 0, 0.4)
