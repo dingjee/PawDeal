@@ -1,0 +1,306 @@
+[gd_scene format=3 uid="uid://nnri3arcly3b"]
+
+[ext_resource type="Script" uid="uid://bwd3c71wnqwxn" path="res://scenes/debug/VectorNegotiationLab.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://pln854e0aaos" path="res://scenes/debug/VectorFieldPlot.gd" id="2_plot"]
+
+[node name="VectorNegotiationLab" type="Control" unique_id=1725840036]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1117223531]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.06, 0.1, 1)
+
+[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=1740133306]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offsets = PackedInt32Array(0, 0)
+
+[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=254045962]
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 18
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/LeftPanel" unique_id=1595577994]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "⚡ 动力室 (Dynamics)"
+horizontal_alignment = 1
+
+[node name="TimeScaleGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=1596806308]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TimeScaleLabel" type="Label" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=603479636]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+text = "⏱️ 时间流速"
+
+[node name="TimeScaleSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=753952313]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+max_value = 5.0
+step = 0.1
+value = 1.0
+
+[node name="TimeScaleValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=995094986]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "时间流速: 1.0x"
+horizontal_alignment = 1
+
+[node name="GreedGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=551069458]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GreedLabel" type="Label" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=1069180380]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
+text = "💰 贪婪因子 (曲线曲率)"
+
+[node name="GreedSlider" type="HSlider" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=1896834616]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+min_value = 0.2
+max_value = 3.0
+step = 0.1
+value = 1.0
+
+[node name="GreedValueLabel" type="Label" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=1221227472]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "贪婪因子: 1.00 (均衡)"
+horizontal_alignment = 1
+
+[node name="TargetPGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=289249211]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TargetPLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=1402133596]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+text = "🎯 目标利润 (Target P)"
+
+[node name="TargetPSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=1190438815]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+min_value = -100.0
+max_value = 200.0
+step = 5.0
+value = 100.0
+
+[node name="TargetPValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=1122975900]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "目标利润: 100"
+horizontal_alignment = 1
+
+[node name="TargetRGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=776161698]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TargetRLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=105594102]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
+text = "🎯 目标关系 (Target R)"
+
+[node name="TargetRSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=515252889]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+min_value = -100.0
+max_value = 200.0
+step = 5.0
+value = 80.0
+
+[node name="TargetRValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=715137091]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "目标关系: 80"
+horizontal_alignment = 1
+
+[node name="ThresholdGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=404220223]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ThresholdLabel" type="Label" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=1722055426]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.5, 1)
+text = "🔘 成交阈值 (Acceptance)"
+
+[node name="ThresholdSlider" type="HSlider" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=465002127]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+min_value = 10.0
+step = 5.0
+value = 40.0
+
+[node name="ThresholdValueLabel" type="Label" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=1113245286]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "成交阈值: 40"
+horizontal_alignment = 1
+
+[node name="ActiveStrengthGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=636189191]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ActiveStrengthLabel" type="Label" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=198608642]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.7, 1)
+text = "🤖 AI 主动性 (Active Strength)"
+
+[node name="ActiveStrengthSlider" type="HSlider" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=1209494844]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+step = 5.0
+value = 30.0
+
+[node name="ActiveStrengthValueLabel" type="Label" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=1983574866]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "主动性: 30"
+horizontal_alignment = 1
+
+[node name="CenterPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=222745476]
+custom_minimum_size = Vector2(450, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/CenterPanel" unique_id=1124612680]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "📡 向量雷达 (Vector Radar)"
+horizontal_alignment = 1
+
+[node name="VectorFieldPlot" type="Control" parent="HSplitContainer/CenterPanel" unique_id=125832271]
+custom_minimum_size = Vector2(400, 350)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_plot")
+
+[node name="StatusLabel" type="RichTextLabel" parent="HSplitContainer/CenterPanel" unique_id=1479117537]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+bbcode_enabled = true
+text = "[center][b]═══ 态势分析 ═══[/b][/center]
+
+等待初始化..."
+scroll_active = false
+
+[node name="ButtonContainer" type="HBoxContainer" parent="HSplitContainer/CenterPanel" unique_id=930867786]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SubmitButton" type="Button" parent="HSplitContainer/CenterPanel" unique_id=1551996639]
+custom_minimum_size = Vector2(180, 45)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 16
+text = "🤝 提交提案"
+
+[node name="ResetButton" type="Button" parent="HSplitContainer/CenterPanel" unique_id=1311171562]
+custom_minimum_size = Vector2(120, 35)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 14
+text = "🔄 重置"
+
+[node name="RightPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=1413316093]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="HSplitContainer/RightPanel" unique_id=6027820]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7, 0.4, 1)
+theme_override_font_sizes/font_size = 18
+text = "📊 示波器 (Oscilloscope)"
+horizontal_alignment = 1
+
+[node name="PressureGroup" type="VBoxContainer" parent="HSplitContainer/RightPanel" unique_id=358750809]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PressureLabel" type="Label" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=1710817073]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.5, 0.3, 1)
+text = "🌡️ 压力 (Pressure)"
+
+[node name="PressureBar" type="ProgressBar" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=13057661]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = false
+
+[node name="PressureValueLabel" type="Label" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=1900650415]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "0 / 100"
+horizontal_alignment = 1
+
+[node name="SatisfactionGroup" type="VBoxContainer" parent="HSplitContainer/RightPanel" unique_id=884237262]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SatisfactionLabel" type="Label" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=2065697610]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+text = "😊 满意度 (Satisfaction)"
+
+[node name="SatisfactionBar" type="ProgressBar" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=440754441]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+value = 50.0
+show_percentage = false
+
+[node name="SatisfactionValueLabel" type="Label" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=979037549]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "50%"
+horizontal_alignment = 1
+
+[node name="LogLabel" type="Label" parent="HSplitContainer/RightPanel" unique_id=1179221667]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.6, 1)
+text = "📜 交易日志"
+
+[node name="HistoryLog" type="RichTextLabel" parent="HSplitContainer/RightPanel" unique_id=687533955]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "[color=gray][i]等待首次提交...[/i][/color]"
+
+[node name="ScreenFlash" type="ColorRect" parent="." unique_id=1763596620]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 1, 0, 0.4)

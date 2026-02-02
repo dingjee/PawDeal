@@ -168,6 +168,8 @@ GAME_END        - 游戏结束
 | 2026-01-19 | 数据层重构 Phase3 | 创建 InterestCardData；GapLAI 新增 current_interests 和 evaluate_proposal()；权重乘法叠加；4/4 测试通过 |
 | 2026-01-19 | Mesh Feathering V2 | **A2 Bevel Join 方案**：废弃不稳定的 `Geometry2D.offset_polygon`，改用叉积判断凹凸角。凹角使用边法线形成 Bevel（两个外扩点），凸角使用平均法线 + Miter 校正。无外部依赖，100% 稳定。Ref: `CornerFeatherDealer._update_feather_mesh`. |
 | 2026-01-30 | **PR 模型重构** | **废弃 GAP-L 四维度模型**，改用 PR (Profit-Relationship) 统一价值坐标系。核心公式：`final_utility = v_self + (v_opp × strategy_factor)`。`strategy_factor` 正数=合作型（愿意战略性亏损），负数=嫉妒型（零和博弈），零=冷漠理性型。情绪通过加法修正 strategy_factor。移除 weight_greed/anchor/power/laziness，新增 strategy_factor + base_batna 两个核心参数。战术映射更新：威胁降低 SF，拉关系增加 SF，理性论证降低 BATNA。|
+| 2026-02-02 | **PRModelLab** | 创建 `scenes/debug/PRModelLab.tscn` PR 模型调试场景。三栏布局：左=AI 脑图(SF/BATNA/Sentiment/Volatility 滑条)、中=提案构造器(P/R 垂直滑条+公式实时预览)、右=历史日志。实时预览循环(不改状态) + 提交执行循环(触发情绪演化)。情绪更新通过信号同步 UI。|
+| 2026-02-02 | **VectorNegotiationLab** | 创建 `scenes/debug/VectorNegotiationLab.tscn` 向量场谈判物理引擎。**设计哲学**：将谈判视为物理过程（弹簧/引力/阻尼）。**核心组件**：VectorDecisionEngine（纯数学计算）+ VectorFieldPlot（2D 自定义绘图）。**功能**：等效用曲线(满意度等高线)、可拖拽当前提案点、决策向量(AI修正意图)、压力系统(_process自动增长)、成交区域可视化。**测试通过**：3张快照验证(初始/参数修改/多轮提交)。|
 
 ---
 
