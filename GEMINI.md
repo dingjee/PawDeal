@@ -22,7 +22,7 @@
 
 ## 3. ENV & TOOLS
 * **Godot Bin**:
-    * Win: `D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe`
+    * Win: `D:\Software\Godot\Godot_v4.6-stable_win64_console.exe`
     * Mac: `/Applications/Godot.app/Contents/MacOS/Godot`
 * **Wrapper**: `.\tests\run_test.{bat|sh} <scene_path> [--gui]`
     * Default: `--headless` (Logic). Use `--gui` for UI Snapshots.
