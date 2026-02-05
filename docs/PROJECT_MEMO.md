@@ -171,10 +171,67 @@ GAME_END        - 游戏结束
 | 2026-02-02 | **PRModelLab** | 创建 `scenes/debug/PRModelLab.tscn` PR 模型调试场景。三栏布局：左=AI 脑图(SF/BATNA/Sentiment/Volatility 滑条)、中=提案构造器(P/R 垂直滑条+公式实时预览)、右=历史日志。实时预览循环(不改状态) + 提交执行循环(触发情绪演化)。情绪更新通过信号同步 UI。|
 | 2026-02-02 | **VectorNegotiationLab** | 创建 `scenes/debug/VectorNegotiationLab.tscn` 向量场谈判物理引擎。**设计哲学**：将谈判视为物理过程（弹簧/引力/阻尼）。**核心组件**：VectorDecisionEngine（纯数学计算）+ VectorFieldPlot（2D 自定义绘图）。**功能**：等效用曲线(满意度等高线)、可拖拽当前提案点、决策向量(AI修正意图)、压力系统(_process自动增长)、成交区域可视化。**测试通过**：3张快照验证(初始/参数修改/多轮提交)。|
 | 2026-02-04 | **AI 4-Layer Pipeline** | 实现 `scenes/negotiation_ai/` 下的 4 层管线：Encoder, Engine, Brain, Decoder。解决 Godot 4.6 CLI 环境下的类缓存加载问题（改用动态 preloading）。验证了物理接受逻辑和压力/急躁度触发机制。测试通过：`tests/gdunit/scenes/negotiation_ai/test_negotiation_agent.gd`。|
+| 2026-02-05 | **Physics Action Cards** | **扩展 ActionCardData** 支持 PR 物理模型。新增：TacticType 枚举(6类 NegotiAct)、即时物理冲击(impact_profit/relationship/pressure)、场扭曲效果(fog_of_war/force_multiplier/mod_greed_factor/jitter)。创建 **NegotiationCardLibrary** 静态工厂，包含 15 张卡牌（A/D/I/E/U 五大分类）。提供 `apply_card_effect()` 函数直接操控 NegotiationPhysicsEngine。|
+| 2026-02-05 | **PipelineLab Card UI** | 升级 **NegotiationPipelineLab** 为卡牌测试台。**布局**：VBoxContainer 根节点，上部 DebugDashboard(70%)，下部 CardDeckPanel(30%) 含可滚动卡牌库。**交互**：双击卡牌激活→调用 CardLibrary.apply_card_effect()→即时更新向量图。**场扭曲可视化**：VectorFieldPlot 新增 fog_of_war(隐藏目标点)、jitter(抖动效果)、target_revealed(金色高亮)。**状态追踪**：force_multiplier 持久化，成交/重置时清除。|
 
 ---
 
-## 6. 在场合成系统 (On-Table Synthesis)
+## 6. Physics-Driven Action Cards (物理驱动动作卡系统)
+
+> **创建日期**: 2026-02-05 | **状态**: ✅ 核心完成
+
+### 设计哲学
+
+**卡牌即物理操控器** - 每张卡牌不是"加数字"，而是"操控物理引擎"。
+
+| 概念 | 物理类比 | 游戏机制 |
+|------|----------|----------|
+| **impact_profit** | Y 轴瞬时力 | 推动提案向利润方向移动 |
+| **impact_relationship** | X 轴瞬时力 | 推动提案向关系方向移动 |
+| **impact_pressure** | 温度调节 | 加压/减压，影响决策阈值 |
+| **fog_of_war** | 隐藏引力源 | 玩家看不到 AI 目标点 |
+| **force_multiplier** | 漂移速度倍增 | AI 更急切或更淡定 |
+| **mod_greed_factor** | 等效用曲线形变 | 改变 AI 对利润/关系的权重 |
+| **jitter_enabled** | 向量噪声 | 制造混乱，干扰判断 |
+
+### NegotiAct 卡牌分类
+
+| Category | 代码前缀 | 设计理念 | 示例卡牌 |
+|----------|----------|----------|----------|
+| **Avoidance** | A | 回避/防御/重置 | 转移话题、沉默以对 |
+| **Distributive** | D | 分配/进攻/施压 | 最后通牒、极端锚定 |
+| **Integrative** | I | 整合/信息/共赢 | 坦诚相告、捆绑交易 |
+| **Emotional** | E | 社交情感/润滑剂 | 恭维、佯装离场 |
+| **Unethical** | U | 非道德/设局/陷阱 | 虚张声势、欲擒故纵 |
+
+### 核心 API
+
+```gdscript
+# 获取所有卡牌
+var cards = NegotiationCardLibrary.get_all_cards()
+
+# 按分类获取
+var attack_cards = NegotiationCardLibrary.get_cards_by_category("D")
+
+# 按编码获取单张
+var ultimatum = NegotiationCardLibrary.get_card_by_code("D01")
+
+# 应用卡牌效果到物理引擎
+var result = NegotiationCardLibrary.apply_card_effect(card, engine, current_offer)
+# result = {new_offer, fog_enabled, jitter_enabled, log_message, ...}
+```
+
+### 相关文件
+
+```
+scenes/negotiation/resources/ActionCardData.gd   # 扩展：TacticType + Physics 字段
+scenes/negotiation/scripts/NegotiationCardLibrary.gd  # 静态工厂 (15 张卡)
+scenes/negotiation_ai/NegotiationPhysicsEngine.gd  # 被操控的物理引擎
+```
+
+---
+
+## 7. 在场合成系统 (On-Table Synthesis)
 
 > **创建日期**: 2026-01-18 | **状态**: ✅ 核心完成
 

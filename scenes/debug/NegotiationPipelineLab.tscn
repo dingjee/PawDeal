@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://tjub0a6f80l2" path="res://scenes/debug/NegotiationPipelineLab.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://pln854e0aaos" path="res://scenes/debug/VectorFieldPlot.gd" id="2_plot"]
 
-[node name="NegotiationPipelineLab" type="Control" unique_id=1345925453]
+[node name="NegotiationPipelineLab" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1495576322]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,7 +21,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.08, 0.12, 1)
 
-[node name="HSplitContainer" type="HSplitContainer" parent="." unique_id=2009069355]
+[node name="MainVBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,53 +32,58 @@ offset_right = -15.0
 offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="DebugDashboard" type="HSplitContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.5
 split_offsets = PackedInt32Array(0, 0)
 
-[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=171477757]
+[node name="LeftPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
 custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 18
 
-[node name="TitleLabel" type="Label" parent="HSplitContainer/LeftPanel" unique_id=2075663340]
+[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.6, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "🧠 AI Core Config"
 horizontal_alignment = 1
 
-[node name="TimeScaleGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=1219955219]
+[node name="TimeScaleGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TimeScaleLabel" type="Label" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=91945699]
+[node name="TimeScaleLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
 text = "⏱️ 时间流速"
 
-[node name="TimeScaleSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=769653578]
+[node name="TimeScaleSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 max_value = 0.1
 step = 0.01
 value = 0.04
 
-[node name="TimeScaleValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TimeScaleGroup" unique_id=1333618242]
+[node name="TimeScaleValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "时间流速: 0.04x"
 horizontal_alignment = 1
 
-[node name="GreedGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=1442085994]
+[node name="GreedGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="GreedLabel" type="Label" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=1850987985]
+[node name="GreedLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
 text = "💰 贪婪因子"
 
-[node name="GreedSlider" type="HSlider" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=38903803]
+[node name="GreedSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 min_value = 0.2
@@ -86,22 +91,22 @@ max_value = 3.0
 step = 0.1
 value = 1.0
 
-[node name="GreedValueLabel" type="Label" parent="HSplitContainer/LeftPanel/GreedGroup" unique_id=1350213645]
+[node name="GreedValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "贪婪因子: 1.00"
 horizontal_alignment = 1
 
-[node name="TargetPGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=864852065]
+[node name="TargetPGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TargetPLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=481627744]
+[node name="TargetPLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
 text = "🎯 目标利润 (Target P)"
 
-[node name="TargetPSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=1895057794]
+[node name="TargetPSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 min_value = -100.0
@@ -109,22 +114,22 @@ max_value = 200.0
 step = 5.0
 value = 100.0
 
-[node name="TargetPValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetPGroup" unique_id=2093900239]
+[node name="TargetPValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "目标利润: 100"
 horizontal_alignment = 1
 
-[node name="TargetRGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=2094329816]
+[node name="TargetRGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TargetRLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=1742694356]
+[node name="TargetRLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
 text = "🎯 目标关系 (Target R)"
 
-[node name="TargetRSlider" type="HSlider" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=792745732]
+[node name="TargetRSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 min_value = -100.0
@@ -132,169 +137,199 @@ max_value = 200.0
 step = 5.0
 value = 80.0
 
-[node name="TargetRValueLabel" type="Label" parent="HSplitContainer/LeftPanel/TargetRGroup" unique_id=1255371261]
+[node name="TargetRValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "目标关系: 80"
 horizontal_alignment = 1
 
-[node name="ThresholdGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=572452300]
+[node name="ThresholdGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="ThresholdLabel" type="Label" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=1755219861]
+[node name="ThresholdLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.5, 1)
 text = "🔘 成交阈值 (Acceptance)"
 
-[node name="ThresholdSlider" type="HSlider" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=1998719643]
+[node name="ThresholdSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 min_value = 10.0
 step = 5.0
 value = 40.0
 
-[node name="ThresholdValueLabel" type="Label" parent="HSplitContainer/LeftPanel/ThresholdGroup" unique_id=372115367]
+[node name="ThresholdValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "成交阈值: 40"
 horizontal_alignment = 1
 
-[node name="ActiveStrengthGroup" type="VBoxContainer" parent="HSplitContainer/LeftPanel" unique_id=636621156]
+[node name="ActiveStrengthGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="ActiveStrengthLabel" type="Label" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=1594659620]
+[node name="ActiveStrengthLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.7, 1)
 text = "🤖 AI Active Agency"
 
-[node name="ActiveStrengthSlider" type="HSlider" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=741074126]
+[node name="ActiveStrengthSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 step = 5.0
 value = 30.0
 
-[node name="ActiveStrengthValueLabel" type="Label" parent="HSplitContainer/LeftPanel/ActiveStrengthGroup" unique_id=840173100]
+[node name="ActiveStrengthValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "主动性: 30"
 horizontal_alignment = 1
 
-[node name="CenterPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=1203973695]
+[node name="CenterPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
 custom_minimum_size = Vector2(450, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.5
 theme_override_constants/separation = 10
 
-[node name="TitleLabel" type="Label" parent="HSplitContainer/CenterPanel" unique_id=774874591]
+[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/CenterPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.8, 1)
 theme_override_font_sizes/font_size = 18
 text = "📡 向量场 (Proposal Space)"
 horizontal_alignment = 1
 
-[node name="VectorFieldPlot" type="Control" parent="HSplitContainer/CenterPanel" unique_id=321957782]
-custom_minimum_size = Vector2(400, 350)
+[node name="VectorFieldPlot" type="Control" parent="MainVBox/DebugDashboard/CenterPanel"]
+custom_minimum_size = Vector2(400, 300)
 layout_mode = 2
 size_flags_vertical = 3
 script = ExtResource("2_plot")
 
-[node name="StatusLabel" type="RichTextLabel" parent="HSplitContainer/CenterPanel" unique_id=650201644]
-custom_minimum_size = Vector2(0, 180)
+[node name="StatusLabel" type="RichTextLabel" parent="MainVBox/DebugDashboard/CenterPanel"]
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 bbcode_enabled = true
-text = "[center][b]═══ 4-Layer Pipeline ═══[/b][/center]
+text = "[center][b]═══ 物理驱动卡牌系统 ═══[/b][/center]
 
-等待初始化..."
+双击下方卡牌激活效果..."
 scroll_active = false
 
-[node name="ButtonContainer" type="HBoxContainer" parent="HSplitContainer/CenterPanel" unique_id=1412415205]
+[node name="ButtonContainer" type="HBoxContainer" parent="MainVBox/DebugDashboard/CenterPanel"]
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
-[node name="SubmitButton" type="Button" parent="HSplitContainer/CenterPanel/ButtonContainer" unique_id=1387960821]
-custom_minimum_size = Vector2(180, 45)
+[node name="SubmitButton" type="Button" parent="MainVBox/DebugDashboard/CenterPanel/ButtonContainer"]
+custom_minimum_size = Vector2(180, 40)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 16
-text = "🤝 模拟提交 (Player Offer)"
+theme_override_font_sizes/font_size = 14
+text = "🤝 提交提案"
 
-[node name="ResetButton" type="Button" parent="HSplitContainer/CenterPanel/ButtonContainer" unique_id=1260003960]
+[node name="ResetButton" type="Button" parent="MainVBox/DebugDashboard/CenterPanel/ButtonContainer"]
 custom_minimum_size = Vector2(120, 35)
 layout_mode = 2
 size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 14
-text = "🔄 重置状态"
+text = "🔄 重置"
 
-[node name="RightPanel" type="VBoxContainer" parent="HSplitContainer" unique_id=2040242556]
+[node name="RightPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
 custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 
-[node name="TitleLabel" type="Label" parent="HSplitContainer/RightPanel" unique_id=252650622]
+[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.7, 0.4, 1)
 theme_override_font_sizes/font_size = 18
-text = "📊 状态监测 (Monitor)"
+text = "📊 状态监测"
 horizontal_alignment = 1
 
-[node name="PressureGroup" type="VBoxContainer" parent="HSplitContainer/RightPanel" unique_id=697858678]
+[node name="PressureGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/RightPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PressureLabel" type="Label" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=780035068]
+[node name="PressureLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.5, 0.3, 1)
-text = "🌡️ 压力 (Pressure)"
+text = "🌡️ 压力"
 
-[node name="PressureBar" type="ProgressBar" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=1113715831]
+[node name="PressureBar" type="ProgressBar" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 show_percentage = false
 
-[node name="PressureValueLabel" type="Label" parent="HSplitContainer/RightPanel/PressureGroup" unique_id=31089041]
+[node name="PressureValueLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "0 / 100"
 horizontal_alignment = 1
 
-[node name="SatisfactionGroup" type="VBoxContainer" parent="HSplitContainer/RightPanel" unique_id=1653370579]
+[node name="SatisfactionGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/RightPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="SatisfactionLabel" type="Label" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=1814470611]
+[node name="SatisfactionLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
-text = "😊 满意度 (Satisfaction)"
+text = "😊 满意度"
 
-[node name="SatisfactionBar" type="ProgressBar" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=27179434]
+[node name="SatisfactionBar" type="ProgressBar" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 value = 50.0
 show_percentage = false
 
-[node name="SatisfactionValueLabel" type="Label" parent="HSplitContainer/RightPanel/SatisfactionGroup" unique_id=1686494580]
+[node name="SatisfactionValueLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "50%"
 horizontal_alignment = 1
 
-[node name="LogLabel" type="Label" parent="HSplitContainer/RightPanel" unique_id=1688189891]
+[node name="LogLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.6, 1)
-text = "📜 决策日志 (Decision Log)"
+text = "📜 决策日志"
 
-[node name="HistoryLog" type="RichTextLabel" parent="HSplitContainer/RightPanel" unique_id=1830618666]
+[node name="HistoryLog" type="RichTextLabel" parent="MainVBox/DebugDashboard/RightPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
 text = "[color=gray][i]等待首次交互...[/i][/color]"
 
-[node name="ScreenFlash" type="ColorRect" parent="." unique_id=1990665791]
+[node name="CardDeckPanel" type="PanelContainer" parent="MainVBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CardDeckBG" type="ColorRect" parent="MainVBox/CardDeckPanel"]
+layout_mode = 2
+color = Color(0.08, 0.06, 0.1, 1)
+
+[node name="DeckTitleLabel" type="Label" parent="MainVBox/CardDeckPanel"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 5.0
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "🃏 卡牌库 (双击激活)"
+
+[node name="CardScroll" type="ScrollContainer" parent="MainVBox/CardDeckPanel"]
+layout_mode = 2
+offset_top = 25.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="CardContainer" type="HBoxContainer" parent="MainVBox/CardDeckPanel/CardScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ScreenFlash" type="ColorRect" parent="."]
 visible = false
 layout_mode = 1
 anchors_preset = 15

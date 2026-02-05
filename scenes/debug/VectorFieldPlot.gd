@@ -55,6 +55,19 @@ var _is_ai_drifting: bool = false
 var _last_drift_magnitude: float = 0.0
 
 
+## ===== 场扭曲状态 (Field Distortion) =====
+
+## 战争迷雾：隐藏 AI 的目标点
+var _fog_of_war_enabled: bool = false
+
+## 抖动效果：向量随机扰动
+var _jitter_enabled: bool = false
+var _jitter_amplitude: float = 5.0
+
+## 目标点是否已被揭示（用于 I02 试探底线）
+var _target_revealed: bool = false
+
+
 ## ===== 生命周期 =====
 
 func _ready() -> void:
@@ -250,20 +263,46 @@ func _draw_target_point() -> void:
 	if engine == null:
 		return
 	
+	# 战争迷雾：隐藏目标点（除非已被揭示）
+	if _fog_of_war_enabled and not _target_revealed:
+		# 绘制迷雾占位符
+		var font: Font = ThemeDB.fallback_font
+		var center_screen: Vector2 = _world_to_screen(Vector2(0, 0))
+		draw_string(font, center_screen + Vector2(-10, 0), "?", HORIZONTAL_ALIGNMENT_CENTER, -1, 32, Color(0.5, 0.5, 0.6, 0.5))
+		return
+	
 	var screen_pos: Vector2 = _world_to_screen(engine.target_point)
 	
+	# 如果是揭示状态，使用高亮效果
+	var target_color: Color = COLOR_TARGET
+	if _target_revealed:
+		target_color = Color(1.0, 0.9, 0.3, 1.0) # 金色高亮
+		# 脉动效果
+		var pulse: float = 0.3 + 0.2 * sin(Time.get_ticks_msec() / 150.0)
+		draw_circle(screen_pos, 20.0, Color(target_color, pulse))
+	
 	# 外圈
-	draw_circle(screen_pos, 12.0, Color(COLOR_TARGET, 0.3))
+	draw_circle(screen_pos, 12.0, Color(target_color, 0.3))
 	# 内圈
-	draw_circle(screen_pos, 6.0, COLOR_TARGET)
+	draw_circle(screen_pos, 6.0, target_color)
 	# 十字准星
-	draw_line(screen_pos - Vector2(15, 0), screen_pos + Vector2(15, 0), COLOR_TARGET, 1.5)
-	draw_line(screen_pos - Vector2(0, 15), screen_pos + Vector2(0, 15), COLOR_TARGET, 1.5)
+	draw_line(screen_pos - Vector2(15, 0), screen_pos + Vector2(15, 0), target_color, 1.5)
+	draw_line(screen_pos - Vector2(0, 15), screen_pos + Vector2(0, 15), target_color, 1.5)
 
 
 ## 绘制当前提案点
 func _draw_current_point() -> void:
 	var screen_pos: Vector2 = _world_to_screen(current_offer)
+	
+	# 抖动效果：添加随机偏移
+	if _jitter_enabled:
+		var jitter_offset: Vector2 = Vector2(
+			randf_range(-_jitter_amplitude, _jitter_amplitude),
+			randf_range(-_jitter_amplitude, _jitter_amplitude)
+		)
+		screen_pos += jitter_offset
+		# 抖动视觉反馈：紫色光晕
+		draw_circle(screen_pos, 20.0, Color(0.8, 0.3, 1.0, 0.3))
 	
 	# 根据状态选择颜色
 	var point_color: Color = COLOR_CURRENT
@@ -404,3 +443,49 @@ func is_ai_drifting() -> bool:
 func stop_drift() -> void:
 	_is_ai_drifting = false
 	_last_drift_magnitude = 0.0
+
+
+## ===== 场扭曲 API =====
+
+## 切换战争迷雾
+## @param enabled: 是否启用迷雾
+func toggle_fog_of_war(enabled: bool) -> void:
+	_fog_of_war_enabled = enabled
+	if not enabled:
+		_target_revealed = false # 关闭迷雾时重置揭示状态
+	queue_redraw()
+
+
+## 设置目标点揭示状态（用于 I02 试探底线）
+## @param revealed: 是否已揭示
+func set_target_revealed(revealed: bool) -> void:
+	_target_revealed = revealed
+	queue_redraw()
+
+
+## 切换抖动效果
+## @param enabled: 是否启用
+## @param amplitude: 抖动振幅（像素）
+func toggle_jitter(enabled: bool, amplitude: float = 5.0) -> void:
+	_jitter_enabled = enabled
+	_jitter_amplitude = amplitude
+	queue_redraw()
+
+
+## 重置所有场扭曲效果
+func reset_field_distortions() -> void:
+	_fog_of_war_enabled = false
+	_target_revealed = false
+	_jitter_enabled = false
+	_jitter_amplitude = 5.0
+	queue_redraw()
+
+
+## 获取当前迷雾状态
+func is_fog_of_war_enabled() -> bool:
+	return _fog_of_war_enabled
+
+
+## 获取当前抖动状态
+func is_jitter_enabled() -> bool:
+	return _jitter_enabled

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bk7m2qljvyhxc"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_card_library_runner.gd" id="1_runner"]
+
+[node name="TestCardLibraryRunner" type="Node"]
+script = ExtResource("1_runner")

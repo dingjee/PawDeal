@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bj8kpqa7v2x0f"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_pipeline_lab_runner.gd" id="1_test"]
+
+[node name="TestPipelineLabRunner" type="Node"]
+script = ExtResource("1_test")

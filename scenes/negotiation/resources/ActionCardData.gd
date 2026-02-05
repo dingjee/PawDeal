@@ -91,6 +91,88 @@ enum EffectType {
 @export var sentiment_impact: float = 0.0
 
 
+## ===== Physics Vector System (PR 物理模型) =====
+##
+## 基于双轴向量场的谈判物理引擎
+## - Profit (Y): 利润轴，正值 = AI 让利
+## - Relationship (X): 关系轴，正值 = 改善关系
+## - Pressure: 压强/温度，影响决策阈值
+
+## NegotiAct 战术分类枚举
+## 基于 NegotiAct 行为分类理论
+enum TacticType {
+	INFO, ## 信息类：探查、披露
+	OFFER, ## 出价类：锚定、让步
+	PERSUASION, ## 说服类：论证、威慑
+	EMOTION, ## 情感类：恭维、示弱
+	UNETHICAL, ## 非道德类：欺骗、设局
+	PROCESS, ## 流程类：换题、搁置
+}
+
+## NegotiAct 战术类型
+@export var tactic_type: TacticType = TacticType.INFO
+
+## NegotiAct 编码（如 "A01", "D02", "U03"）
+## 用于卡牌分类和日志追踪
+@export var negotiact_code: String = ""
+
+
+## ===== 即时物理冲击 (Instant Impact) =====
+##
+## 卡牌打出时立即作用于物理引擎的向量/标量变化
+
+## 利润轴推动幅度
+## 正值 = 推动 AI 让利（提案向 +Y 移动）
+## 负值 = 推动玩家让利（提案向 -Y 移动）
+## 物理含义：施加一个瞬时力，改变当前提案位置
+@export var impact_profit: float = 0.0
+
+## 关系轴推动幅度
+## 正值 = 改善关系（提案向 +X 移动）
+## 负值 = 破坏关系（提案向 -X 移动）
+## 物理含义：影响 AI 对玩家的信任评估
+@export var impact_relationship: float = 0.0
+
+## 压强变化量
+## 正值 = 加压（升温，AI 更急躁）
+## 负值 = 减压（降温，AI 更冷静）
+## 物理含义：调节引擎的"温度"，影响决策阈值
+@export var impact_pressure: float = 0.0
+
+
+## ===== 场扭曲 (Field Distortion / Status Effects) =====
+##
+## 持续性效果，改变物理引擎的参数而非位置
+## 这些效果通常在下一回合或特定条件下消失
+
+## 贪婪因子修正（乘数形式）
+## 1.0 = 不变
+## > 1.0 = AI 更看重利润（等效用曲线在 Y 轴拉伸）
+## < 1.0 = AI 更看重关系（等效用曲线在 X 轴拉伸）
+## 应用方式: engine.greed_factor *= mod_greed_factor
+@export var mod_greed_factor: float = 1.0
+
+## 战争迷雾效果
+## true = 隐藏 AI 的目标点，玩家失去视觉反馈
+## 物理含义：干扰玩家对"引力源"的感知
+@export var fog_of_war: bool = false
+
+## 主动力倍率（AI 漂移速度倍增）
+## 1.0 = 正常漂移
+## > 1.0 = AI 更"急切"，漂移速度加快
+## < 1.0 = AI 更"淡定"，漂移速度减慢
+## 应用方式: active_strength *= force_multiplier
+@export var force_multiplier: float = 1.0
+
+## 抖动效果（向量随机扰动）
+## true = 每帧给向量添加随机噪声
+## 物理含义：制造混乱，干扰双方判断
+@export var jitter_enabled: bool = false
+
+## 抖动强度（当 jitter_enabled = true 时生效）
+@export var jitter_amplitude: float = 5.0
+
+
 ## ===== 工厂方法 =====
 
 ## 脚本路径常量
