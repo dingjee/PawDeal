@@ -39,7 +39,7 @@ const NegotiationAgentScript = preload("res://scenes/negotiation_ai/NegotiationA
 ## ===== 内部状态 =====
 
 var agent = null
-var time_scale: float = 1.0
+var time_scale: float = 0.04
 var current_round: int = 0
 var active_strength: float = 30.0
 
@@ -90,7 +90,7 @@ func _init_agent() -> void:
 func _connect_signals() -> void:
 	time_scale_slider.value_changed.connect(func(v):
 		time_scale = v
-		time_scale_label.text = "时间流速: %.1fx" % v
+		time_scale_label.text = "时间流速: %.2fx" % v
 	)
 	greed_slider.value_changed.connect(func(v):
 		agent.engine.greed_factor = v

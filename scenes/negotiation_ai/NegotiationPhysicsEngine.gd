@@ -188,6 +188,12 @@ func reset_pressure() -> void:
 	current_pressure = 0.0
 
 
+## 获取归一化压力值 (0 ~ 1)
+## @return: 压力占最大值的比例
+func get_pressure_normalized() -> float:
+	return clampf(current_pressure / max_pressure, 0.0, 1.0)
+
+
 ## ===== 急躁度系统 =====
 
 ## 累积主动力到急躁度计量器
