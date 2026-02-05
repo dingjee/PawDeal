@@ -8,7 +8,7 @@
 :: 1. 运行指定的测试场景
 :: 2. GUI 模式下支持自动截图保存到 tests/snapshots/ 目录
 
-set GODOT_PATH="D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe"
+set GODOT_PATH="D:\Software\Godot\Godot_v4.6-stable_win64_console.exe"
 set TEST_SCENE=%1
 set GUI_FLAG=%2
 set HEADLESS_FLAG=--headless

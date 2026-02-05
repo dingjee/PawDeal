@@ -11,7 +11,7 @@
 :: 2. 支持 GUI 模式查看测试过程
 :: 3. 报告输出到 tests/reports/ 目录
 
-set GODOT_PATH="D:\Software\Godot\Godot_v4.5.1-stable_win64_console.exe"
+set GODOT_PATH="D:\Software\Godot\Godot_v4.6-stable_win64_console.exe"
 set TEST_PATH=%1
 set GUI_FLAG=%2
 set REPORT_DIR=tests/reports
