@@ -26,6 +26,10 @@ signal request_synthesis(issue_card: DraggableCard, action_card: DraggableCard)
 ## @param proposal_card: 合成卡 UI 节点
 signal request_split(proposal_card: DraggableCard)
 
+## 卡牌双击信号：当卡牌被双击时发出
+## @param card: 卡牌 UI 节点
+signal card_double_clicked(card: DraggableCard)
+
 
 ## ===== 卡牌类型枚举 =====
 
@@ -231,29 +235,56 @@ func _gui_input(event: InputEvent) -> void:
 				# 发出分离请求信号
 				request_split.emit(self)
 				get_viewport().set_input_as_handled()
+		# 左键双击 (转发自内部)
+		elif mb.button_index == MOUSE_BUTTON_LEFT and mb.double_click:
+			card_double_clicked.emit(self)
+
+
+## 内部输入事件处理（转发给主逻辑）
+func _on_internal_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb: InputEventMouseButton = event
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.double_click:
+			card_double_clicked.emit(self)
+			get_viewport().set_input_as_handled()
 
 
 ## ===== UI 构建 =====
 
 func _setup_ui() -> void:
+	# 创建 ScrollContainer 以处理内容溢出
+	var scroll = ScrollContainer.new()
+	scroll.name = "ContentScroll"
+	scroll.set_anchors_preset(Control.PRESET_FULL_RECT)
+	scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE # 忽略鼠标事件，让 PanelContainer 处理
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	add_child(scroll)
+	
 	_main_vbox = VBoxContainer.new()
+	_main_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_main_vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_main_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	add_child(_main_vbox)
+	_main_vbox.mouse_filter = Control.MOUSE_FILTER_IGNORE # 忽略鼠标事件
+	scroll.add_child(_main_vbox)
 	
 	# 类型徽章
 	_type_badge = Label.new()
 	_type_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_type_badge.add_theme_font_size_override("font_size", 10)
+	_type_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE # 忽略鼠标事件
 	_main_vbox.add_child(_type_badge)
 	
 	# 名称标签
 	_name_label = Label.new()
 	_name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_main_vbox.add_child(_name_label)
 	
 	# 间隔
 	var spacer = Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_main_vbox.add_child(spacer)
 	
 	# G 值标签
@@ -261,6 +292,7 @@ func _setup_ui() -> void:
 	_g_label.add_theme_color_override("font_color", Color(0.4, 0.8, 0.4))
 	_g_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_g_label.add_theme_font_size_override("font_size", 11)
+	_g_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_main_vbox.add_child(_g_label)
 	
 	# Opp 值标签
@@ -268,6 +300,7 @@ func _setup_ui() -> void:
 	_opp_label.add_theme_color_override("font_color", Color(0.9, 0.6, 0.2))
 	_opp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_opp_label.add_theme_font_size_override("font_size", 11)
+	_opp_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_main_vbox.add_child(_opp_label)
 
 

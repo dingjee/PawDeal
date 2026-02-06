@@ -190,18 +190,14 @@ func _spawn_all_debug_cards() -> void:
 		card_ui.custom_minimum_size = Vector2(120, 160)
 		
 		# 连接双击信号
-		card_ui.gui_input.connect(_on_card_gui_input.bind(card_ui, card_data))
+		card_ui.card_double_clicked.connect(_on_card_double_clicked.bind(card_data))
 
 
-## 处理卡牌点击事件
-func _on_card_gui_input(event: InputEvent, card_ui: Control, card_data: Resource) -> void:
-	if event is InputEventMouseButton:
-		var mb: InputEventMouseButton = event as InputEventMouseButton
-		# 双击激活卡牌
-		if mb.button_index == MOUSE_BUTTON_LEFT and mb.double_click:
-			_apply_card_effect(card_data)
-			# 视觉反馈：卡牌闪烁
-			_flash_card(card_ui)
+## 处理卡牌双击事件
+func _on_card_double_clicked(card_ui: Control, card_data: Resource) -> void:
+	_apply_card_effect(card_data)
+	# 视觉反馈：卡牌闪烁
+	_flash_card(card_ui)
 
 
 ## 应用卡牌效果到物理引擎（核心函数）
