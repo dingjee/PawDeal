@@ -21,7 +21,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.1, 0.08, 0.12, 1)
 
-[node name="MainVBox" type="VBoxContainer" parent="."]
+[node name="MainHBox" type="HSplitContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,298 +32,442 @@ offset_right = -15.0
 offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 2
+split_offset = 480
 
-[node name="DebugDashboard" type="HSplitContainer" parent="MainVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-size_flags_stretch_ratio = 2.5
-split_offsets = PackedInt32Array(0, 0)
-
-[node name="LeftPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
-custom_minimum_size = Vector2(260, 0)
+[node name="DebugPanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 18
 
-[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="DebugPanelBG" type="ColorRect" parent="MainHBox/DebugPanel"]
+layout_mode = 2
+color = Color(0.08, 0.06, 0.1, 0.9)
+
+[node name="DebugVBox" type="VBoxContainer" parent="MainHBox/DebugPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DebugTitleLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "🔧 调试控制面板"
+horizontal_alignment = 1
+
+[node name="DebugHSplit" type="HSplitContainer" parent="MainHBox/DebugPanel/DebugVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+split_offset = 200
+
+[node name="LeftControlPanel" type="ScrollContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="LeftControlVBox" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.6, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 text = "🧠 AI Core Config"
 horizontal_alignment = 1
 
-[node name="TimeScaleGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="TimeScaleGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="TimeScaleLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
+[node name="TimeScaleLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TimeScaleGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 12
 text = "⏱️ 时间流速"
 
-[node name="TimeScaleSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="TimeScaleSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TimeScaleGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 max_value = 0.1
 step = 0.01
 value = 0.04
 
-[node name="TimeScaleValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TimeScaleGroup"]
+[node name="TimeScaleValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TimeScaleGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "时间流速: 0.04x"
 horizontal_alignment = 1
 
-[node name="GreedGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="GreedGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="GreedLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
+[node name="GreedLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/GreedGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
+theme_override_font_sizes/font_size = 12
 text = "💰 贪婪因子"
 
-[node name="GreedSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="GreedSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/GreedGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 min_value = 0.2
 max_value = 3.0
 step = 0.1
 value = 1.0
 
-[node name="GreedValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/GreedGroup"]
+[node name="GreedValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/GreedGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "贪婪因子: 1.00"
 horizontal_alignment = 1
 
-[node name="TargetPGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="TargetPGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="TargetPLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
+[node name="TargetPLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetPGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
-text = "🎯 目标利润 (Target P)"
+theme_override_font_sizes/font_size = 12
+text = "🎯 目标利润 (P)"
 
-[node name="TargetPSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="TargetPSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetPGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 min_value = -100.0
 max_value = 200.0
 step = 5.0
 value = 100.0
 
-[node name="TargetPValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetPGroup"]
+[node name="TargetPValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetPGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "目标利润: 100"
 horizontal_alignment = 1
 
-[node name="TargetRGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="TargetRGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="TargetRLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
+[node name="TargetRLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetRGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.8, 1, 1)
-text = "🎯 目标关系 (Target R)"
+theme_override_font_sizes/font_size = 12
+text = "🎯 目标关系 (R)"
 
-[node name="TargetRSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="TargetRSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetRGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 min_value = -100.0
 max_value = 200.0
 step = 5.0
 value = 80.0
 
-[node name="TargetRValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/TargetRGroup"]
+[node name="TargetRValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/TargetRGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "目标关系: 80"
 horizontal_alignment = 1
 
-[node name="ThresholdGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="ThresholdGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="ThresholdLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
+[node name="ThresholdLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ThresholdGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.5, 1)
-text = "🔘 成交阈值 (Acceptance)"
+theme_override_font_sizes/font_size = 12
+text = "🔘 成交阈值"
 
-[node name="ThresholdSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="ThresholdSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ThresholdGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 min_value = 10.0
 step = 5.0
 value = 40.0
 
-[node name="ThresholdValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ThresholdGroup"]
+[node name="ThresholdValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ThresholdGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "成交阈值: 40"
 horizontal_alignment = 1
 
-[node name="ActiveStrengthGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/LeftPanel"]
+[node name="ActiveStrengthGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="ActiveStrengthLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
+[node name="ActiveStrengthLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ActiveStrengthGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.7, 1)
-text = "🤖 AI Active Agency"
+theme_override_font_sizes/font_size = 12
+text = "🤖 AI 主动性"
 
-[node name="ActiveStrengthSlider" type="HSlider" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
-custom_minimum_size = Vector2(0, 22)
+[node name="ActiveStrengthSlider" type="HSlider" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ActiveStrengthGroup"]
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 step = 5.0
 value = 30.0
 
-[node name="ActiveStrengthValueLabel" type="Label" parent="MainVBox/DebugDashboard/LeftPanel/ActiveStrengthGroup"]
+[node name="ActiveStrengthValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/ActiveStrengthGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
 text = "主动性: 30"
 horizontal_alignment = 1
 
-[node name="CenterPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
-custom_minimum_size = Vector2(450, 0)
+[node name="StatusPanel" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox"]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_stretch_ratio = 1.5
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/CenterPanel"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 1, 0.8, 1)
-theme_override_font_sizes/font_size = 18
-text = "📡 向量场 (Proposal Space)"
-horizontal_alignment = 1
-
-[node name="VectorFieldPlot" type="Control" parent="MainVBox/DebugDashboard/CenterPanel"]
-custom_minimum_size = Vector2(400, 300)
-layout_mode = 2
-size_flags_vertical = 3
-script = ExtResource("2_plot")
-
-[node name="StatusLabel" type="RichTextLabel" parent="MainVBox/DebugDashboard/CenterPanel"]
-custom_minimum_size = Vector2(0, 150)
-layout_mode = 2
-bbcode_enabled = true
-text = "[center][b]═══ 物理驱动卡牌系统 ═══[/b][/center]
-
-双击下方卡牌激活效果..."
-scroll_active = false
-
-[node name="ButtonContainer" type="HBoxContainer" parent="MainVBox/DebugDashboard/CenterPanel"]
-layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
-
-[node name="SubmitButton" type="Button" parent="MainVBox/DebugDashboard/CenterPanel/ButtonContainer"]
-custom_minimum_size = Vector2(180, 40)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 14
-text = "🤝 提交提案"
-
-[node name="ResetButton" type="Button" parent="MainVBox/DebugDashboard/CenterPanel/ButtonContainer"]
-custom_minimum_size = Vector2(120, 35)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 14
-text = "🔄 重置"
-
-[node name="RightPanel" type="VBoxContainer" parent="MainVBox/DebugDashboard"]
-custom_minimum_size = Vector2(240, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="TitleLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel"]
+[node name="StatusTitleLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.7, 0.4, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 14
 text = "📊 状态监测"
 horizontal_alignment = 1
 
-[node name="PressureGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/RightPanel"]
+[node name="PressureGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="PressureLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
+[node name="PressureLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/PressureGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.5, 0.3, 1)
+theme_override_font_sizes/font_size = 11
 text = "🌡️ 压力"
 
-[node name="PressureBar" type="ProgressBar" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
-custom_minimum_size = Vector2(0, 24)
+[node name="PressureBar" type="ProgressBar" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/PressureGroup"]
+custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 show_percentage = false
 
-[node name="PressureValueLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/PressureGroup"]
+[node name="PressureValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/PressureGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 10
 text = "0 / 100"
 horizontal_alignment = 1
 
-[node name="SatisfactionGroup" type="VBoxContainer" parent="MainVBox/DebugDashboard/RightPanel"]
+[node name="SatisfactionGroup" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="SatisfactionLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
+[node name="SatisfactionLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/SatisfactionGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 11
 text = "😊 满意度"
 
-[node name="SatisfactionBar" type="ProgressBar" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
-custom_minimum_size = Vector2(0, 24)
+[node name="SatisfactionBar" type="ProgressBar" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/SatisfactionGroup"]
+custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 value = 50.0
 show_percentage = false
 
-[node name="SatisfactionValueLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel/SatisfactionGroup"]
+[node name="SatisfactionValueLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/LeftControlPanel/LeftControlVBox/StatusPanel/SatisfactionGroup"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 10
 text = "50%"
 horizontal_alignment = 1
 
-[node name="LogLabel" type="Label" parent="MainVBox/DebugDashboard/RightPanel"]
+[node name="RightDebugPanel" type="VBoxContainer" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="VectorPlotTitle" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/RightDebugPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "📡 向量场 (PR Space)"
+horizontal_alignment = 1
+
+[node name="VectorFieldPlot" type="Control" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/RightDebugPanel"]
+custom_minimum_size = Vector2(260, 240)
+layout_mode = 2
+size_flags_vertical = 3
+script = ExtResource("2_plot")
+
+[node name="StatusLabel" type="RichTextLabel" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/RightDebugPanel"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+bbcode_enabled = true
+text = "[center][b]═══ 物理驱动卡牌系统 ═══[/b][/center]
+
+双击卡牌激活效果..."
+scroll_active = false
+
+[node name="LogLabel" type="Label" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/RightDebugPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.6, 1)
+theme_override_font_sizes/font_size = 12
 text = "📜 决策日志"
 
-[node name="HistoryLog" type="RichTextLabel" parent="MainVBox/DebugDashboard/RightPanel"]
+[node name="HistoryLog" type="RichTextLabel" parent="MainHBox/DebugPanel/DebugVBox/DebugHSplit/RightDebugPanel"]
 layout_mode = 2
 size_flags_vertical = 3
 bbcode_enabled = true
 text = "[color=gray][i]等待首次交互...[/i][/color]"
 
-[node name="CardDeckPanel" type="PanelContainer" parent="MainVBox"]
-custom_minimum_size = Vector2(0, 200)
+[node name="GamePanel" type="PanelContainer" parent="MainHBox"]
+custom_minimum_size = Vector2(500, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GamePanelBG" type="ColorRect" parent="MainHBox/GamePanel"]
+layout_mode = 2
+color = Color(0.12, 0.1, 0.15, 0.95)
+
+[node name="GameVBox" type="VBoxContainer" parent="MainHBox/GamePanel"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="GameTitleLabel" type="Label" parent="MainHBox/GamePanel/GameVBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 22
+text = "🎮 谈判桌"
+horizontal_alignment = 1
+
+[node name="ProposalSection" type="VBoxContainer" parent="MainHBox/GamePanel/GameVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.5
+theme_override_constants/separation = 10
+
+[node name="ProposalTitleLabel" type="Label" parent="MainHBox/GamePanel/GameVBox/ProposalSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.75, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+text = "📋 当前提案 (拖放提案牌到此处)"
+horizontal_alignment = 1
+
+[node name="ProposalDropZone" type="PanelContainer" parent="MainHBox/GamePanel/GameVBox/ProposalSection"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="CardDeckBG" type="ColorRect" parent="MainVBox/CardDeckPanel"]
+[node name="ProposalDropBG" type="ColorRect" parent="MainHBox/GamePanel/GameVBox/ProposalSection/ProposalDropZone"]
 layout_mode = 2
-color = Color(0.08, 0.06, 0.1, 1)
+color = Color(0.15, 0.12, 0.2, 0.8)
 
-[node name="DeckTitleLabel" type="Label" parent="MainVBox/CardDeckPanel"]
+[node name="ProposalDropBorder" type="Panel" parent="MainHBox/GamePanel/GameVBox/ProposalSection/ProposalDropZone"]
 layout_mode = 2
-offset_left = 10.0
-offset_top = 5.0
-theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 14
-text = "🃏 卡牌库 (双击激活)"
 
-[node name="CardScroll" type="ScrollContainer" parent="MainVBox/CardDeckPanel"]
+[node name="ProposalScroll" type="ScrollContainer" parent="MainHBox/GamePanel/GameVBox/ProposalSection/ProposalDropZone"]
 layout_mode = 2
-offset_top = 25.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 2
 
-[node name="CardContainer" type="HBoxContainer" parent="MainVBox/CardDeckPanel/CardScroll"]
+[node name="ProposalCardContainer" type="HBoxContainer" parent="MainHBox/GamePanel/GameVBox/ProposalSection/ProposalDropZone/ProposalScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="ProposalHintLabel" type="Label" parent="MainHBox/GamePanel/GameVBox/ProposalSection/ProposalDropZone"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -20.0
+offset_right = 120.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 0.6)
+theme_override_font_sizes/font_size = 14
+text = "从下方拖入提案牌..."
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SubmitSection" type="HBoxContainer" parent="MainHBox/GamePanel/GameVBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SubmitButton" type="Button" parent="MainHBox/GamePanel/GameVBox/SubmitSection"]
+custom_minimum_size = Vector2(180, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🤝 提交提案"
+
+[node name="ResetButton" type="Button" parent="MainHBox/GamePanel/GameVBox/SubmitSection"]
+custom_minimum_size = Vector2(120, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🔄 重置"
+
+[node name="ProposalCardSection" type="VBoxContainer" parent="MainHBox/GamePanel/GameVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ProposalCardLabel" type="Label" parent="MainHBox/GamePanel/GameVBox/ProposalCardSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "🏷️ 可用提案牌 (双击或拖放)"
+
+[node name="ProposalCardPanel" type="PanelContainer" parent="MainHBox/GamePanel/GameVBox/ProposalCardSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProposalCardBG" type="ColorRect" parent="MainHBox/GamePanel/GameVBox/ProposalCardSection/ProposalCardPanel"]
+layout_mode = 2
+color = Color(0.1, 0.12, 0.08, 0.8)
+
+[node name="ProposalCardScroll" type="ScrollContainer" parent="MainHBox/GamePanel/GameVBox/ProposalCardSection/ProposalCardPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="ProposalCardContainer" type="HBoxContainer" parent="MainHBox/GamePanel/GameVBox/ProposalCardSection/ProposalCardPanel/ProposalCardScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="ActionCardSection" type="VBoxContainer" parent="MainHBox/GamePanel/GameVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ActionCardLabel" type="Label" parent="MainHBox/GamePanel/GameVBox/ActionCardSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "🃏 动作卡库 (双击激活效果)"
+
+[node name="ActionCardPanel" type="PanelContainer" parent="MainHBox/GamePanel/GameVBox/ActionCardSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ActionCardBG" type="ColorRect" parent="MainHBox/GamePanel/GameVBox/ActionCardSection/ActionCardPanel"]
+layout_mode = 2
+color = Color(0.08, 0.06, 0.1, 0.8)
+
+[node name="ActionCardScroll" type="ScrollContainer" parent="MainHBox/GamePanel/GameVBox/ActionCardSection/ActionCardPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="ActionCardContainer" type="HBoxContainer" parent="MainHBox/GamePanel/GameVBox/ActionCardSection/ActionCardPanel/ActionCardScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3

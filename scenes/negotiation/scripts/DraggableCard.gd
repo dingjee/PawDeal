@@ -377,23 +377,49 @@ func _update_action_display() -> void:
 ## 更新合成卡显示（覆盖叠加效果）
 func _update_proposal_display() -> void:
 	if _type_badge:
-		_type_badge.text = "📜 提案 (右键分离)"
-		_type_badge.add_theme_color_override("font_color", Color(0.5, 0.9, 0.7))
+		# 根据立场显示不同颜色徽章
+		var stance_text: String = ""
+		var stance_color: Color = Color(0.5, 0.9, 0.7)
+		if card_data.get("stance") != null:
+			match card_data.stance:
+				1: # AGGRESSIVE
+					stance_text = " [强硬]"
+					stance_color = Color(0.9, 0.5, 0.4)
+				2: # COOPERATIVE
+					stance_text = " [合作]"
+					stance_color = Color(0.4, 0.9, 0.5)
+				3: # DECEPTIVE
+					stance_text = " [欺骗]"
+					stance_color = Color(0.7, 0.4, 0.9)
+		_type_badge.text = "📜 提案" + stance_text
+		_type_badge.add_theme_color_override("font_color", stance_color)
 	
 	if _name_label:
 		var card_name_text: String = card_data.display_name if card_data.get("display_name") else str(card_data)
 		_name_label.text = card_name_text
 	
-	# 显示数值
+	# 显示数值（优先使用方法，兼容旧属性）
 	if _g_label:
 		_g_label.visible = true
-		var g_val: float = card_data.g_value if card_data.get("g_value") != null else 0.0
-		_g_label.text = "AI方: %+.0f" % g_val
+		var g_val: float = 0.0
+		if card_data.has_method("get_g_value"):
+			g_val = card_data.get_g_value()
+		elif card_data.get("g_value") != null:
+			g_val = card_data.g_value
+		elif card_data.source_action and card_data.source_action.get("impact_profit") != null:
+			g_val = card_data.source_action.impact_profit
+		_g_label.text = "P: %+.0f" % g_val
 	
 	if _opp_label:
 		_opp_label.visible = true
-		var opp_val: float = card_data.opp_value if card_data.get("opp_value") != null else 0.0
-		_opp_label.text = "玩家: %+.0f" % opp_val
+		var r_val: float = 0.0
+		if card_data.has_method("get_p_value"):
+			r_val = card_data.get_p_value()
+		elif card_data.get("opp_value") != null:
+			r_val = card_data.opp_value
+		elif card_data.source_action and card_data.source_action.get("impact_relationship") != null:
+			r_val = card_data.source_action.impact_relationship
+		_opp_label.text = "R: %+.0f" % r_val
 	
 	# 合成卡使用渐变边框表示"叠加"
 	_apply_proposal_style()

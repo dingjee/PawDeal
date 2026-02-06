@@ -173,6 +173,7 @@ GAME_END        - 游戏结束
 | 2026-02-04 | **AI 4-Layer Pipeline** | 实现 `scenes/negotiation_ai/` 下的 4 层管线：Encoder, Engine, Brain, Decoder。解决 Godot 4.6 CLI 环境下的类缓存加载问题（改用动态 preloading）。验证了物理接受逻辑和压力/急躁度触发机制。测试通过：`tests/gdunit/scenes/negotiation_ai/test_negotiation_agent.gd`。|
 | 2026-02-05 | **Physics Action Cards** | **扩展 ActionCardData** 支持 PR 物理模型。新增：TacticType 枚举(6类 NegotiAct)、即时物理冲击(impact_profit/relationship/pressure)、场扭曲效果(fog_of_war/force_multiplier/mod_greed_factor/jitter)。创建 **NegotiationCardLibrary** 静态工厂，包含 15 张卡牌（A/D/I/E/U 五大分类）。提供 `apply_card_effect()` 函数直接操控 NegotiationPhysicsEngine。|
 | 2026-02-05 | **PipelineLab Card UI** | 升级 **NegotiationPipelineLab** 为卡牌测试台。**布局**：VBoxContainer 根节点，上部 DebugDashboard(70%)，下部 CardDeckPanel(30%) 含可滚动卡牌库。**交互**：双击卡牌激活→调用 CardLibrary.apply_card_effect()→即时更新向量图。**场扭曲可视化**：VectorFieldPlot 新增 fog_of_war(隐藏目标点)、jitter(抖动效果)、target_revealed(金色高亮)。**状态追踪**：force_multiplier 持久化，成交/重置时清除。|
+| 2026-02-06 | **PipelineLab Option A 布局** | 重构为 **两栏布局**：左=调试面板（AI配置滑块+向量场+物理状态+决策日志），右=游戏模拟区（提案放置区+预定义提案牌库+动作卡库）。**预定义提案牌**：8张模拟牌（降低关税、增加投资、购买国债、开放农产品、技术保护、半导体豁免、报复关税、稀土限制），支持双击添加到提案区，再双击移除。**物理联动**：每张提案牌携带 impact_profit/impact_relationship，添加/移除时实时更新向量图。|
 
 ---
 

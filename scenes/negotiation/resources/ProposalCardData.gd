@@ -48,15 +48,21 @@ var sentiment_impact: float = 0.0
 
 ## ===== 实时计算 G/P 值 (Phase 1: 动态模式) =====
 
-## 获取 Greed 值（实时计算）
-## 公式：raw_greed - self_cost
-## raw_greed = issue.base_volume × action.profit_mult
-## self_cost = issue.base_volume × issue.my_dependency × action.cost_mult
-## @return: 计算后的 G 值
+## 获取 Greed/Profit 值（实时计算）
+## 优先使用物理模型的 impact_profit
+## 如果无物理冲击，则回退到旧 GAP-L 公式：
+## raw_greed = issue.base_volume × profit_mult
+## self_cost = issue.base_volume × my_dependency × cost_mult
+## @return: 计算后的 G/P 值
 func get_g_value() -> float:
 	if source_issue == null or source_action == null:
 		return 0.0
 	
+	# Phase 2: 优先读取物理冲击值 (Physics-Driven)
+	if source_action.get("impact_profit") != null and source_action.impact_profit != 0.0:
+		return source_action.impact_profit
+	
+	# Phase 1: 旧版乘区逻辑 (Deprecated)
 	var base_volume: float = source_issue.base_volume
 	var my_dependency: float = source_issue.my_dependency
 	var profit_mult: float = source_action.profit_mult
@@ -70,13 +76,21 @@ func get_g_value() -> float:
 	return raw_greed - self_cost
 
 
-## 获取 Power 值（实时计算）
-## 公式：issue.base_volume × issue.opp_dependency_true × action.power_mult
-## @return: 计算后的 P 值
+## 获取 Power/Relationship 值（实时计算）
+## 优先使用物理模型的 impact_relationship
+## 如果无物理冲击，则回退到旧 GAP-L 公式：
+## power = issue.base_volume × issue.opp_dependency_true × action.power_mult
+## @return: 计算后的 P/R 值
 func get_p_value() -> float:
 	if source_issue == null or source_action == null:
 		return 0.0
 	
+	# Phase 2: 优先读取物理冲击值 (Physics-Driven)
+	# 注意：在 UI 上通常映射为 R (Relationship)
+	if source_action.get("impact_relationship") != null and source_action.impact_relationship != 0.0:
+		return source_action.impact_relationship
+	
+	# Phase 1: 旧版乘区逻辑 (Deprecated)
 	var base_volume: float = source_issue.base_volume
 	var opp_dependency: float = source_issue.opp_dependency_true
 	var power_mult: float = source_action.power_mult
