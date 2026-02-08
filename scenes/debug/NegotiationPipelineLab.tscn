@@ -411,6 +411,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "🔄 重置"
 
+[node name="AISynthesisButton" type="Button" parent="MainHBox/GamePanel/GameVBox/SubmitSection"]
+custom_minimum_size = Vector2(150, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.4, 0.9, 1, 1)
+text = "🤖 AI 合成分析"
+
 [node name="ProposalCardSection" type="VBoxContainer" parent="MainHBox/GamePanel/GameVBox"]
 layout_mode = 2
 size_flags_vertical = 3

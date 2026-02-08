@@ -60,10 +60,10 @@ var is_core_issue: bool = false
 
 ## ===== 常量 =====
 
-## 卡牌尺寸
-const CARD_SIZE_ISSUE: Vector2 = Vector2(120, 100)
-const CARD_SIZE_ACTION: Vector2 = Vector2(100, 80)
-const CARD_SIZE_PROPOSAL: Vector2 = Vector2(130, 120)
+## ===== 常量 =====
+
+## 卡牌尺寸（统一）
+const CARD_SIZE_UNIFIED: Vector2 = Vector2(120, 160)
 
 ## 拖拽预览缩放
 const DRAG_SCALE: float = 1.1
@@ -98,7 +98,8 @@ func set_as_issue(data: Resource) -> void:
 	card_type = CardType.ISSUE
 	card_data = data
 	is_core_issue = data.is_core_issue if data.get("is_core_issue") != null else false
-	custom_minimum_size = CARD_SIZE_ISSUE
+	is_core_issue = data.is_core_issue if data.get("is_core_issue") != null else false
+	custom_minimum_size = CARD_SIZE_UNIFIED
 	_update_display()
 
 
@@ -107,7 +108,7 @@ func set_as_issue(data: Resource) -> void:
 func set_as_action(data: Resource) -> void:
 	card_type = CardType.ACTION
 	card_data = data
-	custom_minimum_size = CARD_SIZE_ACTION
+	custom_minimum_size = CARD_SIZE_UNIFIED
 	_update_display()
 
 
@@ -119,7 +120,7 @@ func set_as_proposal(data: Resource, issue_ui: DraggableCard = null) -> void:
 	card_data = data
 	source_issue_ui = issue_ui
 	source_action_data = data.source_action if data else null
-	custom_minimum_size = CARD_SIZE_PROPOSAL
+	custom_minimum_size = CARD_SIZE_UNIFIED
 	_update_display()
 
 
@@ -141,7 +142,7 @@ func set_card_data(data: Resource) -> void:
 		# 兼容旧的 GapLCardData，当作动作卡处理
 		card_type = CardType.ACTION
 		card_data = data
-		custom_minimum_size = CARD_SIZE_ACTION
+		custom_minimum_size = CARD_SIZE_UNIFIED
 		_update_display()
 
 
@@ -332,11 +333,20 @@ func _update_issue_display() -> void:
 			card_name_text = "★ " + card_name_text
 		_name_label.text = card_name_text
 	
-	# 议题卡不显示数值
+	# 议题卡显示依赖度（作为基础数据参考）
 	if _g_label:
-		_g_label.visible = false
+		_g_label.visible = true
+		var my_dep: float = card_data.my_dependency * 100.0 if card_data.get("my_dependency") else 0.0
+		_g_label.text = "MyDep: %.0f%%" % my_dep
+		_g_label.modulate = Color(0.7, 0.7, 0.9)
+	
 	if _opp_label:
-		_opp_label.visible = false
+		_opp_label.visible = true
+		var opp_dep: float = 0.0
+		if card_data.get("opp_dependency_true"):
+			opp_dep = card_data.opp_dependency_true * 100.0
+		_opp_label.text = "OppDep: %.0f%%" % opp_dep
+		_opp_label.modulate = Color(0.9, 0.7, 0.7)
 	
 	_apply_style(Color(0.15, 0.2, 0.3), Color(0.4, 0.5, 0.7))
 
@@ -355,16 +365,35 @@ func _update_action_display() -> void:
 						   card_data.card_name if card_data.get("card_name") else str(card_data)
 		_name_label.text = card_name_text
 	
-	# 显示数值
+	# 显示数值 (适配物理模型)
 	if _g_label:
 		_g_label.visible = true
-		var g_val: float = card_data.g_value if card_data.get("g_value") != null else 0.0
-		_g_label.text = "AI方: %+.0f" % g_val
+		var profit: float = 0.0
+		if card_data.get("impact_profit") != null:
+			profit = card_data.impact_profit
+		elif card_data.get("g_value") != null:
+			profit = card_data.g_value
+		
+		# 仅显示非零值，或者即使是0也显示以明确无影响
+		_g_label.text = "P: %+.0f" % profit
+		# 根据正负变色
+		if profit > 0: _g_label.modulate = Color(0.4, 0.9, 0.4)
+		elif profit < 0: _g_label.modulate = Color(0.9, 0.4, 0.4)
+		else: _g_label.modulate = Color(0.7, 0.7, 0.7)
 	
 	if _opp_label:
 		_opp_label.visible = true
-		var opp_val: float = card_data.opp_value if card_data.get("opp_value") != null else 0.0
-		_opp_label.text = "玩家: %+.0f" % opp_val
+		var relationship: float = 0.0
+		if card_data.get("impact_relationship") != null:
+			relationship = card_data.impact_relationship
+		elif card_data.get("opp_value") != null:
+			relationship = card_data.opp_value
+			
+		_opp_label.text = "R: %+.0f" % relationship
+		# 根据正负变色
+		if relationship > 0: _opp_label.modulate = Color(0.4, 0.9, 0.4)
+		elif relationship < 0: _opp_label.modulate = Color(0.9, 0.4, 0.4)
+		else: _opp_label.modulate = Color(0.7, 0.7, 0.7)
 	
 	# 根据立场设置颜色
 	var stance_color: Color = Color(0.5, 0.5, 0.5)
@@ -398,28 +427,65 @@ func _update_proposal_display() -> void:
 		var card_name_text: String = card_data.display_name if card_data.get("display_name") else str(card_data)
 		_name_label.text = card_name_text
 	
+	# 检查是否为纯议题展示（无动作）
+	var is_pure_issue: bool = false
+	if card_data.source_issue != null and card_data.source_action == null:
+		is_pure_issue = true
+		
 	# 显示数值（优先使用方法，兼容旧属性）
 	if _g_label:
-		_g_label.visible = true
-		var g_val: float = 0.0
-		if card_data.has_method("get_g_value"):
-			g_val = card_data.get_g_value()
-		elif card_data.get("g_value") != null:
-			g_val = card_data.g_value
-		elif card_data.source_action and card_data.source_action.get("impact_profit") != null:
-			g_val = card_data.source_action.impact_profit
-		_g_label.text = "P: %+.0f" % g_val
+		if is_pure_issue:
+			_g_label.visible = false
+		else:
+			_g_label.visible = true
+			var g_val: float = 0.0
+			if card_data.has_method("get_g_value"):
+				g_val = card_data.get_g_value()
+			elif card_data.get("g_value") != null:
+				g_val = card_data.g_value
+			elif card_data.source_action and card_data.source_action.get("impact_profit") != null:
+				g_val = card_data.source_action.impact_profit
+			_g_label.text = "P: %+.0f" % g_val
+			
+			# 颜色
+			if g_val > 0: _g_label.modulate = Color(0.4, 0.9, 0.4)
+			elif g_val < 0: _g_label.modulate = Color(0.9, 0.4, 0.4)
+			else: _g_label.modulate = Color(0.7, 0.7, 0.7)
+	
 	
 	if _opp_label:
-		_opp_label.visible = true
-		var r_val: float = 0.0
-		if card_data.has_method("get_p_value"):
-			r_val = card_data.get_p_value()
-		elif card_data.get("opp_value") != null:
-			r_val = card_data.opp_value
-		elif card_data.source_action and card_data.source_action.get("impact_relationship") != null:
-			r_val = card_data.source_action.impact_relationship
-		_opp_label.text = "R: %+.0f" % r_val
+		if is_pure_issue:
+			# 纯议题展示依赖度
+			_opp_label.visible = true
+			var opp_dep: float = 0.0
+			if card_data.source_issue and card_data.source_issue.get("opp_dependency_true"):
+				opp_dep = card_data.source_issue.opp_dependency_true * 100.0
+			_opp_label.text = "OppDep: %.0f%%" % opp_dep
+			_opp_label.modulate = Color(0.9, 0.7, 0.7)
+			
+			# 也显示 MyDep
+			if _g_label:
+				_g_label.visible = true
+				var my_dep: float = 0.0
+				if card_data.source_issue and card_data.source_issue.get("my_dependency"):
+					my_dep = card_data.source_issue.my_dependency * 100.0
+				_g_label.text = "MyDep: %.0f%%" % my_dep
+				_g_label.modulate = Color(0.7, 0.7, 0.9)
+		else:
+			_opp_label.visible = true
+			var r_val: float = 0.0
+			if card_data.has_method("get_p_value"):
+				r_val = card_data.get_p_value()
+			elif card_data.get("opp_value") != null:
+				r_val = card_data.opp_value
+			elif card_data.source_action and card_data.source_action.get("impact_relationship") != null:
+				r_val = card_data.source_action.impact_relationship
+			_opp_label.text = "R: %+.0f" % r_val
+			
+			# 颜色
+			if r_val > 0: _opp_label.modulate = Color(0.4, 0.9, 0.4)
+			elif r_val < 0: _opp_label.modulate = Color(0.9, 0.4, 0.4)
+			else: _opp_label.modulate = Color(0.7, 0.7, 0.7)
 	
 	# 合成卡使用渐变边框表示"叠加"
 	_apply_proposal_style()

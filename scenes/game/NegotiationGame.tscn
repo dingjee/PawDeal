@@ -1,0 +1,177 @@
+[gd_scene format=3 uid="uid://c2negotiation_game"]
+
+[ext_resource type="Script" uid="uid://negotiation_game_script" path="res://scenes/game/NegotiationGame.gd" id="1_main"]
+
+[node name="NegotiationGame" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.08, 0.12, 1)
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = -20.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="StatusBar" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="RoundLabel" type="Label" parent="MainVBox/StatusBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 18
+text = "回合 #0"
+
+[node name="StatusLabel" type="Label" parent="MainVBox/StatusBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 16
+text = "初始化中..."
+
+[node name="EmotionLabel" type="Label" parent="MainVBox/StatusBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+text = "😐 中立"
+horizontal_alignment = 2
+
+[node name="ProposalSection" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ProposalLabel" type="Label" parent="MainVBox/ProposalSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "📋 当前提案区 (双击移除)"
+
+[node name="ProposalPanel" type="PanelContainer" parent="MainVBox/ProposalSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ProposalBG" type="ColorRect" parent="MainVBox/ProposalSection/ProposalPanel"]
+layout_mode = 2
+color = Color(0.15, 0.12, 0.2, 0.8)
+
+[node name="ProposalScroll" type="ScrollContainer" parent="MainVBox/ProposalSection/ProposalPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="ProposalContainer" type="HBoxContainer" parent="MainVBox/ProposalSection/ProposalPanel/ProposalScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="IssueSection" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="IssueLabel" type="Label" parent="MainVBox/IssueSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.9, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+text = "🏷️ 桌面议题 (双击选择)"
+
+[node name="IssuePanel" type="PanelContainer" parent="MainVBox/IssueSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="IssueBG" type="ColorRect" parent="MainVBox/IssueSection/IssuePanel"]
+layout_mode = 2
+color = Color(0.1, 0.15, 0.12, 0.8)
+
+[node name="IssueScroll" type="ScrollContainer" parent="MainVBox/IssueSection/IssuePanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="IssueContainer" type="HBoxContainer" parent="MainVBox/IssueSection/IssuePanel/IssueScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 10
+
+[node name="HandSection" type="VBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.2
+theme_override_constants/separation = 6
+
+[node name="HandLabel" type="Label" parent="MainVBox/HandSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.7, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "🃏 玩家手牌 (双击选择动作)"
+
+[node name="HandPanel" type="PanelContainer" parent="MainVBox/HandSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HandBG" type="ColorRect" parent="MainVBox/HandSection/HandPanel"]
+layout_mode = 2
+color = Color(0.08, 0.1, 0.15, 0.8)
+
+[node name="HandScroll" type="ScrollContainer" parent="MainVBox/HandSection/HandPanel"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 2
+
+[node name="HandContainer" type="HBoxContainer" parent="MainVBox/HandSection/HandPanel/HandScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ButtonBar" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SubmitButton" type="Button" parent="MainVBox/ButtonBar"]
+custom_minimum_size = Vector2(180, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "🤝 提交提案"
+
+[node name="ResetButton" type="Button" parent="MainVBox/ButtonBar"]
+custom_minimum_size = Vector2(140, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🔄 重置"
+
+[node name="NextRoundButton" type="Button" parent="MainVBox/ButtonBar"]
+custom_minimum_size = Vector2(140, 45)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+disabled = true
+text = "⏩ 下一回合"

@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActionCardData" load_steps=2 format=3 uid="uid://g6us_tech_waiver"]
+
+[ext_resource type="Script" uid="uid://bb5epqq7p1qni" path="res://scenes/negotiation/resources/ActionCardData.gd" id="1_action"]
+
+[resource]
+script = ExtResource("1_action")
+action_name = "技术豁免许可"
+negotiact_code = "US-A03"
+tactic_type = 2
+stance = 2
+verb_suffix = "豁免"
+description = "发放特定技术出口许可证。妥协卡：放弃压制换取授权费收入，改善关系。"
+profit_mult = 1.5
+power_mult = 0.2
+cost_mult = 0.0
+has_gapl_modifiers = false
+gapl_modifiers = []
+sentiment_impact = 0.2
+impact_profit = 20.0
+impact_relationship = 25.0
+impact_pressure = -10.0
+fog_of_war = false
+target_reveal = false
+jitter_enabled = false
+jitter_amplitude = 0.0

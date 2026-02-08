@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActionCardData" load_steps=2 format=3 uid="uid://e4us_entity_list"]
+
+[ext_resource type="Script" uid="uid://bb5epqq7p1qni" path="res://scenes/negotiation/resources/ActionCardData.gd" id="1_action"]
+
+[resource]
+script = ExtResource("1_action")
+action_name = "实体清单制裁"
+negotiact_code = "US-A01"
+tactic_type = 4
+stance = 1
+verb_suffix = "制裁令"
+description = "将特定企业/机构列入实体清单，禁止美国技术出口。必杀技：牺牲市场换取极高压制力。"
+profit_mult = 0.0
+power_mult = 2.5
+cost_mult = 0.5
+has_gapl_modifiers = false
+gapl_modifiers = []
+sentiment_impact = -0.3
+impact_profit = 0.0
+impact_relationship = -40.0
+impact_pressure = 25.0
+fog_of_war = false
+target_reveal = false
+jitter_enabled = false
+jitter_amplitude = 0.0

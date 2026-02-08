@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ActionCardData" load_steps=2 format=3 uid="uid://f5us_section_301"]
+
+[ext_resource type="Script" uid="uid://bb5epqq7p1qni" path="res://scenes/negotiation/resources/ActionCardData.gd" id="1_action"]
+
+[resource]
+script = ExtResource("1_action")
+action_name = "长臂管辖关税"
+negotiact_code = "US-A02"
+tactic_type = 4
+stance = 1
+verb_suffix = "关税"
+description = "依据301条款征收惩罚性关税。常规武器：高自损（通胀），但利润和压制力都不错。"
+profit_mult = 1.2
+power_mult = 1.5
+cost_mult = 0.8
+has_gapl_modifiers = false
+gapl_modifiers = []
+sentiment_impact = -0.15
+impact_profit = 15.0
+impact_relationship = -20.0
+impact_pressure = 15.0
+fog_of_war = false
+target_reveal = false
+jitter_enabled = false
+jitter_amplitude = 0.0

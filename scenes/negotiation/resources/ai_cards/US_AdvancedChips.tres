@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IssueCardData" load_steps=2 format=3 uid="uid://b8us_advanced_chips"]
+
+[ext_resource type="Script" uid="uid://dpbpxdnvdqj8e" path="res://scenes/negotiation/resources/IssueCardData.gd" id="1_issue"]
+
+[resource]
+script = ExtResource("1_issue")
+issue_name = "先进制程芯片"
+base_volume = 500.0
+my_dependency = 0.2
+opp_dependency_true = 0.9
+opp_dependency_perceived = -1.0
+is_foggy = true
+tags = ["tech", "security", "chips"]
+description = "7nm以下先进制程芯片及相关制造设备。美方掌握核心技术，对方高度依赖进口/授权。"
+is_core_issue = false

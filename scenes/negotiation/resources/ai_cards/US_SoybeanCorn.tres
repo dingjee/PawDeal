@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IssueCardData" load_steps=2 format=3 uid="uid://c7us_soybean_corn"]
+
+[ext_resource type="Script" uid="uid://dpbpxdnvdqj8e" path="res://scenes/negotiation/resources/IssueCardData.gd" id="1_issue"]
+
+[resource]
+script = ExtResource("1_issue")
+issue_name = "大豆与玉米"
+base_volume = 200.0
+my_dependency = 0.8
+opp_dependency_true = 0.4
+opp_dependency_perceived = -1.0
+is_foggy = true
+tags = ["agriculture", "trade", "export"]
+description = "大豆、玉米等农产品出口。美方农业州依赖出口市场，对方可寻找替代供应源。"
+is_core_issue = false

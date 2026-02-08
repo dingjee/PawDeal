@@ -345,6 +345,139 @@ func evaluate_proposal_with_tactic(
 	return result
 
 
+## ===== AI 主动合成系统 =====
+
+## ProposalSynthesizer 引用（延迟加载）
+const ProposalSynthesizerScript: GDScript = preload("res://scenes/negotiation/scripts/ProposalSynthesizer.gd")
+
+
+## 寻找最佳合成移动
+## 遍历所有可能的 {桌面议题 + AI手牌动作} 组合，找出提升 Total Score 最大的移动
+## @param available_issues: 桌面上的 IssueCardData 列表（未被合成的）
+## @param ai_action_hand: AI 手中持有的 ActionCardData 列表
+## @param current_table_score: 当前桌面的总分（用于计算增量）
+## @param context: 包含 round 等信息
+## @return: 最佳移动字典，包含 score_gain, issue, action, proposal, reason
+func find_best_synthesis_move(
+	available_issues: Array,
+	ai_action_hand: Array,
+	current_table_score: float,
+	context: Dictionary = {}
+) -> Dictionary:
+	var best_move: Dictionary = {
+		"score_gain": - 9999.0,
+		"issue": null,
+		"action": null,
+		"proposal": null,
+		"reason": "",
+		"breakdown": {}
+	}
+	
+	# 遍历桌面所有纯议题（未合成状态）
+	for issue: Resource in available_issues:
+		if issue == null:
+			continue
+		
+		# 确保是 IssueCardData
+		var issue_script_path: String = issue.get_script().resource_path if issue.get_script() else ""
+		if not issue_script_path.ends_with("IssueCardData.gd"):
+			continue
+		
+		# 遍历 AI 手牌
+		for action: Resource in ai_action_hand:
+			if action == null:
+				continue
+			
+			# 验证是否可以合成
+			if not ProposalSynthesizerScript.can_craft(issue, action):
+				continue
+			
+			# 虚拟合成
+			var virtual_proposal: Resource = ProposalSynthesizerScript.craft(issue, action)
+			if virtual_proposal == null:
+				continue
+			
+			# 评估单卡效用
+			var eval_result: Dictionary = evaluate_proposal(virtual_proposal, context)
+			var move_score: float = eval_result["total_score"]
+			
+			# 计算增量收益 (Marginal Utility)
+			var marginal_gain: float = move_score - current_table_score
+			
+			# 选出分数最高的组合
+			if move_score > best_move["score_gain"]:
+				best_move["score_gain"] = move_score
+				best_move["issue"] = issue
+				best_move["action"] = action
+				best_move["proposal"] = virtual_proposal
+				best_move["reason"] = eval_result["reason"]
+				best_move["breakdown"] = eval_result.get("breakdown", {})
+				best_move["marginal_gain"] = marginal_gain
+	
+	# 日志输出
+	if best_move["proposal"] != null:
+		print("[GapLAI] 最佳合成: %s + %s = %s (分数: %.2f)" % [
+			best_move["issue"].issue_name,
+			best_move["action"].action_name,
+			best_move["proposal"].display_name,
+			best_move["score_gain"]
+		])
+	else:
+		print("[GapLAI] 未找到有效的合成组合")
+	
+	return best_move
+
+
+## 批量评估多个合成组合
+## @param available_issues: 议题卡数组
+## @param ai_action_hand: 动作卡数组
+## @param context: 上下文
+## @return: 所有可能组合的评估结果数组（按分数降序排列）
+func evaluate_all_synthesis_options(
+	available_issues: Array,
+	ai_action_hand: Array,
+	context: Dictionary = {}
+) -> Array:
+	var all_options: Array = []
+	
+	for issue: Resource in available_issues:
+		if issue == null:
+			continue
+		
+		var issue_script_path: String = issue.get_script().resource_path if issue.get_script() else ""
+		if not issue_script_path.ends_with("IssueCardData.gd"):
+			continue
+		
+		for action: Resource in ai_action_hand:
+			if action == null:
+				continue
+			
+			if not ProposalSynthesizerScript.can_craft(issue, action):
+				continue
+			
+			var virtual_proposal: Resource = ProposalSynthesizerScript.craft(issue, action)
+			if virtual_proposal == null:
+				continue
+			
+			var eval_result: Dictionary = evaluate_proposal(virtual_proposal, context)
+			
+			all_options.append({
+				"issue": issue,
+				"action": action,
+				"proposal": virtual_proposal,
+				"score": eval_result["total_score"],
+				"accepted": eval_result["accepted"],
+				"reason": eval_result["reason"]
+			})
+	
+	# 按分数降序排列
+	all_options.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return a["score"] > b["score"]
+	)
+	
+	return all_options
+
+
 ## ===== AI 反提案生成 =====
 
 ## 生成 AI 反提案

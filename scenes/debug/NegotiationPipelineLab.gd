@@ -22,6 +22,8 @@ const DraggableCardScene: PackedScene = preload("res://scenes/negotiation/scenes
 const IssueCardDataScript: GDScript = preload("res://scenes/negotiation/resources/IssueCardData.gd")
 const ActionCardDataScript: GDScript = preload("res://scenes/negotiation/resources/ActionCardData.gd")
 const ProposalCardDataScript: GDScript = preload("res://scenes/negotiation/resources/ProposalCardData.gd")
+const GapLAIScript: GDScript = preload("res://scenes/gap_l_mvp/scripts/GapLAI.gd")
+const ProposalSynthesizerScript: GDScript = preload("res://scenes/negotiation/scripts/ProposalSynthesizer.gd")
 
 
 ## ===== 节点引用：左侧调试面板 =====
@@ -61,6 +63,7 @@ const ProposalCardDataScript: GDScript = preload("res://scenes/negotiation/resou
 # 按钮
 @onready var submit_button: Button = $MainHBox/GamePanel/GameVBox/SubmitSection/SubmitButton
 @onready var reset_button: Button = $MainHBox/GamePanel/GameVBox/SubmitSection/ResetButton
+@onready var ai_synthesis_button: Button = $MainHBox/GamePanel/GameVBox/SubmitSection/AISynthesisButton
 
 # 可用提案牌库（预生成的合成牌）
 @onready var proposal_card_container: HBoxContainer = $MainHBox/GamePanel/GameVBox/ProposalCardSection/ProposalCardPanel/ProposalCardScroll/ProposalCardContainer
@@ -85,21 +88,37 @@ var _force_multiplier_active: float = 1.0
 ## 当前提案区的牌
 var _active_proposals: Array[Resource] = []
 
+## ===== AI 主动合成系统 =====
+
+## GapLAI 实例（用于评估合成提案）
+var gap_l_ai: RefCounted = null
+
+## AI 手牌：议题卡（桌面上可用的）
+var ai_issue_hand: Array[Resource] = []
+
+## AI 手牌：动作卡（可重复使用）
+var ai_action_hand: Array[Resource] = []
+
 
 ## ===== 生命周期 =====
 
 func _ready() -> void:
 	_init_agent()
+	_init_gap_l_ai()
+	_init_ai_hand()
 	_connect_signals()
 	_sync_ui_from_agent()
 	_update_status_display()
 	_spawn_proposal_cards()
 	_spawn_action_cards()
+	_spawn_ai_issue_cards()
 	
 	vector_plot.set_engine(agent.engine)
-	print("[PipelineLab] 初始化完成，提案牌: %d, 动作卡: %d" % [
+	print("[PipelineLab] 初始化完成，提案牌: %d, 动作卡: %d, AI议题: %d, AI动作: %d" % [
 		proposal_card_container.get_child_count(),
-		action_card_container.get_child_count()
+		action_card_container.get_child_count(),
+		ai_issue_hand.size(),
+		ai_action_hand.size()
 	])
 
 
@@ -139,6 +158,58 @@ func _init_agent() -> void:
 	agent = NegotiationAgentScript.new()
 	agent.configure_personality(Vector2(80.0, 100.0), 1.0, 40.0)
 	print("[PipelineLab] Negotiation Agent 初始化完成")
+
+
+## 初始化 GapLAI 实例（用于评估合成提案）
+func _init_gap_l_ai() -> void:
+	gap_l_ai = GapLAIScript.new()
+	# 配置为美方立场：中等嫉妒性格，较高底线
+	gap_l_ai.strategy_factor = -0.3 # 略微嫉妒型
+	gap_l_ai.base_batna = 10.0 # 中等底线
+	print("[PipelineLab] GapLAI 初始化完成 (SF=%.2f, BATNA=%.2f)" % [
+		gap_l_ai.strategy_factor, gap_l_ai.base_batna
+	])
+
+
+## 初始化 AI 手牌（加载美方专属卡牌）
+func _init_ai_hand() -> void:
+	# 清空现有手牌
+	ai_issue_hand.clear()
+	ai_action_hand.clear()
+	
+	# 加载美方议题卡
+	var issue_paths: Array[String] = [
+		"res://scenes/negotiation/resources/ai_cards/US_AdvancedChips.tres",
+		"res://scenes/negotiation/resources/ai_cards/US_SoybeanCorn.tres",
+		"res://scenes/negotiation/resources/ai_cards/US_CloudData.tres",
+	]
+	
+	for path: String in issue_paths:
+		var issue: Resource = load(path)
+		if issue != null:
+			ai_issue_hand.append(issue)
+			print("[PipelineLab] 加载 AI 议题: %s" % issue.issue_name)
+		else:
+			push_warning("[PipelineLab] 无法加载议题卡: %s" % path)
+	
+	# 加载美方动作卡
+	var action_paths: Array[String] = [
+		"res://scenes/negotiation/resources/ai_cards/US_EntityListBan.tres",
+		"res://scenes/negotiation/resources/ai_cards/US_Section301.tres",
+		"res://scenes/negotiation/resources/ai_cards/US_TechWaiver.tres",
+	]
+	
+	for path: String in action_paths:
+		var action: Resource = load(path)
+		if action != null:
+			ai_action_hand.append(action)
+			print("[PipelineLab] 加载 AI 动作: %s" % action.action_name)
+		else:
+			push_warning("[PipelineLab] 无法加载动作卡: %s" % path)
+	
+	print("[PipelineLab] AI 手牌加载完成: %d 议题, %d 动作" % [
+		ai_issue_hand.size(), ai_action_hand.size()
+	])
 
 
 func _connect_signals() -> void:
@@ -181,6 +252,7 @@ func _connect_signals() -> void:
 	# 按钮信号
 	submit_button.pressed.connect(_on_submit_pressed)
 	reset_button.pressed.connect(_on_reset_pressed)
+	ai_synthesis_button.pressed.connect(demonstrate_ai_synthesis)
 	
 	# Agent 信号
 	agent.impatience_counter_offer.connect(_on_impatience_triggered)
@@ -389,7 +461,106 @@ func _spawn_action_cards() -> void:
 		card_ui.card_double_clicked.connect(_on_action_card_double_clicked.bind(modified_card))
 
 
+## ===== AI 议题卡生成 =====
+
+## 在提案牌库中生成 AI 议题卡（用于演示 AI 主动合成）
+func _spawn_ai_issue_cards() -> void:
+	# 将 AI 议题卡添加到提案区（作为可被合成的素材）
+	for issue: Resource in ai_issue_hand:
+		var card_ui: Control = DraggableCardScene.instantiate()
+		proposal_card_container.add_child(card_ui)
+		
+		# 创建一个简单的提案牌来展示议题
+		var display_proposal: Resource = ProposalCardDataScript.new()
+		display_proposal.display_name = "📋 " + issue.issue_name
+		display_proposal.stance = ActionCardDataScript.Stance.NEUTRAL
+		display_proposal.source_issue = issue
+		display_proposal.source_action = null
+		
+		card_ui.set_as_proposal(display_proposal)
+		card_ui.custom_minimum_size = Vector2(80, 105)
+		
+		# 双击时触发 AI 合成演示
+		card_ui.card_double_clicked.connect(_on_ai_issue_double_clicked.bind(issue))
+
+
+## 处理 AI 议题卡双击：演示 AI 主动合成
+func _on_ai_issue_double_clicked(_card_ui: Control, issue: Resource) -> void:
+	_append_log_entry("[color=cyan]🤖 AI 正在分析议题: %s[/color]" % issue.issue_name)
+	
+	# 使用 GapLAI 寻找最佳合成
+	var best_move: Dictionary = gap_l_ai.find_best_synthesis_move(
+		[issue], # 只提供这一个议题
+		ai_action_hand, # 所有 AI 动作卡
+		0.0, # 当前桌面分数（假设为 0）
+		{"round": current_round}
+	)
+	
+	if best_move["proposal"] != null:
+		var proposal: Resource = best_move["proposal"]
+		
+		# 应用到物理引擎
+		_apply_proposal_effect(proposal)
+		
+		# 添加到当前提案区
+		_active_proposals.append(proposal)
+		_refresh_proposal_display()
+		
+		# 日志
+		_append_log_entry("[color=lime]🤖 AI 合成提案: %s[/color]" % proposal.display_name)
+		_append_log_entry("[color=gray]   动作: %s | 分数: %.2f[/color]" % [
+			best_move["action"].action_name, best_move["score_gain"]
+		])
+		_append_log_entry("[color=gray]   理由: %s[/color]" % best_move["reason"])
+		
+		# 屏幕闪烁
+		_play_card_flash(best_move["action"])
+	else:
+		_append_log_entry("[color=orange]🤖 AI 未找到合适的合成方案[/color]")
+
+
+## ===== AI 主动合成演示 =====
+
+## 演示 AI 评估所有可能的合成组合
+func demonstrate_ai_synthesis() -> void:
+	_append_log_entry("[color=yellow]═══ AI 合成分析开始 ═══[/color]")
+	
+	# 评估所有组合
+	var all_options: Array = gap_l_ai.evaluate_all_synthesis_options(
+		ai_issue_hand,
+		ai_action_hand,
+		{"round": current_round}
+	)
+	
+	if all_options.is_empty():
+		_append_log_entry("[color=red]❌ 无可用的合成组合[/color]")
+		return
+	
+	# 显示所有选项（最多前 5 个）
+	var count: int = 0
+	for option: Dictionary in all_options:
+		if count >= 5:
+			break
+		
+		var emoji: String = "✅" if option["accepted"] else "❌"
+		_append_log_entry("[color=white]%s %s + %s = %.2f[/color]" % [
+			emoji,
+			option["issue"].issue_name,
+			option["action"].action_name,
+			option["score"]
+		])
+		count += 1
+	
+	# 自动选择最佳选项
+	if all_options.size() > 0:
+		var best: Dictionary = all_options[0]
+		_append_log_entry("[color=lime]🏆 最佳选择: %s (%.2f)[/color]" % [
+			best["proposal"].display_name, best["score"]
+		])
+
+
 ## ===== 卡牌交互 =====
+
 
 ## 处理提案牌双击：添加到当前提案区
 func _on_proposal_card_double_clicked(card_ui: Control, proposal: Resource) -> void:

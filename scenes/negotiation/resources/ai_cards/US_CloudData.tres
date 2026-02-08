@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="IssueCardData" load_steps=2 format=3 uid="uid://d2us_cloud_data"]
+
+[ext_resource type="Script" uid="uid://dpbpxdnvdqj8e" path="res://scenes/negotiation/resources/IssueCardData.gd" id="1_issue"]
+
+[resource]
+script = ExtResource("1_issue")
+issue_name = "云服务数据"
+base_volume = 300.0
+my_dependency = 0.1
+opp_dependency_true = 0.6
+opp_dependency_perceived = -1.0
+is_foggy = true
+tags = ["tech", "security", "data"]
+description = "云计算服务及跨境数据流动。涉及数据安全与隐私，美方倾向于封锁。"
+is_core_issue = false
