@@ -177,6 +177,7 @@ GAME_END        - 游戏结束
 | 2026-02-08 | **AI 主动合成系统** | 实现 AI 主动合成/修改提案能力。**新增资源**：`scenes/negotiation/resources/ai_cards/` 目录，包含 3 张美方议题卡（先进制程芯片/大豆与玉米/云服务数据）和 3 张美方动作卡（实体清单制裁/长臂管辖关税/技术豁免许可）。**GapLAI 扩展**：新增 `find_best_synthesis_move()` 和 `evaluate_all_synthesis_options()` 方法，遍历 {议题×动作} 组合进行虚拟合成评估。**Lab 集成**：AI 手牌管理 (`ai_issue_hand`, `ai_action_hand`)，支持双击 AI 议题卡触发 AI 合成演示，新增"AI 合成分析"按钮展示所有组合评分。**设计决策**：动作卡可重复使用，提案牌唯一；美方立场使用高 Power/高 Cost 的"霸权卡"设计。|
 | 2026-02-09 | **PhysicsState Bug 修复** | 修复 `NegotiationGame.gd` 中因使用错误 key 名称导致的崩溃。`PhysicsState.to_dict()` 返回的是 `force_magnitude` 和 `is_acceptable`，而非 `correction_magnitude` 和 `effective_threshold`。|
 | 2026-02-09 | **两段式卡牌选择机制** | 实现 Option A 交互方案。**流程**：1) 双击议题卡选中（金色高亮+1.05倍放大）；2) 双击动作卡与选中议题合成提案；3) 若无选中议题直接点动作卡，显示提示"⚠️ 请先双击选择一个议题卡！"。**新增变量**：`selected_issue`、`issue_card_map`、`action_card_map`。**新增函数**：`_select_issue()`、`_deselect_issue()`、`_set_card_highlight()`。重置时自动清除选中状态。|
+| 2026-02-09 | **三层合成系统 V2** | **全面重构为 Context-Leverage-Action 架构**。**原料层 (Info)**: `InfoCardData.gd` 携带事实标签和环境变量贡献。**转化层 (Power)**: `PowerTemplateData.gd` 使用 Godot Expression 动态公式计算 `power_value`/`cost_value`。**执行层 (Action)**: `ActionTemplateData.gd` 定义插槽数量和合成模式(SUM/MAX/AVERAGE)。**中间产物**: `LeverageData.gd` 携带计算结果。**最终输出**: `OfferData.gd` 提供 AI 接口 `to_ai_interface()`。**核心引擎**: `SynthesisCalculator.gd` 使用 Expression 类解析公式。**流程管理**: `CardSynthesisManager.gd` 状态机 + 重复防护 + BATNA 衰减。**测试**: 21/21 通过。|
 
 ---
 
@@ -362,4 +363,81 @@ scenes/negotiation/                     # 谈判系统主目录
 | Socio-emotional | S7 |
 | Unethical | S8 |
 | Process-related | S9 |
+
+### C. 三层合成系统 V2 (Card Synthesis V2)
+
+> **创建日期**: 2026-02-09 | **状态**: ✅ 核心完成
+
+#### 架构概览
+
+```
+┌─────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  InfoCard   │ ──► │  PowerTemplate   │ ──► │  ActionTemplate  │
+│  (Context)  │     │   (Leverage)     │     │    (Offer)       │
+└─────────────┘     └──────────────────┘     └──────────────────┘
+      │                      │                        │
+      ▼                      ▼                        ▼
+  环境变量贡献          Expression 公式           合成模式
+  (variable_contributions)  (formula_power/cost)    (SUM/MAX/AVG)
+```
+
+#### 资源类
+
+| 类名 | 路径 | 职责 |
+|------|------|------|
+| `InfoCardData` | `resources/InfoCardData.gd` | 原料层：事实/情报卡牌，贡献环境变量 |
+| `PowerTemplateData` | `resources/PowerTemplateData.gd` | 转化层：权势模板，定义动态公式 |
+| `LeverageData` | `resources/LeverageData.gd` | 中间产物：计算后的筹码 |
+| `ActionTemplateData` | `resources/ActionTemplateData.gd` | 执行层：提案封装器 |
+| `OfferData` | `resources/OfferData.gd` | 最终输出：AI 评估接口 |
+
+#### 核心组件
+
+| 类名 | 路径 | 职责 |
+|------|------|------|
+| `SynthesisCalculator` | `scripts/SynthesisCalculator.gd` | 使用 Godot Expression 解析动态公式 |
+| `CardSynthesisManager` | `scripts/CardSynthesisManager.gd` | 状态机 + 重复防护 + BATNA 衰减 |
+| `GlobalSignalBus` | `globals/GlobalSignalBus.gd` | 拖拽事件/合成事件广播 |
+| `SampleCards` | `scripts/SampleCards.gd` | 示例卡牌工厂 |
+
+#### 状态机
+
+```
+IDLE → DRAGGING_INFO → SYNTHESIZED_LEVERAGE → DRAGGING_LEVERAGE → COMPLETED
+                ↓                                      ↓
+           cancel_drag()                          cancel_drag()
+                ↓                                      ↓
+              IDLE                           SYNTHESIZED_LEVERAGE
+```
+
+#### 公式示例
+
+```yaml
+# PowerTemplate 公式配置
+formula_power: "dep_oppo * 1.5 + trade_deficit * 0.1"
+formula_cost: "dep_self * 0.5"
+
+# 环境变量来源
+# 1. SynthesisCalculator.create_default_environment()
+# 2. InfoCard.variable_contributions
+# 3. CardSynthesisManager.global_environment
+```
+
+#### AI 接口 (OfferData.to_ai_interface())
+
+```gdscript
+{
+    "total_power": float,      # 总威力分
+    "sentiment": String,       # "Hostile" / "Cooperative" / "Neutral"
+    "action_type": String,     # ActionTemplate 名称
+    "tags": Array[String],     # 语义标签
+    "cost_to_player": float    # 玩家代价
+}
+```
+
+#### 测试覆盖
+
+| 测试文件 | 用例数 |
+|----------|--------|
+| `tests/scripts/test_synthesis_v2_runner.gd` | 21 |
 

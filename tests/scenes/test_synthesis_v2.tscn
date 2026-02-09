@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://byvmfnxq5k7oh"]
+
+[ext_resource type="Script" path="res://tests/scripts/test_synthesis_v2_runner.gd" id="1_runner"]
+
+[node name="TestSynthesisV2" type="Node"]
+script = ExtResource("1_runner")
