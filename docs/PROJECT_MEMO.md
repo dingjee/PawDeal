@@ -175,6 +175,8 @@ GAME_END        - 游戏结束
 | 2026-02-05 | **PipelineLab Card UI** | 升级 **NegotiationPipelineLab** 为卡牌测试台。**布局**：VBoxContainer 根节点，上部 DebugDashboard(70%)，下部 CardDeckPanel(30%) 含可滚动卡牌库。**交互**：双击卡牌激活→调用 CardLibrary.apply_card_effect()→即时更新向量图。**场扭曲可视化**：VectorFieldPlot 新增 fog_of_war(隐藏目标点)、jitter(抖动效果)、target_revealed(金色高亮)。**状态追踪**：force_multiplier 持久化，成交/重置时清除。|
 | 2026-02-06 | **PipelineLab Option A 布局** | 重构为 **两栏布局**：左=调试面板（AI配置滑块+向量场+物理状态+决策日志），右=游戏模拟区（提案放置区+预定义提案牌库+动作卡库）。**预定义提案牌**：8张模拟牌（降低关税、增加投资、购买国债、开放农产品、技术保护、半导体豁免、报复关税、稀土限制），支持双击添加到提案区，再双击移除。**物理联动**：每张提案牌携带 impact_profit/impact_relationship，添加/移除时实时更新向量图。|
 | 2026-02-08 | **AI 主动合成系统** | 实现 AI 主动合成/修改提案能力。**新增资源**：`scenes/negotiation/resources/ai_cards/` 目录，包含 3 张美方议题卡（先进制程芯片/大豆与玉米/云服务数据）和 3 张美方动作卡（实体清单制裁/长臂管辖关税/技术豁免许可）。**GapLAI 扩展**：新增 `find_best_synthesis_move()` 和 `evaluate_all_synthesis_options()` 方法，遍历 {议题×动作} 组合进行虚拟合成评估。**Lab 集成**：AI 手牌管理 (`ai_issue_hand`, `ai_action_hand`)，支持双击 AI 议题卡触发 AI 合成演示，新增"AI 合成分析"按钮展示所有组合评分。**设计决策**：动作卡可重复使用，提案牌唯一；美方立场使用高 Power/高 Cost 的"霸权卡"设计。|
+| 2026-02-09 | **PhysicsState Bug 修复** | 修复 `NegotiationGame.gd` 中因使用错误 key 名称导致的崩溃。`PhysicsState.to_dict()` 返回的是 `force_magnitude` 和 `is_acceptable`，而非 `correction_magnitude` 和 `effective_threshold`。|
+| 2026-02-09 | **两段式卡牌选择机制** | 实现 Option A 交互方案。**流程**：1) 双击议题卡选中（金色高亮+1.05倍放大）；2) 双击动作卡与选中议题合成提案；3) 若无选中议题直接点动作卡，显示提示"⚠️ 请先双击选择一个议题卡！"。**新增变量**：`selected_issue`、`issue_card_map`、`action_card_map`。**新增函数**：`_select_issue()`、`_deselect_issue()`、`_set_card_highlight()`。重置时自动清除选中状态。|
 
 ---
 

@@ -86,6 +86,15 @@ var current_offer: Vector2 = Vector2(50, 50) # (R, P)
 ## AI 最后的反提案
 var ai_counter_proposal: Resource = null
 
+## 当前选中的议题卡 (两段式选择)
+var selected_issue: Resource = null
+
+## 议题 -> UI 卡牌的映射 (用于高亮显示)
+var issue_card_map: Dictionary = {}
+
+## 动作 -> UI 卡牌的映射
+var action_card_map: Dictionary = {}
+
 
 ## ===== 生命周期 =====
 
@@ -159,6 +168,9 @@ func _connect_signals() -> void:
 
 
 func _spawn_cards() -> void:
+	issue_card_map.clear()
+	action_card_map.clear()
+	
 	# 生成议题卡 UI
 	for issue: Resource in table_issues:
 		var card_ui: Control = DraggableCardScene.instantiate()
@@ -172,7 +184,10 @@ func _spawn_cards() -> void:
 		
 		card_ui.set_as_proposal(display)
 		card_ui.custom_minimum_size = Vector2(90, 120)
-		card_ui.card_double_clicked.connect(_on_issue_double_clicked.bind(issue))
+		# 使用双击来选中议题（两段式第一步）
+		card_ui.card_double_clicked.connect(_on_issue_clicked.bind(issue))
+		# 保存映射
+		issue_card_map[issue] = card_ui
 	
 	# 生成玩家手牌 UI
 	for action: Resource in player_hand:
@@ -180,7 +195,10 @@ func _spawn_cards() -> void:
 		hand_container.add_child(card_ui)
 		card_ui.set_as_action(action)
 		card_ui.custom_minimum_size = Vector2(80, 110)
-		card_ui.card_double_clicked.connect(_on_action_double_clicked.bind(action))
+		# 使用双击来应用动作（两段式第二步）
+		card_ui.card_double_clicked.connect(_on_action_clicked.bind(action))
+		# 保存映射
+		action_card_map[action] = card_ui
 
 
 ## ===== 状态机 =====
@@ -295,8 +313,8 @@ func _ai_evaluate_proposal() -> void:
 	
 	print("[AI] 物理引擎评估结果:")
 	print("  - Target: (%.1f, %.1f)" % [agent.engine.target_point.x, agent.engine.target_point.y])
-	print("  - 校正向量长度: %.2f" % result["physics"]["correction_magnitude"])
-	print("  - 有效阈值: %.2f" % result["physics"]["effective_threshold"])
+	print("  - 修正力大小: %.2f" % result["physics"]["force_magnitude"])
+	print("  - 压力水平: %.2f, 可接受: %s" % [result["physics"]["pressure_level"], result["physics"]["is_acceptable"]])
 	print("  - 决策: %s" % result["intent"])
 	print("  - 理由: %s" % result["response_text"])
 	
@@ -331,10 +349,8 @@ func _ai_generate_counter() -> void:
 		print("  - 评分: %.2f" % best_move["score_gain"])
 		print("  - 理由: %s" % best_move["reason"])
 		
-		# 添加到提案区 (替换玩家提案)
-		_clear_proposals()
-		active_proposals.append(ai_counter_proposal)
-		_refresh_proposal_display()
+		# 显示对比：玩家提案(淡化) + AI反提案(高亮)
+		_refresh_proposal_display_with_counter()
 		
 		# 计算 AI 提案的物理效果
 		var action: Resource = best_move["action"]
@@ -346,31 +362,62 @@ func _ai_generate_counter() -> void:
 			current_offer.x, current_offer.y
 		])
 		
+		# 更新状态栏显示 AI 反提案详情
+		status_label.text = "🤖 AI 反提案: %s (议题: %s + 动作: %s)" % [
+			ai_counter_proposal.display_name,
+			best_move["issue"].issue_name,
+			best_move["action"].action_name
+		]
+		
 		_change_state(GameState.PLAYER_EVALUATE)
 	else:
 		print("[AI] 无法生成有效反提案，维持现状")
+		status_label.text = "🤔 AI 无法提出更优方案..."
 		_change_state(GameState.ROUND_END)
 
 
-## ===== 玩家交互 =====
+## ===== 玩家交互 (两段式选择) =====
 
-func _on_issue_double_clicked(_card_ui: Control, issue: Resource) -> void:
+## 第一步：双击议题卡进行选中
+func _on_issue_clicked(_card_ui: Control, issue: Resource) -> void:
 	if current_state != GameState.PLAYER_TURN:
 		print("[Game] 非玩家回合，忽略操作")
 		return
 	
-	# 使用玩家第一张手牌进行合成 (简化版)
-	if player_hand.is_empty():
-		print("[Game] 玩家无手牌，无法合成")
+	# 如果点击的是已选中的议题，取消选中
+	if selected_issue == issue:
+		_deselect_issue()
+		print("[Player] 取消选中议题: %s" % issue.issue_name)
+		status_label.text = "🎮 你的回合 - 双击选择议题"
 		return
 	
-	# 找一张尚未使用的动作卡
-	var action: Resource = player_hand[0] # 简化：用第一张
+	# 选中新议题
+	_select_issue(issue)
+	print("[Player] 选中议题: %s → 请双击一张动作卡合成提案" % issue.issue_name)
+	status_label.text = "🎯 已选中 [%s] - 双击动作卡合成提案" % issue.issue_name
+
+
+## 第二步：双击动作卡进行合成
+func _on_action_clicked(_card_ui: Control, action: Resource) -> void:
+	if current_state != GameState.PLAYER_TURN:
+		print("[Game] 非玩家回合，忽略操作")
+		return
+	
+	# 检查是否已选中议题
+	if selected_issue == null:
+		print("[Game] ⚠️ 请先双击选择一个议题卡！")
+		status_label.text = "⚠️ 请先双击选择一个议题卡！"
+		return
+	
+	# 使用选中的议题进行合成
+	var issue: Resource = selected_issue
 	
 	if not ProposalSynthesizerScript.can_craft(issue, action):
 		print("[Game] 无法合成: %s + %s" % [issue.issue_name, action.action_name])
+		status_label.text = "❌ 无法合成 %s + %s" % [issue.issue_name, action.action_name]
 		return
 	
+	# 合成提案
 	var proposal: Resource = ProposalSynthesizerScript.craft(issue, action)
 	active_proposals.append(proposal)
 	_refresh_proposal_display()
@@ -381,31 +428,51 @@ func _on_issue_double_clicked(_card_ui: Control, issue: Resource) -> void:
 	print("[Player] 提案效果: G=%.2f, P=%.2f" % [
 		proposal.get_g_value(), proposal.get_p_value()
 	])
+	
+	# 合成后取消选中
+	_deselect_issue()
+	status_label.text = "✅ 已合成 [%s] - 继续选择或提交" % proposal.display_name
 
 
-func _on_action_double_clicked(_card_ui: Control, action: Resource) -> void:
-	if current_state != GameState.PLAYER_TURN:
-		print("[Game] 非玩家回合，忽略操作")
+## ===== 选中状态管理 =====
+
+## 选中议题卡
+func _select_issue(issue: Resource) -> void:
+	# 先取消之前的选中
+	if selected_issue != null:
+		_deselect_issue()
+	
+	selected_issue = issue
+	
+	# 高亮显示
+	var card_ui: Control = issue_card_map.get(issue)
+	if card_ui:
+		_set_card_highlight(card_ui, true)
+
+
+## 取消选中
+func _deselect_issue() -> void:
+	if selected_issue == null:
 		return
 	
-	# 使用第一个议题进行合成
-	if table_issues.is_empty():
-		print("[Game] 无桌面议题")
-		return
+	# 移除高亮
+	var card_ui: Control = issue_card_map.get(selected_issue)
+	if card_ui:
+		_set_card_highlight(card_ui, false)
 	
-	var issue: Resource = table_issues[0]
-	
-	if not ProposalSynthesizerScript.can_craft(issue, action):
-		print("[Game] 无法合成")
-		return
-	
-	var proposal: Resource = ProposalSynthesizerScript.craft(issue, action)
-	active_proposals.append(proposal)
-	_refresh_proposal_display()
-	
-	print("[Player] 合成提案: %s + %s = %s" % [
-		issue.issue_name, action.action_name, proposal.display_name
-	])
+	selected_issue = null
+
+
+## 设置卡牌高亮效果
+func _set_card_highlight(card_ui: Control, highlighted: bool) -> void:
+	if highlighted:
+		# 金色边框 + 轻微放大
+		card_ui.modulate = Color(1.2, 1.1, 0.8)
+		card_ui.scale = Vector2(1.05, 1.05)
+	else:
+		# 恢复正常
+		card_ui.modulate = Color.WHITE
+		card_ui.scale = Vector2.ONE
 
 
 func _on_submit_pressed() -> void:
@@ -429,8 +496,10 @@ func _on_reset_pressed() -> void:
 	match current_state:
 		GameState.PLAYER_TURN:
 			_clear_proposals()
+			_deselect_issue()
 			current_offer = Vector2(50, 50)
 			print("[Player] 重置提案区")
+			status_label.text = "🎮 你的回合 - 双击选择议题"
 		
 		GameState.PLAYER_EVALUATE:
 			# 玩家拒绝反提案，修改自己的提案
@@ -465,6 +534,54 @@ func _refresh_proposal_display() -> void:
 		card_ui.set_as_proposal(proposal)
 		card_ui.custom_minimum_size = Vector2(85, 115)
 		card_ui.card_double_clicked.connect(_on_proposal_double_clicked.bind(proposal))
+
+
+## 显示对比模式：玩家提案(淡化) + AI反提案(高亮)
+func _refresh_proposal_display_with_counter() -> void:
+	# 清空提案区 UI
+	for child: Node in proposal_container.get_children():
+		child.queue_free()
+	
+	# 1. 显示玩家原提案 (淡化 + 删除线效果)
+	if not active_proposals.is_empty():
+		# 添加分隔标签
+		var player_label: Label = Label.new()
+		player_label.text = "❌ 你的提案 (已拒绝)"
+		player_label.add_theme_color_override("font_color", Color(0.6, 0.4, 0.4))
+		player_label.add_theme_font_size_override("font_size", 12)
+		proposal_container.add_child(player_label)
+		
+		for proposal: Resource in active_proposals:
+			var card_ui: Control = DraggableCardScene.instantiate()
+			proposal_container.add_child(card_ui)
+			card_ui.set_as_proposal(proposal)
+			card_ui.custom_minimum_size = Vector2(75, 100)
+			# 淡化效果
+			card_ui.modulate = Color(0.5, 0.5, 0.5, 0.7)
+	
+	# 2. 添加箭头分隔符
+	var arrow_label: Label = Label.new()
+	arrow_label.text = "  ➜  "
+	arrow_label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.3))
+	arrow_label.add_theme_font_size_override("font_size", 24)
+	proposal_container.add_child(arrow_label)
+	
+	# 3. 显示 AI 反提案 (高亮 + 红色边框)
+	if ai_counter_proposal != null:
+		# 添加分隔标签
+		var ai_label: Label = Label.new()
+		ai_label.text = "🤖 AI 反提案"
+		ai_label.add_theme_color_override("font_color", Color(1.0, 0.6, 0.3))
+		ai_label.add_theme_font_size_override("font_size", 12)
+		proposal_container.add_child(ai_label)
+		
+		var card_ui: Control = DraggableCardScene.instantiate()
+		proposal_container.add_child(card_ui)
+		card_ui.set_as_proposal(ai_counter_proposal)
+		card_ui.custom_minimum_size = Vector2(95, 125)
+		# 高亮效果 (金橙色)
+		card_ui.modulate = Color(1.3, 1.0, 0.7)
+		card_ui.scale = Vector2(1.08, 1.08)
 
 
 func _on_proposal_double_clicked(_card_ui: Control, proposal: Resource) -> void:
